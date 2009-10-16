@@ -1,16 +1,24 @@
 <?php
 /**
-* @version $Id$
-* @package CMSBrick
-* @copyright Copyright (C) 2008 CMSBrick. All rights reserved.
-* @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
-*/
-
-global $cms;
+ * Модуль "Менеджер файлов"
+ * 
+ * @version $Id$
+ * @package CMSBrick
+ * @subpackage FileManager
+ * @copyright Copyright (C) 2008 CMSBrick. All rights reserved.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
+ * @author Alexander Kuzmin (roosit@cmsbrick.ru)
+ */
 
 $mod = new CMSModuleFileManager();
-$cms->modules->Register($mod);
+CMSRegistry::$instance->modules->Register($mod);
 
+/**
+ * Модуль "Менеджер файлов"
+ * 
+ * @package CMSBrick
+ * @subpackage FileManager
+ */
 class CMSModuleFileManager extends CMSModule {
 	
 	/**
@@ -57,6 +65,12 @@ class CMSModuleFileManager extends CMSModule {
 	}
 }
 
+/**
+ * Статичные функции работы с модулем
+ * 
+ * @package CMSBrick
+ * @subpackage FileManager
+ */
 class CMSFileManagerMan {
 	
 	public static function IsAdmin(){ return CMSRegistry::$instance->session->IsAdminMode(); }
@@ -181,6 +195,12 @@ class CMSFileManagerMan {
 	
 }
 
+/**
+ * Статичные функции запросов к базе данных
+ * 
+ * @package CMSBrick
+ * @subpackage FileManager
+ */
 class CMSQFileManager extends CMSBaseClass {
 	
 	/**

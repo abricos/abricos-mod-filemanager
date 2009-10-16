@@ -1,14 +1,23 @@
 <?php
 /**
-* @version $Id$
-* @package CMSBrick
-* @copyright Copyright (C) 2008 CMSBrick. All rights reserved.
-* @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
-*/
+ * @version $Id$
+ * @package CMSBrick
+ * @subpackage FileManager
+ * @copyright Copyright (C) 2008 CMSBrick. All rights reserved.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
+ * @author Alexander Kuzmin (roosit@cmsbrick.ru)
+ */
 
-class CMSUpload extends CMSBaseClass {
+/**
+ * Загрузчик файлов в базу данных
+ * 
+ * @package CMSBrick
+ * @subpackage FileManager
+ */
+class CMSUpload {
 	
 	/**
+	 * Ядро
 	 * @var CMSRegistry
 	 */
 	public $registry = null;
@@ -16,7 +25,7 @@ class CMSUpload extends CMSBaseClass {
 	public $userGroupLimit = array();
 	public $lastLoadFileHash = "";
 	
-	public function __construct(CMSRegistry $registry){
+	public function CMSUpload(CMSRegistry $registry){
 		$this->registry = $registry;
 		
 		$rows = CMSQFileManager::FileTypeList($this->registry->db);
