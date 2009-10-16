@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: js_data.php 10 2009-08-29 13:29:01Z roosit $
+* @version $Id$
 * @package CMSBrick
 * @copyright Copyright (C) 2008 CMSBrick. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

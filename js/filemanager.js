@@ -1,5 +1,5 @@
 /**
-* @version $Id: filemanager.js 11 2009-09-20 12:03:11Z roosit $
+* @version $Id$
 * @package CMSBrick
 * @copyright Copyright (C) 2008 CMSBrick. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

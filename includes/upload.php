@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: upload.php 6 2009-06-30 08:49:20Z roosit $
+* @version $Id$
 * @package CMSBrick
 * @copyright Copyright (C) 2008 CMSBrick. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
