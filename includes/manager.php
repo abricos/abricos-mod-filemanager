@@ -166,10 +166,11 @@ class FileManager {
 	 * 6 - нет прав на выгрузку файла,
 	 * 7 - файл с таким именем уже есть в этой папке
 	 * 
+	 * @param $folderid идентификатор папки
 	 * @param $fileinfo
-	 * @param $system если true, файл является системным и виден всем администраторам 
+	 * @param $newNameIfFind Назначить новое имя, если файл с таким именем уже есть в папке
 	 */
-	public function UploadFiles($folderid, $fileinfo){
+	public function UploadFiles($folderid, $fileinfo, $newNameIfFind = false){
 		
 		if (!$this->IsFileUploadRole()){
 			return 6;
@@ -182,16 +183,18 @@ class FileManager {
 		}
 		
 		$filename = trim($fileinfo['name']);
+		$pathinfo = pathinfo($filename);
+		$extension = strtolower($pathinfo['extension']);
 		
 		$dbFileInfo = CMSQFileManager::FileInfoByName($this->db, $this->user['userid'], $folderid, $filename); 
 		if (!empty($dbFileInfo)) {
-			return 7;
+			if (!$newNameIfFind){
+				return 7;
+			}
+			$filename = str_replace(".".$extension, "", $filename)."_".substr(md5(time()), 1, 8).".".$extension; 
 		}
 		$filelocation = trim($fileinfo['tmp_name']);
 		$filesize = intval($fileinfo['size']);
-		
-		$pathinfo = pathinfo($filename);
-		$extension = strtolower($pathinfo['extension']);
 		
 		if (!is_uploaded_file($filelocation)){ 
 			return 3; 
@@ -223,7 +226,6 @@ class FileManager {
 			return 5; 
 		} 
 		
-		// TODO: Необходимо убрать библиотеку из ядра и разместить ее в этом модуле 
 		// если картинка, проверка на допустимый размер
 		$upload = $this->GetUploadLib($filelocation);
 		
