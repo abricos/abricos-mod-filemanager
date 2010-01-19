@@ -13,7 +13,7 @@ Component.requires = {
 	mod:[{name: 'user', files: ['cpanel.js']}]
 };
 Component.entryPoint = function(){
-	
+	return;
 	if (!Brick.env.user.isAdmin()){ return; }
 	var cp = Brick.mod.user.cp;
 

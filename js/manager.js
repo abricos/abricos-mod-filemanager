@@ -29,7 +29,7 @@ Component.entryPoint = function(){
 	var API = NS.API;
 	
 	if (!Brick.objectExists('Brick.mod.filemanager.data')){
-		Brick.mod.feedback.data = new Brick.util.data.byid.DataSet('filemanager');
+		Brick.mod.filemanager.data = new Brick.util.data.byid.DataSet('filemanager');
 	}
 	var DATA = Brick.mod.filemanager.data;
 	
