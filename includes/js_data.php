@@ -21,28 +21,7 @@ $newMessageId = 0;
 foreach ($ds->ts as $ts){
 	foreach ($ts->rs as $tsrs){
 		if (empty($tsrs->r)){continue; }
-		switch ($ts->nm){
-			case 'files':
-				foreach ($tsrs->r as $r){
-					if ($r->f == 'u' && $r->d->act == 'editor'){ $fileManager->ImageEditorSave($r->d); }
-					if ($r->f == 'd'){ $fileManager->FileRemove($r->d->fh); }
-				}
-				break;
-			case 'editor':
-				foreach ($tsrs->r as $r){
-					if ($r->f == 'a'){ 
-						$fileManager->ImageEditorChange($tsrs->p->filehash, $tsrs->p->session, $r->d); 
-					}
-				}
-				break;
-			case 'folders':
-				foreach ($tsrs->r as $r){
-					if ($r->f == 'a'){ $fileManager->FolderAppendFromData($r->d); }
-					if ($r->f == 'd'){ $fileManager->FolderRemove($r->d); }
-					if ($r->f == 'u'){ $fileManager->FolderChangePhrase($r->d); }
-				}
-				break;
-		}
+		$fileManager->DSProcess($ts->nm, $tsrs);
 	}
 }
 
@@ -56,18 +35,7 @@ foreach ($ds->ts as $ts){
 	
 	$table->rs = array();
 	foreach ($ts->rs as $tsrs){
-		$rows = null;
-		switch ($ts->nm){
-			case 'files':
-				$rows = $fileManager->FileList($tsrs->p->folderid); 
-				break;
-			case 'folders':
-				$rows = $fileManager->FolderList(); 
-				break;
-			case 'editor':
-				$rows = $fileManager->EditorList($tsrs->p->filehash, $tsrs->p->session); 
-				break;
-		}
+		$rows = $fileManager->DSGetData($ts->nm, $tsrs);
 		
 		if (!is_null($rows)){
 			if ($qcol){

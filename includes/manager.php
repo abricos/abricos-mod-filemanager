@@ -78,6 +78,97 @@ class FileManager {
 		}
 		return false;
 	}
+	
+	public function DSProcess($name, $rows){
+		switch ($name){
+			case 'files':
+				foreach ($rows->r as $r){
+					if ($r->f == 'u' && $r->d->act == 'editor'){ $this->ImageEditorSave($r->d); }
+					if ($r->f == 'd'){ $this->FileRemove($r->d->fh); }
+				}
+				break;
+			case 'editor':
+				foreach ($rows->r as $r){
+					if ($r->f == 'a'){ 
+						$this->ImageEditorChange($tsrs->p->filehash, $tsrs->p->session, $r->d); 
+					}
+				}
+				break;
+			case 'folders':
+				foreach ($rows->r as $r){
+					if ($r->f == 'a'){ $this->FolderAppendFromData($r->d); }
+					if ($r->f == 'd'){ $this->FolderRemove($r->d); }
+					if ($r->f == 'u'){ $this->FolderChangePhrase($r->d); }
+				}
+				break;
+			case 'userconfig':
+				foreach ($rows->r as $r){
+					if ($r->f == 'u'){ $this->UserConfigUpdate($r->d); }
+					if ($r->f == 'a'){ $this->UserConfigAppend($r->d); } 
+				}
+				break;
+		}
+	}
+	
+	public function DSGetData($name, $rows){
+		$p = $rows->p;
+		switch ($name){
+			case 'files':
+				return $this->FileList($p->folderid); 
+			case 'folders':
+				return$this->FolderList(); 
+			case 'editor':
+				return $this->EditorList($p->filehash, $p->session); 
+			case 'userconfig':
+				return $this->UserConfigList(); 
+		}
+		
+		return null;
+	}
+	
+	private function UserConfigCheckVarName($name){
+		if (!$this->IsFileUploadRole()){ return false; }
+		switch($name){
+			case "tpl-screenshot":
+				return true;
+		}
+		return false;
+	}
+	
+	public function UserConfigList(){
+		if (!$this->IsFileUploadRole()){ return null; }
+		$modSys = Brick::$modules->GetModule('sys');
+		return CMSQSys::UserConfigList($this->db, 'filemanager', $this->user['userid']);
+	}
+
+	public function UserConfigAppend($d){
+		if (!$this->UserConfigCheckVarName($d->nm)){
+			return;
+		}
+		CMSQSys::UserConfigAppend($this->db, 'filemanager', $this->user['userid'], $d->nm, $d->vl);
+	}
+	
+	private function UserConfigCheckAccess($id){
+		$info = CMSQSys::UserConfigInfo($this->db, $id);
+		if (empty($info) || $info['uid'] != $this->user['userid']){ 
+			return false; 
+		}
+		return true;
+	}
+	
+	
+	public function UserConfigUpdate($d){
+		if (!$this->UserConfigCheckVarName($d->nm) || 
+			!$this->UserConfigCheckAccess($d->id)){
+			return;
+		}
+		CMSQSys::UserConfigUpdate($this->db, $d->id, $d->nm, $d->vl);
+	}
+	
+	public function UserConfigRemove($id){
+		 if (!$this->UserConfigCheckAccess($id)){ return; }
+	}
+	
 
 	public function FileList($folderid){
 		return $this->FileListByUser($this->user['userid'], $folderid);

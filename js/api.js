@@ -53,9 +53,9 @@ Component.entryPoint = function(){
 	 * @method dsRequest
 	 */
 	API.dsRequest = function(){
-		if (!Brick.objectExists('Brick.mod.filemanager.data')){
+		if (!NS.data){
 			return;
 		}
-		Brick.mod.filemanager.data.request(true);
+		NS.data.request(true);
 	};
 };

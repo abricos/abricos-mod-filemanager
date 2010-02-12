@@ -325,6 +325,99 @@ Component.entryPoint = function(){
 		this.init(owner, container); 
 	};
 	Screenshot.prototype = {
+		el: function(name){ return Dom.get(TId['screenshot'][name]); },
+		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
+		setel: function(el, value){ Brick.util.Form.setValue(el, value); },
+		setelv: function(name, value){ Brick.util.Form.setValue(this.el(name), value); },
+		getData: function(){
+			return {
+				'tpl': this.elv('code'),
+				'w': this.elv('width')*1,
+				'h': this.elv('height')*1
+			};
+		},
+		init: function(owner, container){
+			
+			this.owner = owner;
+			
+			container.innerHTML = T['screenshot'];
+			this.setImage(null);
+			
+			var tables = {
+				'userconfig': DATA.get('userconfig', true)
+			};
+			if (DATA.isFill(tables)){
+				this.render();
+			}
+			DATA.onComplete.subscribe(this.onDSUpdate, this, true);
+		},
+		onDSUpdate: function(type, args){
+			if (args[0].check(['userconfig'])){ this.render(); }
+		},
+		render: function(){
+			var row = this._getRow();
+			if (L.isNull(row)){
+				this.setelv('code', T['screenshottemplate']);
+				return;
+			}
+			var val = YAHOO.lang.JSON.parse(row.cell['vl']);
+
+			this.setelv('code', val['tpl']);
+			this.setelv('width', val['w']);
+			this.setelv('height', val['h']);
+		},
+
+		setImage: function(file){
+			if (L.isNull(file) || file.type != 'file' || L.isNull(file.image)){
+				file = null;
+			}
+			this.file = file;
+				
+			var elBSelect = this.el('bselect');
+			var elImgTitle = this.el('title');
+			var elImgWidth = this.el('width');
+			var elImgHeight = this.el('height');
+			var elImgCode = this.el('code');
+			
+			this.disabled([elBSelect, elImgTitle, elImgWidth, elImgHeight, elImgCode], L.isNull(file));
+		},
+		disabled: function(els, disabled){
+			for (var i=0;i<els.length;i++){ els[i].disabled = disabled ? 'disabled' : ''; }
+		},
+		clearValue: function(els){
+			for (var i=0;i<els.length;i++){ this.setel(els[i], ''); }
+		},
+		onClick: function(el){
+			if (L.isNull(this.file)){return false;}
+			var tp = TId['screenshot']; 
+			switch(el.id){
+			case tp['bselect']: this.selectItem(); return true;
+			}
+			return false;
+		},
+		_getRow: function(){
+			return DATA.get('userconfig').getRows().find({'nm': 'tpl-screenshot'});
+		},
+		save: function(){
+			var d = this.getData();
+			
+			var J = YAHOO.lang.JSON;
+			var table = DATA.get('userconfig');
+			
+			var row = this._getRow();
+			if (L.isNull(row)){
+				row = table.newRow();
+				table.getRows().add(row);
+				row.update({
+					'nm': 'tpl-screenshot'
+				});
+			}
+			row.update({
+				'vl': J.stringify(d)
+			});
+			table.applyChanges();
+			API.dsRequest();
+		},
 		selectItem: function(){
 			if (!this.owner.callback){ return; }
 			var item = this.file;
@@ -332,7 +425,7 @@ Component.entryPoint = function(){
 			
 			var width = this.elv('width')*1;
 			var height = this.elv('height')*1;
-			if (width == 0 || height == 0){ return; }
+			if (width == 0 && height == 0){ return; }
 			var title = this.elv('title');
 			
 			var smallLinker = new NS.Linker(item);
@@ -350,52 +443,8 @@ Component.entryPoint = function(){
 				'file': item,
 				'src': linker.getSrc()
 			});
+			this.save();
 			this.owner.close();
-		},
-		el: function(name){ return Dom.get(TId['screenshot'][name]); },
-		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
-		setel: function(el, value){ Brick.util.Form.setValue(el, value); },
-		setelv: function(name, value){ Brick.util.Form.setValue(this.el(name), value); },
-		init: function(owner, container){
-			
-			this.owner = owner;
-			container.innerHTML = T['screenshot'];
-			this.setImage(null);
-			this.setelv('code', T['screenshottemplate']);
-		},
-		setImage: function(file){
-			if (L.isNull(file) || file.type != 'file' || L.isNull(file.image)){
-				file = null;
-			}
-			this.file = file;
-				
-			var elBSelect = this.el('bselect');
-			var elImgTitle = this.el('title');
-			var elImgWidth = this.el('width');
-			var elImgHeight = this.el('height');
-			var elImgCode = this.el('code');
-			
-			this.disabled([elBSelect, elImgTitle, elImgWidth, elImgHeight, elImgCode], L.isNull(file));
-			if (L.isNull(file)){
-				// this.clearValue([elImgTitle]);
-			}else{
-				// this.setel(elImgWidth, file.image.width);
-				// this.setel(elImgHeight, file.image.height);
-			}
-		},
-		disabled: function(els, disabled){
-			for (var i=0;i<els.length;i++){ els[i].disabled = disabled ? 'disabled' : ''; }
-		},
-		clearValue: function(els){
-			for (var i=0;i<els.length;i++){ this.setel(els[i], ''); }
-		},
-		onClick: function(el){
-			if (L.isNull(this.file)){return false;}
-			var tp = TId['screenshot']; 
-			switch(el.id){
-			case tp['bselect']: this.selectItem(); return true;
-			}
-			return false;
 		}
 	};
 	
