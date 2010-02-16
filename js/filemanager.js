@@ -256,17 +256,19 @@ Component.entryPoint = function(){
 			this.setelv('path', this.folders.fullPath(this.folders.selectedFolderId));
 		},
 		onSelectItem_filesPanel: function(item){
-			var fname = '', fsrc = '';
+			var fname = '', fsrc = '', fpath='';
 			if (!L.isNull(item)){
 				if (item.type == 'file'){
 					fname = item.name;
 					var lnk = new NS.Linker(item);
 					fsrc = lnk.getHTML();
+					fpath = lnk.getSrc(); 
 				}else{
 					fname = item.phrase;
 				}
 			}
-			this.setelv('filesrc', fsrc);
+			this.setelv('filesrchtml', fsrc);
+			this.setelv('filesrc', fpath);
 			this.el('bselect').disabled = L.isNull(item) ? "disabled" : "";
 			this.screenshot.setImage(item);
 			this.refreshPath();
@@ -310,7 +312,7 @@ Component.entryPoint = function(){
 				if (this.callback){
 					var linker = new NS.Linker(item);
 					this.callback({
-						'html': this.elv('filesrc'),
+						'html': this.elv('filesrchtml'),
 						'file': item,
 						'src': linker.getSrc()
 					});
