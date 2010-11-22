@@ -17,24 +17,24 @@ $back = Brick::$builder->brick;
 
 $folderid = Brick::$input->clean_gpc('g', 'folderid', TYPE_STR);
 $brick->param->var['fid'] = $folderid;
+
 // формирование списка разрешенных типов файлов и их макс. размеры
-$t = $brick->param->var["ftypelsti"];
-$text = "";
+$list = "";
 
 $fileExtensionList = $fileManager->GetFileExtensionList();
 
 foreach ($fileExtensionList as $key => $value){
-	$trow = $t;
-	$trow = str_replace('#1', $key, $trow);
-	$trow = str_replace('#2', round(($value['maxsize']/1024))." Kb", $trow);
 	$imgSize = "&nbsp;";
 	if (!empty($value['maxwidth'])){
 		$imgSize = $value['maxwidth']."x".$value['maxheight'];
 	}
-	$trow = str_replace('#3', $imgSize, $trow);
-	$text = $text.$trow;
+	$list .= Brick::ReplaceVarByData($brick->param->var["ftypelsti"], array(
+		"1" => $key,
+		"2" => round(($value['maxsize']/1024))." Kb",
+		"3" => $imgSize 
+	));
 }
-$brick->param->var['ftypelst'] = $text;
+$brick->param->var['ftypelst'] = $list;
 
 
 $freeSpace = $fileManager->GetFreeSpace();

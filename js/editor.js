@@ -1,5 +1,5 @@
 /*
-* @version $Id: filemanager.js 189 2009-11-25 15:24:22Z roosit $
+* @version $Id$
 * @copyright Copyright (C) 2008 Abricos All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
 */
@@ -35,10 +35,10 @@ Component.entryPoint = function(){
 		T = TM.data,
 		TId = TM.idManager;
 
-	if (!Brick.objectExists('Brick.mod.filemanager.data')){
-		Brick.mod.filemanager.data = new Brick.util.data.byid.DataSet('filemanager');
+	if (!NS.data){
+		NS.data = new Brick.util.data.byid.DataSet('filemanager');
 	}
-	var DATA = Brick.mod.filemanager.data;
+	var DATA = NS.data;
 
 (function(){
 	

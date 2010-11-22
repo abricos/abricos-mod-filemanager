@@ -1,5 +1,5 @@
 /*
-* @version $Id: filemanager.js 189 2009-11-25 15:24:22Z roosit $
+* @version $Id$
 * @copyright Copyright (C) 2008 Abricos All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
 */
@@ -11,11 +11,6 @@ Component.entryPoint = function(){
 		L = YAHOO.lang;
 
 	var NS = this.namespace;
-	
-	var tSetVar = Brick.util.Template.setProperty;
-	var tSetVarA = Brick.util.Template.setPropertyArray;
-	
-(function(){
 	
 	var File = function(d){this.init(d);};
 	File.prototype = {
@@ -106,7 +101,7 @@ Component.entryPoint = function(){
 				}
 				var src = this._getSrc(f.id, f.name, w, h);
 				var t = "<img {v#id} src='{v#src}' title='{v#title}' alt='{v#alt}' width='{v#width}' height='{v#height}' />";
-				var html = tSetVarA(t, {
+				var html = Brick.util.Template.setPropertyArray(t, {
 					'src': src,
 					'width': width+'px',
 					'height': height+'px',
@@ -125,7 +120,5 @@ Component.entryPoint = function(){
 	
 	NS.Linker = Linker;
 	
-})();
-
 };
 

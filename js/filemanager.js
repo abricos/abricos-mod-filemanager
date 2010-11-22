@@ -40,10 +40,10 @@ Component.entryPoint = function(){
 		T = TM.data,
 		TId = TM.idManager;
 
-	if (!Brick.objectExists('Brick.mod.filemanager.data')){
-		Brick.mod.filemanager.data = new Brick.util.data.byid.DataSet('filemanager');
+	if (!NS.data){
+		NS.data = new Brick.util.data.byid.DataSet('filemanager');
 	}
-	var DATA = Brick.mod.filemanager.data;
+	var DATA = NS.data;
 	
 	Brick.util.CSS.update(Brick.util.CSS['filemanager']['filemanager']);
 	
@@ -52,12 +52,15 @@ Component.entryPoint = function(){
 	var File = NS.File;
 	var Folder = NS.Folder;
 
-	var ROOT_FOLDER = new Folder({"id":"0","pid":"-1","fn":"root","ph":"My files"}); 
+	var ROOT_FOLDER = new Folder({
+		'id':'0','pid':'-1',"fn":"root",
+		'ph':Brick.util.Language.getData()['fm']['myfiles']
+	}); 
 
 	var FolderNode = function(oData, oParent, expanded) { 
 		FolderNode.superclass.constructor.call(this,oData, oParent, expanded); 
 	};
-	YAHOO.extend(FolderNode, YAHOO.widget.TextNode, {	});
+	YAHOO.extend(FolderNode, YAHOO.widget.TextNode, {});
 	
 	var FolderPanel = function(onSelectItem){ 
 		this.init(onSelectItem); 

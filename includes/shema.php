@@ -111,14 +111,6 @@ if ($updateManager->isInstall()){
 		)".$charset
 	);
 
-	// лимиты объема файлов на группу пользователей
-	$db->query_write("
-		INSERT INTO `".$pfx."fm_usergrouplimit` (`usergrouplimitid`, `usergroupid`, `flimit`) VALUES 
-		(1, 3, 5242880),
-		(2, 5, 15728640),
-		(3, 6, 104857600)
-	");
-
 	// таблица для хранения изменений в редакторе картинок
 	$db->query_write("
 		CREATE TABLE IF NOT EXISTS ".$pfx."fm_editor (
@@ -138,10 +130,31 @@ if ($updateManager->isInstall()){
 		)".$charset
 	);
 }
+if ($updateManager->serverVersion == "1.0.0"){
+	$db->query_write("
+		ALTER TABLE `".$pfx."fm_file` ADD `title` VARCHAR( 250 ) NOT NULL AFTER `filename`
+	");
+
+	$db->query_write("
+		CREATE TABLE IF NOT EXISTS ".$pfx."fm_editor (
+		  `editorid` int(10) unsigned NOT NULL auto_increment,
+		  `userid` int(10) unsigned NOT NULL ,
+		  `filehashsrc` varchar(8) NOT NULL ,
+		  `width` int(6) unsigned NOT NULL DEFAULT 0,
+		  `height` int(6) unsigned NOT NULL DEFAULT 0,
+		  `left` int(6) unsigned NOT NULL DEFAULT 0,
+		  `top` int(6) unsigned NOT NULL DEFAULT 0,
+		  `tools` varchar(20) default NULL,
+		  `filehashdst` varchar(8) NOT NULL,
+		  `dateline` int(10) unsigned NOT NULL DEFAULT 0,
+		  `session` int(10) unsigned NOT NULL DEFAULT 0,
+		  PRIMARY KEY  (`editorid`),
+		  KEY `filehashsrc` (`filehashsrc`)
+		)".$charset
+	);
+}
 
 if ($updateManager->isInstall() || $updateManager->isUpdate('0.3')){
-	
-	CMSRegistry::$instance->modules->GetModule('filemanager')->permission->InstallDefault();
 	
 	// Добавить поле имени файла в файловой системе
 	$db->query_write("
@@ -149,8 +162,34 @@ if ($updateManager->isInstall() || $updateManager->isUpdate('0.3')){
 			ADD `fsname` varchar(250) NOT NULL default '' AFTER `folderid`
 	");
 	
-	
 }
 
+if ( $updateManager->isUpdate('0.3.1')){
+	CMSRegistry::$instance->modules->GetModule('filemanager')->permission->Install();
 	
+	$db->query_write("
+		TRUNCATE TABLE `".$pfx."fm_usergrouplimit`
+	");
+	
+	// лимиты объема файлов на группу пользователей
+	$db->query_write("
+		INSERT INTO `".$pfx."fm_usergrouplimit` (`usergroupid`, `flimit`) VALUES 
+		(2, 15728640),
+		(3, 104857600)
+	");
+	
+}
+if ( $updateManager->isUpdate('0.3.2')){
+	
+	$db->query_write("
+		CREATE TABLE IF NOT EXISTS ".$pfx."fm_enthumbs (
+		  `enthumbs` int(4) unsigned NOT NULL auto_increment,
+		  `width` int(6) unsigned NOT NULL DEFAULT 0,
+		  `height` int(6) unsigned NOT NULL DEFAULT 0,
+		  PRIMARY KEY  (`enthumbs`),
+		  UNIQUE KEY `size` (`width`,`height`)
+		)".$charset
+	);
+}
+
 ?>

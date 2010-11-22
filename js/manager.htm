@@ -20,6 +20,9 @@
 </div>
 
 <!--{limitwidget}-->
+<div class="buttons right">
+	<input type="button" value="Добавить группу" id="{i#bappend}" />
+</div>
 <div id='{i#table}'></div>
 
 <!--{limittable}-->
@@ -29,6 +32,7 @@
 			<th>Группа</th>
 			<th>Объем</th>
 			<th></th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>{v#rows}</tbody>
@@ -36,13 +40,114 @@
 
 <!--{limitrowwait}-->
 <tr valign="top">
-	<td colspan="3">Идет загрузка данных...</td>
+	<td colspan="4">Идет загрузка данных...</td>
 </tr>
 
 <!--{limitrow}-->
 <tr valign="top">
-	<td>{v#grp}</td>
+	<td>{v#gnm}</td>
+	<td>{v#lmt}</td>
+	<td><a href="#" id="{i#edit}-{v#id}">Править</a></td>
+	<td><a href="#" id="{i#remove}-{v#id}">Удалить</a></td>
+</tr>
+
+<!--{limitappendpanel}-->
+<div class='hd'>Добавить квоту</div>
+<div class='bd'>
+	<div class="field">
+		<div id="{i#table}"></div>
+		<p>
+			Квота (байт) <input id="{i#size}" type="text" style="width: 80px;" />
+		</p>
+		<div style="text-align: right">
+			<input id="{i#bsave}" type="button" value="Добавить" />
+			<input id="{i#bcancel}" type="button" value="Закрыть" />
+		</div>
+	</div>
+</div>
+
+<!--{limiteditorpanel}-->
+<div class='hd'>Изменить квоту</div>
+<div class='bd'>
+	<div class="field">
+		<div id="{i#table}"></div>
+		<p>
+			Квота (байт) <input id="{i#size}" type="text" style="width: 100px;" />
+		</p>
+		<div style="text-align: right">
+			<input id="{i#bsave}" type="button" value="Сохранить" />
+			<input id="{i#bcancel}" type="button" value="Закрыть" />
+		</div>
+	</div>
+</div>
+
+<!--{grouptable}-->
+<select id="{i#id}" style="width: 300px;" >{v#rows}</select>
+
+<!--{grouprow}-->
+<option value="{v#id}">{v#nm}</option>
+
+<!--{grouprowwait}-->
+<option>Идет загрузка...</option>
+
+
+<!--{extwidget}-->
+<div id='{i#table}'></div>
+
+<!--{exttable}-->
+<table class="bk-table-def">
+	<thead>
+		<tr>
+			<th>Расширение файла</th>
+			<th>MIME</th>
+			<th>Размер файла, байт</th>
+			<th>Ширина картинки, px</th>
+			<th>Высота картинки, px</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>{v#rows}</tbody>
+</table>
+
+<!--{extrowwait}-->
+<tr valign="top">
+	<td colspan="6">Идет загрузка данных...</td>
+</tr>
+
+<!--{extrow}-->
+<tr valign="top">
+	<td>{v#ext}</td>
+	<td>{v#mime}</td>
 	<td>{v#size}</td>
+	<td>{v#width}</td>
+	<td>{v#height}</td>
 	<td><a href="#" id="{i#edit}-{v#id}">Править</a></td>
 </tr>
 
+<!--{exteditorpanel}-->
+<div class='hd'>Редактор</div>
+<div class='bd'>
+
+	<div class="field">	
+		<p>
+			Расширение <input id="{i#ext}" type="text" style="width: 300px;" />
+		</p>
+		<p>
+			MIME <input id="{i#mime}" type="text" style="width: 300px;" />
+		</p>
+		<p>
+			Допустимый объем файла <input id="{i#size}" type="text" style="width: 300px;" />
+		</p>
+		<p>
+			Макс. ширина картинки <input id="{i#width}" type="text" style="width: 300px;" />
+		</p>
+		<p>
+			Макс. высота картинки <input id="{i#height}" type="text" style="width: 300px;" />
+		</p>
+ 	
+		<div class="buttons right">
+			<input type="button" value="Сохранить" id="{i#bsave}" />
+			<input type="button" value="Отмена" id="{i#bcancel}" />
+		</div>
+	</div>
+</div>

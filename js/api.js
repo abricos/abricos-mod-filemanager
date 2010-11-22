@@ -35,12 +35,6 @@ Component.entryPoint = function(){
 		});
 	};
 	
-	API.showManagerWidget = function(container){
-		API.fn('manager', function(){
-			new NS.ManagerWidget(container);
-		});
-	};
-	
 	API.showImageEditorPanel = function(file){
 		API.fn('editor', function(){
 			new NS.ImageEditorPanel(new NS.File(file));
