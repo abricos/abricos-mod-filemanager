@@ -429,6 +429,7 @@ class FileManager {
 		$isimage = $upload->file_is_image ? 1 : 0;
 		
 		if (empty($filetype['mimetype'])){
+			#TODO: в этом месте возникает ошибка если попытаться загрузить файл bmp большого размера
 			CMSQFileManager::FileTypeUpdateMime($this->registry->db, $filetype['filetypeid'], $upload->file_src_mime);
 			$filetype['mimetype'] = $upload->file_src_mime;
 		}
