@@ -153,6 +153,7 @@ class FileManager {
 				break;
 			case 'extensions':
 				foreach ($rows->r as $r){
+					if ($r->f == 'a'){ $this->FileTypeAppend($r->d); }
 					if ($r->f == 'u'){ $this->FileTypeUpdate($r->d); }
 				}
 				break;
@@ -274,6 +275,11 @@ class FileManager {
 	public function FileTypeUpdate($d){
 		if (!$this->IsAdminRole()) { return; }
 		FileManagerQueryExt::FileTypeUpdate($this->db, $d);
+	}
+	
+	public function FileTypeAppend($d){
+		if (!$this->IsAdminRole()) { return; }
+		FileManagerQueryExt::FileTypeAppend($this->db, $d);
 	}
 	
 	public function GetFileExtensionList($ignoreRole = false, $forDataSet = false){
@@ -429,14 +435,14 @@ class FileManager {
 		$isimage = $upload->file_is_image ? 1 : 0;
 		
 		if (empty($filetype['mimetype'])){
-			#TODO: в этом месте возникает ошибка если попытаться загрузить файл bmp большого размера
-			CMSQFileManager::FileTypeUpdateMime($this->registry->db, $filetype['filetypeid'], $upload->file_src_mime);
+			CMSQFileManager::FileTypeUpdateMime($this->db, $filetype['filetypeid'], $upload->file_src_mime);
 			$filetype['mimetype'] = $upload->file_src_mime;
 		}
 		
 		if (!($filedata = @file_get_contents($filelocation))) { // ошибка: в чтении файла 
-			return 3; 
+			return 3;
 		} 
+
 		$filehash = CMSQFileManager::FileUpload(
 			$this->db, $userid, $folderid, 
 			$filename, $filedata, $filesize, $extension, 

@@ -1,3 +1,33 @@
+/* Copyright (c) 2006 Yahoo! Inc. All rights reserved. */
+
+.ygtvtn { background: url(/modules/filemanager/images/fds/tn.gif) 0 0 no-repeat; width:17px; height:22px; }
+.ygtvtm { background: url(/modules/filemanager/images/fds/tm.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
+.ygtvtmh { background: url(/modules/filemanager/images/fds/tmh.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
+.ygtvtp { background: url(/modules/filemanager/images/fds/tp.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
+.ygtvtph { background: url(/modules/filemanager/images/fds/tph.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
+.ygtvln { background: url(/modules/filemanager/images/fds/ln.gif) 0 0 no-repeat; width:17px; height:22px; }
+.ygtvlm { background: url(/modules/filemanager/images/fds/lm.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
+.ygtvlmh { background: url(/modules/filemanager/images/fds/lmh.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
+.ygtvlp { background: url(/modules/filemanager/images/fds/lp.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
+.ygtvlph { background: url(/modules/filemanager/images/fds/lph.gif) 0 0 no-repeat; width:34px; height:22px; cursor:pointer }
+.ygtvloading { background: url(/modules/filemanager/images/fds/loading.gif) 0 0 no-repeat; width:16px; height:22px; }
+.ygtvdepthcell { background: url(/modules/filemanager/images/fds/vline.gif) 0 0 no-repeat; width:17px; height:22px; }
+.ygtvblankdepthcell { width:17px; height:22px; }
+.ygtvitem { }  
+.ygtvitem  table{
+    margin-bottom:0;
+}
+.ygtvitem  td {
+    border:none;padding:0;
+} 
+.ygtvchildren { }  
+* html .ygtvchildren { height:1%; }  
+.ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover { 
+	margin-left:2px;
+	text-decoration: none;
+}
+
+
 .selected {background-color: #ccc}
 
 .fm_window	{
@@ -200,6 +230,7 @@ width:100%;
 border: 0px;
 border-collapse: collapse;
 }
-div#fm_openfile table td	{
-padding: 0px
+div#fm_openfile table td {
+	padding: 0px
 }
+

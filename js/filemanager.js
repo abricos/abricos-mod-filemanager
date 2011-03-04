@@ -16,12 +16,7 @@ Component.requires = {
 	mod:[
 	     {name: 'sys', files: ['form.js','data.js']},
 	     {name: 'filemanager', files: ['api.js','lib.js']}
-	],
-	ext: [{
-		name: "treeview-folder-css",
-		fullpath: "/js/yui/"+Brick.env.lib.yui+"/treeview/assets/css/folders/tree.css",
-		type: "css"
-	}]
+	]
 };
 Component.entryPoint = function(){
 	var Dom = YAHOO.util.Dom,
@@ -154,7 +149,7 @@ Component.entryPoint = function(){
 			fixedcenter: true
 		});
 	};
-	YAHOO.extend(CreateFolderPanel, Brick.widget.Panel, {
+	YAHOO.extend(CreateFolderPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(TId['createfolderpanel'][name]); },
 		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
 		initTemplate: function(){
@@ -183,7 +178,7 @@ Component.entryPoint = function(){
 			fixedcenter: true
 		});
 	};
-	YAHOO.extend(FolderEditPanel, Brick.widget.Panel, {
+	YAHOO.extend(FolderEditPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(TId['editfolderpanel'][name]); },
 		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
 		setelv: function(name, value){ Brick.util.Form.setValue(this.el(name), value); },
@@ -214,7 +209,7 @@ Component.entryPoint = function(){
 			fixedcenter: true
 		});
 	};
-	YAHOO.extend(FolderRemoveMsg, Brick.widget.Panel, {
+	YAHOO.extend(FolderRemoveMsg, Brick.widget.Dialog, {
 		initTemplate: function(){
 			var t = T['folderremovemsg'];
 			return tSetVar(t, 'info', this.row.cell['ph']); 
@@ -236,7 +231,7 @@ Component.entryPoint = function(){
 			fixedcenter: true
 		});
 	};
-	YAHOO.extend(BrowserPanel, Brick.widget.Panel, {
+	YAHOO.extend(BrowserPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(TId['panel'][name]); },
 		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
 		setel: function(el, value){ Brick.util.Form.setValue(el, value); },
@@ -633,7 +628,7 @@ Component.entryPoint = function(){
 			modal: true, fixedcenter: true
 		});
 	};
-	YAHOO.extend(FileRemoveMsg, Brick.widget.Panel, {
+	YAHOO.extend(FileRemoveMsg, Brick.widget.Dialog, {
 		initTemplate: function(){
 			var t = T['fileremovemsg'];
 			return tSetVar(t, 'info', this.row.cell['fn']); 

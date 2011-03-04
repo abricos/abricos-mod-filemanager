@@ -104,6 +104,19 @@ class FileManagerQueryExt extends FileManagerQuery {
 		";
 		$db->query_write($sql);
 	}
+
+	public static function FileTypeAppend(CMSDatabase $db, $d){
+		$sql = "
+			INSERT INTO ".$db->prefix."fm_filetype (extension, mimetype, maxsize, maxwidth, maxheight) VALUES (
+				'".bkstr($d->extension)."',
+				'".bkstr($d->mimetype)."',
+				".bkint($d->maxsize).",
+				".bkint($d->maxwidth).",
+				".bkint($d->maxheight)."
+			)
+		";
+		$db->query_write($sql);
+	}
 }
 
 /**

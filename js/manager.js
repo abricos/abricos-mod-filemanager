@@ -36,33 +36,27 @@ Component.entryPoint = function(){
 	
 	var buildTemplate = function(widget, templates){
 		var TM = TMG.build(templates), T = TM.data, TId = TM.idManager;
-		widget._TM = TM; 
-		widget._T = T; 
-		widget._TId = TId;
+		widget._TM = TM; widget._T = T; widget._TId = TId;
 	};
 	
 	var ManagerWidget = function(container){
-		
-		var TM = TMG.build('widget'), T = TM.data, TId = TM.idManager;
-		this._TM = TM; this._T = T; this._TId = TId;
+		buildTemplate(this, 'widget');
 
 		container = L.isString(container) ? Dom.get(container) : container;
 		this.init(container);
 	};
 	ManagerWidget.prototype = {
-		pages: null,
-		
 		init: function(container){
-			container.innerHTML = this._T['widget'];
-			var TId = this._TId;
+		
+			var T = this._T, TId = this._TId;
+		
+			container.innerHTML = T['widget'];
 			
 			var tabView = new YAHOO.widget.TabView(TId['widget']['id']);
-			var pages = {};
-			
-			pages['limit'] = new NS.UserGroupLimitWidget(Dom.get(TId['widget']['limit']));
-			pages['ext'] = new NS.ExtensionFileWidget(Dom.get(TId['widget']['exten']));
-			
-			this.pages = pages;
+			this.pages = {
+				'limit': new NS.UserGroupLimitWidget(Dom.get(TId['widget']['limit'])),
+				'ext': new NS.ExtensionFileWidget(Dom.get(TId['widget']['exten']))
+			};
 	
 			var __self = this;
 			E.on(container, 'click', function(e){
@@ -303,6 +297,11 @@ Component.entryPoint = function(){
 		},
 		onClick: function(el){
 			var TId = this._TId;
+			
+			if (el.id == TId['extwidget']['bappend']){
+				this.editExtension(0);
+				return true;
+			}
 			
 			var prefix = el.id.replace(/([0-9]+$)/, '');
 			var numid = el.id.replace(prefix, "");

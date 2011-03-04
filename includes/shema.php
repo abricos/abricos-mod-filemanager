@@ -61,18 +61,19 @@ if ($updateManager->isInstall()){
 	// список разрешеных типов файлов и их параметры
 	$db->query_write("
 		INSERT INTO `".$pfx."fm_filetype` 
-		(`filetypeid`, `extension`, `usergroupid`, `mimetype`, `maxsize`, `maxwidth`, `maxheight`, `disable`) VALUES 
-		(1, 'bmp', 0, '', 307200, 1024, 768, 0),
-		(2, 'doc', 0, 'application/msword', 307200, 0, 0, 0),
-		(3, 'gif', 0, 'image/gif', 307200, 1024, 768, 0),
-		(4, 'jpe', 0, '', 307200, 1024, 768, 0),
-		(5, 'jpeg', 0, '', 307200, 1024, 768, 0),
-		(6, 'jpg', 0, 'image/jpeg', 307200, 1024, 768, 0),
-		(7, 'pdf', 0, 'application/pdf', 51200, 0, 0, 0),
-		(8, 'png', 0, 'image/png', 307200, 1024, 768, 0),
-		(9, 'rar', 0, 'application/rar', 102400, 0, 0, 0),
-		(10, 'txt', 0, 'text/plain', 51200, 0, 0, 0),
-		(11, 'zip', 0, 'application/zip', 102400, 0, 0, 0)	
+		(`extension`, `usergroupid`, `mimetype`, `maxsize`, `maxwidth`, `maxheight`, `disable`) VALUES 
+		('bmp', 0, '', 1048576, 1024, 768, 0),
+		('gif', 0, 'image/gif', 1048576, 1024, 1024, 0),
+		('jpe', 0, 'image/jpeg', 1048576, 1024, 1024, 0),
+		('jpeg', 0, 'image/jpeg', 1048576, 1024, 1024, 0),
+		('jpg', 0, 'image/jpeg', 1048576, 1024, 1024, 0),
+		('doc', 0, 'application/msword', 1048576, 0, 0, 0),
+		('xls', 0, 'application/msexcel', 1048576, 0, 0, 0),
+		('pdf', 0, 'application/pdf', 1048576, 0, 0, 0),
+		('png', 0, 'image/png', 1048576, 1024, 1024, 0),
+		('txt', 0, 'text/plain', 1048576, 0, 0, 0),
+		('rar', 0, 'application/rar', 1048576, 0, 0, 0),
+		('zip', 0, 'application/zip', 1048576, 0, 0, 0)	
 	");
 	
 	$db->query_write("
