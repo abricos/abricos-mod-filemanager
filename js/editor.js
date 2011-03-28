@@ -23,9 +23,6 @@ Component.entryPoint = function(){
 		L = YAHOO.lang,
 		W = YAHOO.widget;
 
-	var tSetVar = Brick.util.Template.setProperty;
-	var tSetVarA = Brick.util.Template.setPropertyArray;
-	
 	var __selfCT = this;
 	
 	var NS = this.namespace,
@@ -40,8 +37,6 @@ Component.entryPoint = function(){
 	}
 	var DATA = NS.data;
 
-(function(){
-	
 	var File = NS.File;
 	
 	var ImageEditorPanel = function(file, callback){
@@ -200,7 +195,6 @@ Component.entryPoint = function(){
 	});
 
 	NS.ImageEditorPanel = ImageEditorPanel;
-})();
 
 };
 

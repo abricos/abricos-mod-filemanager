@@ -84,7 +84,15 @@ Component.entryPoint = function(){
 			if (p.length>0){
 				ps = '/'+p.join('-');
 			}
-			return '/filemanager/i/'+id+ps+'/'+name;
+			var loc = window.location;
+			
+			var src = loc.protocol + '//' + loc.hostname;
+			if (loc.port*1 != 80){
+				src += ":"+loc.port;
+			}
+			src += '/filemanager/i/'+id+ps+'/'+name;
+
+			return src;
 		},
 		getSrc: function(){
 			var f = this.file;

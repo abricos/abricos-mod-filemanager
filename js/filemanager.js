@@ -288,7 +288,7 @@ Component.entryPoint = function(){
 			this.folders.destroy();
 		},
 		showUpload: function(){
-			if (!L.isNull(this.uploadWindow) && !this.uploadWindow.closed){
+			if (!L.isNull(this.uploadWindow) && !this.uploadWindow.closed && L.isFunction(this.uploadWindow.focus)){
 				this.uploadWindow.focus();
 			}else{
 				var folderid = this.folders.selectedFolderId;
