@@ -87,7 +87,7 @@ Component.entryPoint = function(){
 			var loc = window.location;
 			
 			var src = loc.protocol + '//' + loc.hostname;
-			if (loc.port*1 != 80){
+			if (loc.port*1 != 80 && loc.port*1 > 0){
 				src += ":"+loc.port;
 			}
 			src += '/filemanager/i/'+id+ps+'/'+name;
