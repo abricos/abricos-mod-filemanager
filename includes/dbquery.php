@@ -490,7 +490,7 @@ class CMSQFileManager {
 		return $db->query_first($sql);
 	}
 	
-	public static function &FileData(CMSDatabase $db, $filehash, $begin = 1, $count = 2097152){
+	public static function &FileData(CMSDatabase $db, $filehash, $begin = 1, $count = 1048576){
 		$sql = "
 			SELECT 
 				fileid, 
@@ -508,15 +508,15 @@ class CMSQFileManager {
 			LIMIT 1
 		";
 		$row = $db->query_first($sql);
-		
+
+		return $row;
+		/*
 		$fsPath = CMSQFileManager::FSPathGetByEls($row['userid'], $row['folderid'], $row['fsname']);
 		$row['fsname'] = '';
 		
 		if (!file_exists($fsPath)){
 			return $row;
 		}
-		// $size = filesize($fsPath);
-		
 		$begin = $begin - 1;
 		
 		$fp = fopen($fsPath, 'r');
@@ -525,6 +525,7 @@ class CMSQFileManager {
 		fclose($fp);
 		
 		return $row;
+		/**/
 	}
 	
 	const FILE_FIELD = "
@@ -654,27 +655,6 @@ class CMSQFileManager {
 		return $filehash;
 	}
 	
-	public static function FileUploadAppend(CMSDatabase $db, $filehash, $filedata, $offset, $bytes){
-		// echo("$offset, $bytes	\n");
-		$sql = "
-			UPDATE ".$db->prefix."fm_file
-				SET filedata = INSERT('filedata', ".($offset+1).", ".$bytes.", '".addslashes($filedata)."')
-			WHERE filehash='".$filehash."'
-		";
-		
-		//INSERT(`data`, ".($offset+1).", ".$bytes.", ‘".mysql_real_escape_string($data)."‘)
-		
-		// mysql_query("UPDATE `files` SET `data` = INSERT(`data`, ".($offset+1).", ".$bytes.", ‘".mysql_real_escape_string($data)."‘) WHERE `id` = ‘".$file->id."‘");
-		/*
-		$sql = "
-			UPDATE ".$db->prefix."fm_file
-				SET filedata = CONCAT(filedata,'".mysql_escape_string($filedata)."')
-			WHERE filehash='".$filehash."'
-		";
-		/**/
-		$db->query_write($sql);
-	}
-	
 	public static function FileUpload(CMSDatabase $db, $userid, $folderid, $filename, $filedata, $filesize, $extension, $isimage=0, $imgwidth=0, $imgheight=0, $attribute = 0){
 		$filehash = CMSQFileManager::GetFileHash($db);
 		$sql = "
@@ -694,13 +674,16 @@ class CMSQFileManager {
 				'".TIMENOW."'".
 			")";
 		$db->query_write($sql);
-		if ($db->error){
-			$db->close();
-			$db->ClearError();
-			$db->reConnect();
-			return '';
-		}
 		return $filehash;
+	}
+	
+	public static function FileUploadPart(CMSDatabase $db, $filehash, $data){
+		$sql = "
+			UPDATE ".$db->prefix."fm_file
+			SET filedata=CONCAT(filedata, '".addslashes($data)."')
+			WHERE filehash='".bkstr($filehash)."'
+		";
+		$db->query_write($sql);
 	}
 	
 	public static function FileTypeUpdateMime(CMSDatabase $db, $fileTypeId, $mimeType){

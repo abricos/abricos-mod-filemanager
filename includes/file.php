@@ -131,9 +131,9 @@ while (!empty($fileinfo['filedata']) && connection_status() == 0) {
 	echo $fileinfo['filedata'];
 	flush();
 
-	if (strlen($fileinfo['filedata']) == 2097152) {
+	if (strlen($fileinfo['filedata']) == 1048576) {
 
-		$startat = (2097152 * $count) + 1;
+		$startat = (1048576 * $count) + 1;
 		$fileinfo = $fileManager->GetFileData($p_filehash, $startat);
 		$count++;
 	} else {

@@ -48,7 +48,6 @@ Component.entryPoint = function(){
 	};
 	Linker.prototype = {
 		init: function(file){
-			this.file = null;
 			this.imgsize = null;
 			this.objid = null;
 			this.file = file;

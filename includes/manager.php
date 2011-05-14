@@ -10,6 +10,353 @@
 
 require_once 'dbquery.php';
 
+class UploadError {
+	/**
+	 * Нет ошибки - 0
+	 * @var integer
+	 */
+	const NO_ERROR = 0;
+	
+	/**
+	 * Неизвестный тип файла - 1
+	 * @var integer
+	 */
+	const UNKNOWN_TYPE = 1;
+
+	/**
+	 * Размер файла превышает допустимый - 2
+	 * @var integer
+	 */
+	const FILESIZE_IS_LARGER = 2;
+
+	/**
+	 * Ошибка сервера - 3
+	 * @var integer
+	 */
+	const SERVER_ERROR = 3;
+
+	/**
+	 * Размер картинки (в пикселях) превышает допустимый - 4
+	 * @var integer
+	 */
+	const IMAGESIZE_IS_LARGER = 4;
+
+	/**
+	 * Свободное место в профиле закончилось - 5
+	 * @var integer
+	 */
+	const PROFILE_FREESPACE = 5;
+	
+	/**
+	 * Нет прав на выгрузку - 6
+	 * @var integer
+	 */
+	const ACCESS_DENIED = 6;
+	
+	/**
+	 * Файл с таким именем уже существует - 7
+	 * @var integer
+	 */
+	const FILE_EXISTS = 7;
+
+	/**
+	 * Файла для выгрузки отсутствует (не выбран файл) - 8
+	 * @var integer
+	 */
+	const FILE_NOT_FOUND = 8;
+	
+	/**
+	 * Не удалось преобразовать картинку (подогнать по размеру и т.п.) - 9
+	 * @var integer
+	 */
+	const IMAGE_PROCESS = 9;
+
+	/**
+	 * Было заявлено на загрузку картинки, а файл не картинка - 10
+	 * @var integer
+	 */
+	const IS_NOT_IMAGE = 10;
+	
+}
+
+class UploadFile {
+	
+	/**
+	 * @var User
+	 */
+	private $user = null;
+	private $userid = 0;
+	
+	/**
+	 * @var FileManager
+	 */
+	public $manager = null;
+	
+	private $fileInfo = null;
+	private $folderid = 0;
+	
+	public $sourceFileName = "";
+	
+	////////////////// настройки ///////////////
+	
+	/**
+	 * Игнорировать роль на выгрузку
+	 * @var boolean default false
+	 */
+	public $ignoreUploadRole = false;
+	
+	/**
+	 * Загрузить в глобальное хранилище (не в профиль пользователя)
+	 * @var boolean default false
+	 */
+	private $outUserProfile = false; // временно отключено
+	
+	/**
+	 * Отключить проверку на допустимый тип файла
+	 * @var boolean default false
+	 */
+	public $ignoreFileExtension = false;
+	
+	/**
+	 * Отключить проверку на наличия места в профиле
+	 * @var boolean default false
+	 */
+	public $ignoreFreeSpace = false;
+
+	/**
+	 * Отключить проверку на допустимый размер файла.
+	 * Если $ignoreFileExtension==true, этот параметр не используется.
+	 * @var boolean default false
+	 */
+	public $ignoreFileSize = false;
+
+	/**
+	 * Отключить проверку на допустимый размер картинки.
+	 * @var boolean default false
+	 */
+	public $ignoreImageSize = false;
+	
+	/**
+	 * Максимальная ширина картинки.
+	 * Если больше нуля, то игнорирует глобальные настройки разрешенных лимитов.
+	 * Если $ignoreImageSize==true, этот параметр не используется.
+	 * @var integer default 0
+	 */
+	public $maxImageWidth = 0;
+	
+	/**
+	 * Максимальная высота картинки.
+	 * Если больше нуля, то игнорирует глобальные настройки разрешенных лимитов
+	 * Если $ignoreImageSize==true, этот параметр не используется.
+	 * @var integer default 0
+	 */
+	public $maxImageHeight = 0;
+	
+	/**
+	 * Загружаемый файл должен быть картинкой.
+	 * @var integer default false
+	 */
+	public $isOnlyImage = false;
+
+	/**
+	 * Атрибут файла: 0 - стандартый, 1 - скрытый
+	 * @var integer
+	 */
+	public $fileAttribute = 0;
+	
+	public $uploadFileHash = '';
+	public $folderPath = '';
+	
+	
+	/**
+	 * Конструктор
+	 * @param $postVarName  
+	 * @param $folderPath
+	 */
+	public function __construct($getVarName, $folderid = 0){
+		
+		$this->manager = FileManagerModule::$instance->GetFileManager();
+
+		$this->user = CMSRegistry::$instance->user;
+		$this->userid = $this->user->info['userid'];
+		
+		$this->fileInfo = CMSRegistry::$instance->input->clean_gpc('f', $getVarName, TYPE_FILE);
+		$this->folderid = $folderid;
+		$this->db = CMSRegistry::$instance->db;
+	}
+	
+
+	public function IsFileUploadRole(){
+		return FileManagerModule::$instance->permission->CheckAction(FileManagerAction::FILES_UPLOAD) > 0;
+	}
+	
+	
+	public function Upload(){
+		// попытка загрузить не выбранный файл
+		if (empty($this->fileInfo)){
+			return UploadError::FILE_NOT_FOUND;
+		}
+		
+		// проверка роли на выгрузку файла
+		if (!$this->IsFileUploadRole()){
+			if (!$this->IsFileUploadRole()){ 
+				return UploadError::ACCESS_DENIED; 
+			}
+		}
+		
+		// выгрузка в профиль или глобальное хранилище?
+		$userid = $this->userid;
+		if (!$this->outUserProfile ){
+			if (intval($this->userid) == 0){
+				return UploadError::ACCESS_DENIED; 
+			}
+		}else{
+			$userid = 0;
+		}
+
+		$fName = $this->fileInfo['name'];
+		$this->sourceFileName = $fName;
+		$pi = pathinfo($fName);
+		$fExt = strtolower($pi['extension']);
+		$fSize = intval($this->fileInfo['size']);
+		$fPath = $this->fileInfo['tmp_name'];
+		
+		if (!file_exists($fPath)){
+			return UploadError::SERVER_ERROR;
+		}
+		
+		// есть ли свободное место в профиле пользователя?
+		if (!$this->ignoreFreeSpace){
+			$freespace = $this->manager->GetFreeSpaceMethod($this->userid);
+			// TODO: возможно есть смысл делать эту проверку после того, как картинка будет сжата   
+			if ($freespace < $fSize){
+				return UploadError::PROFILE_FREESPACE; 
+			}
+		}
+		
+		$maxFileSize = 0;
+		$maxImageWidth = intval($this->maxImageWidth);
+		$maxImageHeight = intval($this->maxImageHeight);
+		$imageWidth = 0;
+		$imageHeight = 0;
+		
+		// upload для обработки картинок
+		$upload = $this->manager->GetUploadLib($fPath);
+		
+		// разрешенные типы файлов
+		$extensions = $this->manager->GetFileExtensionList(true);
+		if (!$this->ignoreFileExtension){ // проверка на допустимые типы файлов включена
+			$filetype = $extensions[$fExt];
+			if (empty($filetype)){ // нет в списке разрешенных типов файлов
+				return UploadError::UNKNOWN_TYPE;
+			}
+			if (!$this->ignoreFileSize){
+				$maxFileSize = intval($filetype['maxsize']);
+			}
+			if ($maxImageWidth == 0){
+				$maxImageWidth = intval($filetype['maxwidth']);
+			}
+			if ($maxImageHeight == 0){
+				$maxImageHeight = intval($filetype['maxheight']);
+			}
+			if (empty($filetype['mimetype'])){
+				CMSQFileManager::FileTypeUpdateMime(CMSRegistry::$instance->db, $filetype['filetypeid'], $upload->file_src_mime);
+				$filetype['mimetype'] = $upload->file_src_mime;
+			}
+		}
+
+		// проверка допустимого размера файла
+		if ($maxFileSize > 0 && $fSize > $maxFileSize){
+			return UploadError::FILESIZE_IS_LARGER;
+		}
+		
+		// Если файл должен быть только картинкой
+		if ($this->isOnlyImage && !$upload->file_is_image){
+			return UploadError::IS_NOT_IMAGE;
+		}
+
+		// для картинки необходимо выполнить возможные преобразования
+		if ($upload->file_is_image && !$this->ignoreImageSize 
+			&& (($maxImageWidth > 0 && $upload->image_src_x > $maxImageWidth)
+			  ||($maxImageHeight > 0 && $upload->image_src_y > $maxImageHeight))
+			){
+			
+			$upload->image_resize = true;
+			if ($maxImageWidth > 0){
+				$upload->image_x = $maxImageWidth;
+			}
+			if ($maxImageHeight){
+				$upload->image_y = $maxImageHeight;
+			}
+			$upload->image_ratio_fill = true;
+			$upload->process(CWD."/cache");
+			
+			$fPath = $upload->file_dst_pathname;
+			
+			if (!file_exists($fPath)){ 
+				return UploadError::IMAGE_PROCESS;
+			}
+			$fSize = filesize($fPath);
+		}
+		if ($upload->file_is_image){
+			$imageWidth = $upload->image_src_x;
+			$imageHeight = $upload->image_src_y;
+		}
+		
+		// установить идентификатор директории, если есть
+		if ($this->folderid == 0 && !empty($this->folderPath)){
+			$this->folderid = $this->manager->CreateFolderByPathMethod($this->folderPath);
+		}
+		
+		$db = CMSRegistry::$instance->db;
+		
+		// а вдруг этот файл грузят второй раз?
+		$finfo = CMSQFileManager::FileInfoByName($db, $this->userid, $this->folderid, $fName);
+		if (!empty($finfo)){ // точно! так оно и есть.
+			// а может быть этот файл тот же самый?
+			if (intval($fSize) == intval($finfo['fs'])){ // размеры совпадают, нужно сравнить побайтно
+				if ($this->manager->FilesCompare($fPath, $finfo['fh'])){
+					$this->uploadFileHash = $finfo['fh'];
+					return UploadError::NO_ERROR;
+				}
+			}
+			// у этих файлов одинаковое только имя
+			// TODO: необходимо создавать новое имя файла, и делать повторно попытку его загрузки
+		}
+		// все нормально, теперь можно загружать файл в базу
+		$handle = fopen($fPath, 'rb');
+		if (empty($handle)){
+			return UploadError::SERVER_ERROR;
+		}
+		$first = true;
+		$filehash = '';
+		while (!feof($handle)) {
+			$data = fread($handle, 1048576);
+			
+			if ($first){
+				$first = false;
+				$filehash = CMSQFileManager::FileUpload(
+					CMSRegistry::$instance->db, $this->userid, $this->folderid, 
+					$fName, $data, $fSize, $fExt, 
+					($upload->file_is_image ? 1 : 0), 
+					$imageWidth, $imageHeight, $this->fileAttribute
+				);
+			}else{
+				CMSQFileManager::FileUploadPart(CMSRegistry::$instance->db, $filehash, $data);
+			}
+		}
+		fclose($handle);
+		
+		if (empty($filehash) || CMSRegistry::$instance->db->IsError()){
+			return UploadError::SERVER_ERROR;
+		}
+		$this->uploadFileHash = $filehash;
+		
+		return UploadError::NO_ERROR;
+	}
+	
+}
+
 class FileManager {
 	
 	/**
@@ -36,6 +383,7 @@ class FileManager {
 	public $db = null;
 	
 	public $user = null;
+	public $userid = 0;
 	
 	/**
 	 * Ядро
@@ -54,6 +402,7 @@ class FileManager {
 		$this->db = $core->db;
 		
 		$this->user = $core->user->info;
+		$this->userid = $core->user->info['userid'];
 	}
 	
 	/**
@@ -303,14 +652,7 @@ class FileManager {
 		return $list;
 	}
 	
-	public function GetFreeSpace(){
-		return $this->GetFreeSpaceByUser($this->user['userid']);
-	}
-	
-	public function GetFreeSpaceByUser($userid){
-		if (!$this->IsAccessProfile($userid)){
-			return 0;
-		}
+	public function GetFreeSpaceMethod(){
 		
 		if (is_null($this->_userGroupSizeLimit)){
 			$list = array();
@@ -323,18 +665,23 @@ class FileManager {
 		
 		$fullsize = CMSQFileManager::FileUsedSpace($this->db, $userid);
 		
-		if ($userid != $this->user['userid']){
-			// $user = CMSQUser::UserById($this->db, $userid);
-			// TODO: необходимо разработать
-			die('error');
-		}else{
-			$user = $this->user;
-		}
+		$user = $this->user;
 		$limit = 0;
 		foreach ($user['group'] as $gp){
 			$limit = max(array($limit, intval($this->_userGroupSizeLimit[$gp]['lmt'])));
 		}
-		return $limit-$fullsize;
+		return $limit-$fullsize;		
+	}
+	
+	public function GetFreeSpace(){
+		if (!$this->IsAccessProfile($this->user->info['userid'])){
+			return 0;
+		}
+		return $this->GetFreeSpaceMethod();
+	}
+	
+	private function GetFreeSpaceByUser(){
+		return 0;
 	}
 	
 	
@@ -387,9 +734,27 @@ class FileManager {
 		return $ret;
 	}
 	
-	public function UploadFile($folderid, $filelocation, $filename, $extension, $filesize, $atrribute = 0, 
-			$ignoreImageSize = false, $ignoreRole = false, $ignoreFreeSpace = false){
+	/**
+	 * Устаревший метод загрузки файлов. Оставлен для совместимости.
+	 */
+	public function UploadFile($folderid, $filelocation, $filename, $extension, $filesize, 
+		$atrribute = 0, $ignoreImageSize = false, $ignoreRole = false, $ignoreFreeSpace = false){
+
+		$uploadFile = $this->CreateImageUpload(array(
+			"name" => $filename,
+			"size" => $filesize,
+			"tmp_name" => $filelocation
+		), $folderid);
+		$uploadFile->ignoreImageSize = $ignoreImageSize;
+		$uploadFile->ignoreUploadRole = $ignoreRole;
+		$uploadFile->ignoreFreeSpace = $ignoreFreeSpace;
+		$uploadFile->fileAttribute = $atrribute;
+		$error = $uploadFile->Upload();
 		
+		$this->lastUploadFileHash = $uploadFile->uploadFileHash;
+		return $error;
+		
+		/*
 		if (!$ignoreRole){
 			if (!$this->IsFileUploadRole()){
 				return 6;
@@ -477,6 +842,55 @@ class FileManager {
 		$this->lastUploadFileHash = $filehash;
 		
 		return 0;
+		/**/
+	}
+	
+	/**
+	 * Создать объект файла для выгрузки
+	 * @param unknown_type $getVarName
+	 * @param unknown_type $folderPath
+	 * @return UploadFile
+	 */
+	public function CreateImageUpload($getVarName, $folderPath){
+		return new UploadFile($getVarName, $folderPath);
+	}
+	
+	public function GetFileData($p_filehash, $begin = 1, $end = 1048576){
+		if (!$this->IsFileViewRole()){ return; }
+		
+		return CMSQFileManager::FileData($this->db, $p_filehash, $begin, $end);
+	}
+	
+	/**
+	 * Сравнить два файла: загружаемый в базу и тот что уже загружен в ней
+	 * @param $filePath путь к физическому файлы
+	 * @param $fileHash идентификатор файла в базе
+	 */
+	public function FilesCompare($filePath, $fileHash){
+		$handle = fopen($filePath, 'rb');
+		if (empty($handle)){ return false; }
+		$fileinfo = CMSQFileManager::FileData($this->db, $fileHash);
+
+		$count = 1;
+		while (!empty($fileinfo['filedata']) && connection_status() == 0) {
+
+			$data = fread($handle, 1048576);
+			
+			if ($data != $fileinfo['filedata']){
+				fclose($handle);
+				return false;
+			}
+			
+			if (strlen($fileinfo['filedata']) == 1048576) {
+				$startat = (1048576 * $count) + 1;
+				$fileinfo = CMSQFileManager::FileData($this->db, $fileHash, $startat);
+				$count++;
+			} else {
+				$fileinfo['filedata'] = '';
+			}
+		}
+		fclose($handle);
+		return true;
 	}
 	
 	private function SaveTempFile($filehash, $imgname){
@@ -490,8 +904,8 @@ class FileManager {
 		$count = 1;
 		while (!empty($fileinfo['filedata']) && connection_status() == 0) {
 			fwrite($handle, $fileinfo['filedata']);
-			if (strlen($fileinfo['filedata']) == 2097152) {
-				$startat = (2097152 * $count) + 1;
+			if (strlen($fileinfo['filedata']) == 1048576) {
+				$startat = (1048576 * $count) + 1;
 				$fileinfo = CMSQFileManager::FileData($this->db, $filehash, $startat);
 				$count++;
 			} else {
@@ -599,12 +1013,31 @@ class FileManager {
 		return CMSQFileManager::FileInfo($this->db, $p_filehash);
 	}
 	
-	public function GetFileData($p_filehash, $begin = 1, $end = 2097152){
-		if (!$this->IsFileViewRole()){
-			return ;
+	public function CreateFolderByPathMethod($path){
+		if (empty($path)){ return 0;}
+		$rows = CMSQFileManager::FolderList($this->db, $this->userid);
+		$folders = array();
+		while (($row = $this->db->fetch_array($rows))){
+			$folders[$row['id']] = $row;
 		}
-		
-		return CMSQFileManager::FileData($this->db, $p_filehash, $begin, $end);
+		$folderid = 0;
+		$arr = explode("/", $path);
+		for ($i=0;$i<count($arr);$i++){
+			$name = translateruen($arr[$i]);
+			
+			$find = false;
+			foreach ($folders as $key => $value){
+				if ($value['pid'] == $folderid && $name == $value['fn']){
+					$folderid = $key;
+					$find = true;
+					break;
+				}
+			}
+			if (!$find){
+				$folderid = CMSQFileManager::FolderAdd($this->db, $folderid, $this->userid, $name, $arr[$i]);
+			}
+		}
+		return $folderid;
 	}
 	
 	/**

@@ -26,6 +26,11 @@ class FileManagerModule extends CMSModule {
 	 */
 	private $_fileManager = null;
 	
+	/**
+	 * @var FileManagerModule
+	 */
+	public static $instance = null;
+	
 	public function __construct(){
 		$this->version = "0.3.2";
 		
@@ -33,6 +38,8 @@ class FileManagerModule extends CMSModule {
 		$this->takelink = "filemanager";
 		
 		$this->permission = new FileManagerPermission($this);
+		
+		FileManagerModule::$instance = $this;
 	}
 	
 	public function GetContentName(){
