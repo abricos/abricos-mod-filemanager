@@ -317,6 +317,7 @@ class UploadFile {
 			if (intval($fSize) == intval($finfo['fs'])){ // размеры совпадают, нужно сравнить побайтно
 				if ($this->manager->FilesCompare($fPath, $finfo['fh'])){
 					$this->uploadFileHash = $finfo['fh'];
+					@unlink($fPath);
 					return UploadError::NO_ERROR;
 				}
 			}
@@ -326,6 +327,7 @@ class UploadFile {
 		// все нормально, теперь можно загружать файл в базу
 		$handle = fopen($fPath, 'rb');
 		if (empty($handle)){
+			@unlink($fPath);
 			return UploadError::SERVER_ERROR;
 		}
 		$first = true;
@@ -348,10 +350,11 @@ class UploadFile {
 		fclose($handle);
 		
 		if (empty($filehash) || CMSRegistry::$instance->db->IsError()){
+			@unlink($fPath);
 			return UploadError::SERVER_ERROR;
 		}
 		$this->uploadFileHash = $filehash;
-		
+		@unlink($fPath);
 		return UploadError::NO_ERROR;
 	}
 	
