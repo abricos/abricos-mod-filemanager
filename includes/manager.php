@@ -394,6 +394,10 @@ class FileManager {
 		$atrribute = 0, $ignoreImageSize = false, $ignoreRole = false, $ignoreFreeSpace = false){
 			
 		$uploadFile = $this->CreateUpload($filelocation, $filename, $folderid);
+		$uploadFile->fileAttribute = $atrribute;
+		$uploadFile->ignoreImageSize = $ignoreImageSize;
+		$uploadFile->ignoreUploadRole = $ignoreRole;
+		$uploadFile->ignoreFreeSpace = $ignoreFreeSpace;
 		$error = $uploadFile->Upload();
 		
 		$this->lastUploadFileHash = $uploadFile->uploadFileHash;
