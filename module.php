@@ -32,7 +32,7 @@ class FileManagerModule extends CMSModule {
 	public static $instance = null;
 	
 	public function __construct(){
-		$this->version = "0.3.2";
+		$this->version = "0.3.3";
 		
 		$this->name = "filemanager";
 		$this->takelink = "filemanager";

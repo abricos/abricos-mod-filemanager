@@ -193,4 +193,10 @@ if ( $updateManager->isUpdate('0.3.2')){
 	);
 }
 
+if ( $updateManager->isUpdate('0.3.3')){
+	$db->query_write("ALTER TABLE `".$pfx."fm_file` CHANGE `filedata` `filedata` LONGBLOB NULL DEFAULT NULL");
+}
+
+ 
+
 ?>
