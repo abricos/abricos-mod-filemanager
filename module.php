@@ -10,9 +10,6 @@
  * @author Alexander Kuzmin (roosit@abricos.org)
  */
 
-$mod = new FileManagerModule();
-CMSRegistry::$instance->modules->Register($mod);
-
 /**
  * Модуль "Менеджер файлов"
  * 
@@ -126,8 +123,9 @@ class FileManagerQuery {
 			";
 		$db->query_write($sql);
 	}
-
 }
 
+$mod = new FileManagerModule();
+CMSRegistry::$instance->modules->Register($mod);
 
 ?>

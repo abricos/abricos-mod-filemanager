@@ -60,7 +60,7 @@ if (isset($_SERVER['HTTP_IF_NONE_MATCH'])){
 CMSQFileManager::FileUpdateCounter(Brick::$db, $p_filehash);
 
 if ($client_etag == $etag){
-	@header('Not Modified', true, 304);
+	header($_SERVER['SERVER_PROTOCOL'].' 304 Not Modified', true, 304);
 	exit;
 }
 
