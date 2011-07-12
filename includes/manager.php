@@ -406,6 +406,7 @@ class FileManager {
 	
 	/**
 	 * Создать объект файла для выгрузки
+	 * @return UploadFile
 	 */
 	public function CreateUpload($filePath, $fileName = '', $folderid = 0){
 		require_once 'uploadfile.php';
@@ -485,9 +486,8 @@ class FileManager {
 	}
 	
 	public function ImageConvert($p_filehash, $p_w, $p_h, $p_cnv){
-		
 		if (empty($p_w) && empty($p_h) && empty($p_cnv)){ return $p_filehash; }
-
+		
 		if (!$this->IsFileViewRole()){
 			return $p_filehash;
 		}
@@ -550,14 +550,14 @@ class FileManager {
 
 		if (!file_exists($upload->file_dst_pathname)){ return $p_filehash; }
 		
-		$error = $this->UploadFile(
-			$image['folderid'],
-			$upload->file_dst_pathname, 
-			$newfilename.".".$pathinfo['extension'],
-			$upload->file_dst_name_ext, 
-			filesize($upload->file_dst_pathname), 
-			CMSQFileManager::FILEATTRIBUTE_HIDEN, false, true, true
-		);
+		$uploadFile = $this->CreateUpload($upload->file_dst_pathname, $newfilename.".".$pathinfo['extension'], $image['folderid']);
+		$uploadFile->fileAttribute = CMSQFileManager::FILEATTRIBUTE_HIDEN;
+		$uploadFile->ignoreImageSize = false;
+		$uploadFile->ignoreUploadRole = true;
+		$uploadFile->ignoreFreeSpace = true;
+		$error = $uploadFile->Upload();
+
+		$this->lastUploadFileHash = $uploadFile->uploadFileHash;
 
 		if (!empty($error) || empty($this->lastUploadFileHash)){
 			return $p_filehash;

@@ -204,15 +204,17 @@ class UploadFile {
 		}
 		
 		// проверка роли на выгрузку файла
-		if (!$this->IsFileUploadRole()){
+		if (!$this->ignoreUploadRole){
 			if (!$this->IsFileUploadRole()){ 
 				return UploadError::ACCESS_DENIED; 
 			}
+		}else{
+			$this->outUserProfile = true;
 		}
 		
 		// выгрузка в профиль или глобальное хранилище?
 		$userid = $this->userid;
-		if (!$this->outUserProfile ){
+		if (!$this->outUserProfile){
 			if (intval($this->userid) == 0){
 				return UploadError::ACCESS_DENIED; 
 			}

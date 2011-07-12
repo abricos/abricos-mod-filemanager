@@ -40,7 +40,7 @@ if($adress->level > 2 && $adress->dir[1] == 'i'){
 	$p_cnv = Brick::$input->clean_gpc('g', 'cnv', TYPE_STR);
 }
 
-$modFM = Brick::$modules->GetModule('filemanager');
+$modFM = FileManagerModule::$instance;
 $fileManager = $modFM->GetFileManager(); 
 
 $p_filehash = $fileManager->ImageConvert($p_filehash, $p_w, $p_h, $p_cnv);
@@ -69,9 +69,10 @@ header('Last-Modified: '.gmdate('D, d M Y H:i:s', $fileinfo['dateline']).' GMT')
 header('ETag: '.$etag.'');
 header('Expires: ' . gmdate("D, d M Y H:i:s", time() + 3600 * 24 * 15) . ' GMT');
 
-$filename = $fileinfo['filename'];
 $extension = $fileinfo['extension'];
 
+/*
+$filename = $fileinfo['filename'];
 if (preg_match('~&#([0-9]+);~', $filename)){
 	if (function_exists('iconv')) {
 		$filename = @iconv(Brick::$cms->config['Misc']['charset'], 'UTF-8//IGNORE', $filename);
@@ -86,7 +87,6 @@ if (preg_match('~&#([0-9]+);~', $filename)){
 } else {
 	$filename_charset = Brick::$cms->config['Misc']['charset'];
 }
-
 
 if (is_browser('mozilla')) {
 	$filename = "filename*=" . $filename_charset . "''" . rawurlencode($filename);
@@ -106,16 +106,17 @@ if (is_browser('mozilla')) {
 }
 
 if (in_array($extension, array('jpg', 'jpe', 'jpeg', 'gif', 'png'))) {
-	header("Content-disposition: inline; ".$filename);
-	header('Content-transfer-encoding: binary');
+	// header("Content-disposition: inline; ".$filename);
+	// header('Content-transfer-encoding: binary');
 } else {
 	// force txt files to be downloaded because of a possible XSS issue
-	header("Content-disposition: attachment; $filename");
+	// header("Content-disposition: attachment; $filename");
 }
+/**/
 
 header('Content-Length: ' . $fileinfo['filesize']);
 
-$fileExtList = $fileManager->GetFileExtensionList();
+$fileExtList = $fileManager->GetFileExtensionList(true);
 
 $mimetype = $fileExtList[$extension]['mimetype'];
 
