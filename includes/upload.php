@@ -8,8 +8,8 @@
  * @author Alexander Kuzmin (roosit@abricos.org)
  */
 
-$modFM = Brick::$modules->GetModule('filemanager');
-$fileManager = $modFM->GetFileManager();
+
+$fileManager = FileManagerModule::$instance->GetManager();
 
 if (!$fileManager->IsFileUploadRole()){ return; }
 

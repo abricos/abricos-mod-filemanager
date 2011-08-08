@@ -364,7 +364,6 @@ class FileManager {
 		if (empty($filecount)){ 
 			return 0; 
 		}
-		
 		$filename = trim($fileinfo['name']);
 		$pathinfo = pathinfo($filename);
 		$extension = strtolower($pathinfo['extension']);
@@ -382,6 +381,7 @@ class FileManager {
 		if (!is_uploaded_file($filelocation)){ 
 			return 3; 
 		}
+
 		$ret = $this->UploadFile($folderid, $filelocation, $filename, $extension, $filesize);
 
 		return $ret;
