@@ -11,7 +11,7 @@
 <div id="{i#id}" class="yui-navset">
 	<ul class="yui-nav">
 		<li class="selected"><a href="#{i#limit}"><em>Лимиты</em></a></li>
-		<li><a href="#{i#exten}"><em>Разрешеные файлы</em></a></li>
+		<li><a href="#{i#exten}"><em>Разрешенные типы файлов</em></a></li>
 	</ul>            
   <div class="yui-content">
 	  <div id="{i#limit}"></div>
@@ -44,7 +44,7 @@
 </tr>
 
 <!--{limitrow}-->
-<tr valign="top">
+<tr valign="top" class="row">
 	<td>{v#gnm}</td>
 	<td>{v#lmt}</td>
 	<td><a href="#" id="{i#edit}-{v#id}">Править</a></td>
@@ -118,7 +118,7 @@
 </tr>
 
 <!--{extrow}-->
-<tr valign="top">
+<tr valign="top" class="row">
 	<td>{v#ext}</td>
 	<td>{v#mime}</td>
 	<td>{v#size}</td>
