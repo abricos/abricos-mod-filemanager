@@ -316,7 +316,7 @@ class FileManager {
 			$this->_userGroupSizeLimit = $list;
 		}
 		
-		$fullsize = CMSQFileManager::FileUsedSpace($this->db, $userid);
+		$fullsize = CMSQFileManager::FileUsedSpace($this->db, $this->userid);
 		
 		$user = $this->user;
 		$limit = 0;

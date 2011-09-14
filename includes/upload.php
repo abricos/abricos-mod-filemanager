@@ -3,7 +3,7 @@
  * @version $Id$
  * @package Abricos
  * @subpackage FileManager
- * @copyright Copyright (C) 2008 Abricos All rights reserved.
+ * @copyright Copyright (C) 2011 Abricos All rights reserved.
  * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
  * @author Alexander Kuzmin (roosit@abricos.org)
  */
@@ -11,51 +11,75 @@
 
 $fileManager = FileManagerModule::$instance->GetManager();
 
-if (!$fileManager->IsFileUploadRole()){ return; }
+if (!$fileManager->IsFileUploadRole()){ return; } 
 
-$back = Brick::$builder->brick;
+$brick = Brick::$builder->brick;
+$var = &$brick->param->var;
 
-$folderid = Brick::$input->clean_gpc('g', 'folderid', TYPE_STR);
-$brick->param->var['fid'] = $folderid;
+$p_userid		= Brick::$input->clean_gpc('g', 'userid', TYPE_STR);
+$p_winid		= Brick::$input->clean_gpc('g', 'winid', TYPE_STR);
+$p_sysfolder	= Brick::$input->clean_gpc('g', 'sysfolder', TYPE_STR);
+$p_folderid		= Brick::$input->clean_gpc('g', 'folderid', TYPE_STR);
+$p_folderpath	= Brick::$input->clean_gpc('g', 'folderpath', TYPE_STR);
 
 // формирование списка разрешенных типов файлов и их макс. размеры
 $list = "";
 
-$fileExtensionList = $fileManager->GetFileExtensionList();
+$fexts = $fileManager->GetFileExtensionList();
 
-foreach ($fileExtensionList as $key => $value){
+foreach ($fexts as $key => $value){
 	$imgSize = "&nbsp;";
 	if (!empty($value['maxwidth'])){
 		$imgSize = $value['maxwidth']."x".$value['maxheight'];
 	}
 	$list .= Brick::ReplaceVarByData($brick->param->var["ftypelsti"], array(
-		"1" => $key,
-		"2" => round(($value['maxsize']/1024))." Kb",
-		"3" => $imgSize 
+		"ext" => $key,
+		"fsize" => round(($value['maxsize']/1024))." Kb",
+		"imgsize" => $imgSize 
 	));
 }
-$brick->param->var['ftypelst'] = $list;
-
-
 $freeSpace = $fileManager->GetFreeSpace();
-$brick->param->var['freespace'] = (round($freeSpace/1024/1024))." mb";
+
+$brick->content = Brick::ReplaceVarByData($brick->content, array(
+	"freespace" => (round($freeSpace/1024/1024))." mb",
+	"userid" => $p_userid,
+	"winid" => $p_winid,
+	"folderid" => $p_folderid,
+	"folderpath" => $p_folderpath,
+	"sysfolder" => $p_sysfolder,
+	"ftypelst" => $list
+));
 
 
 $p_do = Brick::$input->clean_gpc('g', 'do', TYPE_STR);
 if ($p_do == "upload"){
-	$p_file = Brick::$input->clean_gpc('f', 'uploadfile', TYPE_FILE);
-	$errornum = $fileManager->UploadFiles($folderid, $p_file);
-	if ($errornum > 0){
-		$errorText = 
-			str_replace("#1",
-				$brick->param->var['err'.$errornum],
-				$brick->param->var['errt']
-			);
-		$errorText = str_replace("#2",	$p_file['name'], $errorText);
-		$brick->param->var['err'] = $errorText; 
-	}else{
-		$brick->param->var['onload'] = str_replace("#fid#", $folderid, $brick->param->var['onloads']); 
+	
+	$uploadFile = FileManagerModule::$instance->GetManager()->CreateUploadByVar('uploadfile');
+	if ($p_folderid > 0){
+		$uploadFile->folderid = $p_folderid;
+	}else if (!empty($p_folderpath)){
+		$uploadFile->folderPath = $p_folderpath;
+	}else if ($p_sysfolder){
+		$uploadFile->folderPath = "system/".date("d.m.Y", TIMENOW);
 	}
+	$error = $uploadFile->Upload();
+
+	if ($error == 0){
+		$var['command'] = Brick::ReplaceVarByData($var['ok'], array(
+			"winid" => $p_winid,
+			"fhash" => $uploadFile->uploadFileHash,
+			"fname" => $uploadFile->fileName
+		));
+	}else{
+		$var['command'] = Brick::ReplaceVarByData($var['error'], array(
+			"errnum" => $error
+		));
+	
+		$brick->content = Brick::ReplaceVarByData($brick->content, array(
+			"fname" => $uploadFile->fileName
+		));
+	}
+	
 }
 
 ?>

@@ -1,0 +1,31 @@
+<!--{files}-->
+<div class="aw-filemanager" id="{i#id}" >
+	<div class="attach">
+		<div id="{i#table}"></div>
+		<a href="#" id="{i#bshowbtns}" class="abtn" title="Прикрепить файлы к проекту">Прикрепить файл</a>
+		<a href="#" id="{i#bshowbtnsex}" class="abtn" style="display: none;" title="Прикрепить файлы к проекту">Прикрепить еще файл</a>
+		<div id="{i#fm}" style="display: none;">
+			<input id="{i#bupload}" class="btn" type="button" value="Загрузить с компьютера" title="Загрузить файл со своего компьютера" />
+			<input id="{i#bshowfm}" class="btn" type="button" value="Выбрать в менеджере файлов" title="Выбрать файл через менеджер" />
+			<a href="#" id="{i#bcancel}" class="abtn" title="Отмена">Отмена</a>
+		</div>
+	</div>
+</div>
+
+<!--{ftable}-->
+{v#rows}
+<div class="clear"></div>
+
+<!--{frow}-->
+<ul class="file">
+	<li><a href="{v#src}" target="_blank" class="src">{v#nm}</a></li>
+	<li><div id="{i#remove}-{v#fid}" class="fremove"></div></li>
+</ul>
+
+<!--{list}-->
+<div class="aw-filemanager" id="{i#id}" >
+	<div class="attachview" id="{i#table}"></div>
+</div>
+
+<!--{viewrow}-->
+<div class="file"><a href="{v#src}" target="_blank">{v#nm}</a>&nbsp;(<a href="{v#src}" target="_blank">скачать</a>)</div>

@@ -241,10 +241,13 @@ Component.entryPoint = function(){
 		},
 		onLoad: function(){
 			var __self = this;
-			this.uploadWindow = null;
 			this.screenshot = new Screenshot(this, this.el('screenshot'));
 			this.folders = new FolderPanel(function(item){ __self.onSelectItem_foldersPanel(item);});
 			this.files = new FilesPanel(this.el('files'), '0', function(item){ __self.onSelectItem_filesPanel(item);});
+			
+			this.fileUploader = new NS.FileUploader(Brick.env.user.id, function(fileid, filename){
+				__self.onFileUpload(fileid, filename);
+			});
 		},
 		onSelectItem_foldersPanel: function(item){
 			this.files.setFolderId(item.id);
@@ -288,18 +291,13 @@ Component.entryPoint = function(){
 			this.folders.destroy();
 		},
 		showUpload: function(){
-			if (!L.isNull(this.uploadWindow) && !this.uploadWindow.closed && L.isFunction(this.uploadWindow.focus)){
-				this.uploadWindow.focus();
-			}else{
-				var folderid = this.folders.selectedFolderId;
-				this.uploadWindow = window.open(
-					'/filemanager/upload.html?folderid='+folderid, 'upload'+folderid,	
-					'statusbar=no,menubar=no,toolbar=no,scrollbars=yes,resizable=yes'	+ 
-					',width=480,height=480'); 
-			}
+			this.fileUploader.fileUpload({
+				'folderid': this.folders.selectedFolderId
+			}); 
 		},
-		setUploader: function(doc){ new Uploader(doc); },
-		uploadOK: function(folderid){ this.files.refresh(); },
+		onFileUpload: function(fileid, filename){
+			this.files.refresh(); 
+		},
 		selectItem: function(){
 			if (L.isNull(this.files.selectedItem)){ return; }
 			var item = this.files.selectedItem;
@@ -642,28 +640,7 @@ Component.entryPoint = function(){
 			return false;
 		}
 	});
-
-	var Uploader = function(doc){this.init(doc);};
-	Uploader.prototype = {
-		doc: null,
-		init: function(container){
-			var doc = this.doc = container.document;
-
-			var form = doc.getElementById('bk-fm-upload-form');
-			var btn = doc.getElementById('bk-fm-upload-btn');
-			var file = doc.getElementById('bk-fm-upload-file');
-			
-			E.on(form, 'submit', function(ev){
-				if (!file.value){
-					alert('Необходимо выбрать файл');
-					E.stopEvent(ev);
-					container.focus();
-					return false;
-				}
-				return true;
-			});
-		}
-	};
+	
 
 })();
 };

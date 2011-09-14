@@ -126,5 +126,74 @@ Component.entryPoint = function(){
 	
 	NS.Linker = Linker;
 	
+	
+	var FileUploaders = function(){
+		this.init();
+	};
+	FileUploaders.prototype = {
+		init: function(){
+			this.idinc = 0;
+			this.list = {};
+		},
+		register: function(uploader){
+			var id = this.idinc++;
+			this.list[id] = uploader;
+			return id;
+		},
+		remove: function(id){
+			delete this.list[id];
+		},
+		setFile: function(id, fileid, filename){
+			var ed = this.list[id];
+			if (!ed){ return; }
+			try{
+				ed.setFile(fileid, filename);
+			}catch(e){}
+		}
+	};
+	
+	NS.fileUploaders = new FileUploaders();
+	
+	var FileUploader = function(userid, callback, cfg){
+		cfg = L.merge({
+			'folderid': 0,
+			'folderpath': '',
+			'sysfolder': false
+		}, cfg || {});
+		this.init(userid, callback, cfg);
+	};
+	FileUploader.prototype = {
+		init: function(userid, callback, cfg){
+			this.uploadWindow = null;
+			this.userid = userid;
+			this.callback = callback;
+			this.cfg = cfg;
+			this.id = NS.fileUploaders.register(this);
+		},
+		destroy: function(){
+			NS.fileUploaders.remove(this.id);
+		},
+		fileUpload: function(ucfg){
+			if (!L.isNull(this.uploadWindow) && !this.uploadWindow.closed){
+				this.uploadWindow.focus();
+				return;
+			}
+			var element = this.row,
+				cfg = L.merge(this.cfg, ucfg || {});
+			
+			var url = '/filemanager/upload.html?userid='+this.userid+'&winid='+this.id+'&sysfolder='+(cfg.sysfolder ? '1' : '0')+'&folderid='+cfg.folderid+"&folderpath="+cfg.folderpath;
+			this.uploadWindow = window.open(
+				url, 'upload'+this.id,	
+				'statusbar=no,menubar=no,toolbar=no,scrollbars=yes,resizable=yes,width=480,height=450' 
+			); 
+		},
+		setFile: function(fileid, filename){
+			if (L.isFunction(this.callback)){
+				this.callback(fileid, filename);
+			}
+		}
+	};
+	NS.FileUploader = FileUploader;
+	
 };
 
