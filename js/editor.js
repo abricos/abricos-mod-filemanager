@@ -42,12 +42,9 @@ Component.entryPoint = function(){
 	var ImageEditorPanel = function(file, callback){
 		this.sourcefile = file;
 		this.callback = callback;
-		ImageEditorPanel.superclass.constructor.call(this, {
-			modal: true,
-			fixedcenter: true
-		});
+		ImageEditorPanel.superclass.constructor.call(this);
 	};
-	YAHOO.extend(ImageEditorPanel, Brick.widget.Panel, {
+	YAHOO.extend(ImageEditorPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(TId['editor'][name]); },
 		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
 		setel: function(el, value){ Brick.util.Form.setValue(el, value); },

@@ -144,10 +144,7 @@ Component.entryPoint = function(){
 
 	var CreateFolderPanel = function(callback){
 		this.callback = callback;
-		CreateFolderPanel.superclass.constructor.call(this, {
-			modal: true,
-			fixedcenter: true
-		});
+		CreateFolderPanel.superclass.constructor.call(this);
 	};
 	YAHOO.extend(CreateFolderPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(TId['createfolderpanel'][name]); },
@@ -173,10 +170,7 @@ Component.entryPoint = function(){
 	var FolderEditPanel = function(row, callback){
 		this.row = row;
 		this.callback = callback;
-		FolderEditPanel.superclass.constructor.call(this, {
-			modal: true,
-			fixedcenter: true
-		});
+		FolderEditPanel.superclass.constructor.call(this);
 	};
 	YAHOO.extend(FolderEditPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(TId['editfolderpanel'][name]); },
@@ -204,10 +198,7 @@ Component.entryPoint = function(){
 	var FolderRemoveMsg = function(row, callback){
 		this.row = row;
 		this.callback = callback;
-		FolderRemoveMsg.superclass.constructor.call(this, {
-			modal: true,
-			fixedcenter: true
-		});
+		FolderRemoveMsg.superclass.constructor.call(this);
 	};
 	YAHOO.extend(FolderRemoveMsg, Brick.widget.Dialog, {
 		initTemplate: function(){
@@ -226,10 +217,7 @@ Component.entryPoint = function(){
 	
 	var BrowserPanel = function(callback){
 		this.callback = callback;
-		BrowserPanel.superclass.constructor.call(this, {
-			modal: true,
-			fixedcenter: true
-		});
+		BrowserPanel.superclass.constructor.call(this);
 	};
 	YAHOO.extend(BrowserPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(TId['panel'][name]); },
@@ -622,9 +610,7 @@ Component.entryPoint = function(){
 	var FileRemoveMsg = function(row, callback){
 		this.row = row;
 		this.callback = callback;
-		FileRemoveMsg.superclass.constructor.call(this, {
-			modal: true, fixedcenter: true
-		});
+		FileRemoveMsg.superclass.constructor.call(this);
 	};
 	YAHOO.extend(FileRemoveMsg, Brick.widget.Dialog, {
 		initTemplate: function(){

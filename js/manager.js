@@ -174,11 +174,10 @@ Component.entryPoint = function(){
 		this.tname = row.isNew() ? 'limitappendpanel' : 'limiteditorpanel';
 		this.callback = callback;
 		GroupLimitEditorPanel.superclass.constructor.call(this, {
-			modal: true,
-			fixedcenter: true, width: '400px', resize: true
+			width: '400px', resize: true
 		});
 	};
-	YAHOO.extend(GroupLimitEditorPanel, Brick.widget.Panel, {
+	YAHOO.extend(GroupLimitEditorPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(this._TId[this.tname][name]); },
 		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
 		setelv: function(name, value){ Brick.util.Form.setValue(this.el(name), value); },
@@ -332,12 +331,11 @@ Component.entryPoint = function(){
 		this.row = row;
 		this.callback = callback;
 		ExtensionEditorPanel.superclass.constructor.call(this, {
-			modal: true,
-			fixedcenter: true, width: '600px', resize: true
+			width: '600px', resize: true
 		});
 	};
 	
-	YAHOO.extend(ExtensionEditorPanel, Brick.widget.Panel, {
+	YAHOO.extend(ExtensionEditorPanel, Brick.widget.Dialog, {
 		el: function(name){ return Dom.get(this._TId['exteditorpanel'][name]); },
 		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
 		setelv: function(name, value){ Brick.util.Form.setValue(this.el(name), value); },
