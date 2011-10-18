@@ -104,7 +104,7 @@ class UploadFile {
 	 * Загрузить в глобальное хранилище (не в профиль пользователя)
 	 * @var boolean default false
 	 */
-	private $outUserProfile = false; // временно отключено
+	public $outUserProfile = false; // временно отключено
 	
 	/**
 	 * Отключить проверку на допустимый тип файла
@@ -233,7 +233,7 @@ class UploadFile {
 		}
 		
 		// есть ли свободное место в профиле пользователя?
-		if (!$this->ignoreFreeSpace){
+		if (!$this->outUserProfile && !$this->ignoreFreeSpace){
 			$freespace = $this->manager->GetFreeSpaceMethod($this->userid);
 			// TODO: возможно есть смысл делать эту проверку после того, как картинка будет сжата   
 			if ($freespace < $fSize){
@@ -317,19 +317,21 @@ class UploadFile {
 		
 		$db = CMSRegistry::$instance->db;
 		
-		// а вдруг этот файл грузят второй раз?
-		$finfo = CMSQFileManager::FileInfoByName($db, $this->userid, $this->folderid, $fName);
-		if (!empty($finfo)){ // точно! так оно и есть.
-			// а может быть этот файл тот же самый?
-			if (intval($fSize) == intval($finfo['fs'])){ // размеры совпадают, нужно сравнить побайтно
-				if ($this->manager->FilesCompare($fPath, $finfo['fh'])){
-					$this->uploadFileHash = $finfo['fh'];
-					@unlink($fPath);
-					return UploadError::NO_ERROR;
+		if ($userid > 0){
+			// а вдруг этот файл грузят второй раз?
+			$finfo = CMSQFileManager::FileInfoByName($db, $userid, $this->folderid, $fName);
+			if (!empty($finfo)){ // точно! так оно и есть.
+				// а может быть этот файл тот же самый?
+				if (intval($fSize) == intval($finfo['fs'])){ // размеры совпадают, нужно сравнить побайтно
+					if ($this->manager->FilesCompare($fPath, $finfo['fh'])){
+						$this->uploadFileHash = $finfo['fh'];
+						@unlink($fPath);
+						return UploadError::NO_ERROR;
+					}
 				}
+				// у этих файлов одинаковое только имя
+				// TODO: необходимо создавать новое имя файла, и делать повторно попытку его загрузки
 			}
-			// у этих файлов одинаковое только имя
-			// TODO: необходимо создавать новое имя файла, и делать повторно попытку его загрузки
 		}
 		// все нормально, теперь можно загружать файл в базу
 		$handle = fopen($fPath, 'rb');
@@ -345,7 +347,7 @@ class UploadFile {
 			if ($first){
 				$first = false;
 				$filehash = CMSQFileManager::FileUpload(
-					CMSRegistry::$instance->db, $this->userid, $this->folderid, 
+					CMSRegistry::$instance->db, $userid, $this->folderid, 
 					$fName, $data, $fSize, $fExt, 
 					($upload->file_is_image ? 1 : 0), 
 					$imageWidth, $imageHeight, $this->fileAttribute
