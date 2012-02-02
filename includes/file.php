@@ -15,7 +15,7 @@ error_reporting(E_ERROR);
 
 $brick = Brick::$builder->brick;
 
-$adress = Brick::$cms->adress;
+$adress = Abricos::$adress;
 if($adress->level > 2 && $adress->dir[1] == 'i'){
 	// новая версия запроса файла: 
 	// http://domain.tld/filemanager/i/1a0bd98db/w_16-h_16/brick-cms.png
@@ -34,10 +34,10 @@ if($adress->level > 2 && $adress->dir[1] == 'i'){
 }else{
 	// для совместимости предыдущих версий запроса файла:
 	// http://domain.tld/filemanager/file.html?i=1a0bd98db&fn=brick-cms.png&w=16&h=16
-	$p_filehash = Brick::$input->clean_gpc('g', 'i', TYPE_STR);
-	$p_w = Brick::$input->clean_gpc('g', 'w', TYPE_STR);
-	$p_h = Brick::$input->clean_gpc('g', 'h', TYPE_STR);
-	$p_cnv = Brick::$input->clean_gpc('g', 'cnv', TYPE_STR);
+	$p_filehash = Abricos::CleanGPC('g', 'i', TYPE_STR);
+	$p_w = Abricos::CleanGPC('g', 'w', TYPE_STR);
+	$p_h = Abricos::CleanGPC('g', 'h', TYPE_STR);
+	$p_cnv = Abricos::CleanGPC('g', 'cnv', TYPE_STR);
 }
 
 $modFM = FileManagerModule::$instance;
@@ -57,7 +57,7 @@ if (isset($_SERVER['HTTP_IF_NONE_MATCH'])){
 	$client_etag = false;
 
 // Обновить счетчик
-CMSQFileManager::FileUpdateCounter(Brick::$db, $p_filehash);
+CMSQFileManager::FileUpdateCounter(Abricos::$db, $p_filehash);
 
 if ($client_etag == $etag){
 	header($_SERVER['SERVER_PROTOCOL'].' 304 Not Modified', true, 304);
@@ -70,49 +70,6 @@ header('ETag: '.$etag.'');
 header('Expires: ' . gmdate("D, d M Y H:i:s", time() + 3600 * 24 * 15) . ' GMT');
 
 $extension = $fileinfo['extension'];
-
-/*
-$filename = $fileinfo['filename'];
-if (preg_match('~&#([0-9]+);~', $filename)){
-	if (function_exists('iconv')) {
-		$filename = @iconv(Brick::$cms->config['Misc']['charset'], 'UTF-8//IGNORE', $filename);
-	}
-
-	$filename = preg_replace(
-		'~&#([0-9]+);~e',
-		"convert_int_to_utf8('\\1')",
-		$filename
-	);
-	$filename_charset = 'utf-8';
-} else {
-	$filename_charset = Brick::$cms->config['Misc']['charset'];
-}
-
-if (is_browser('mozilla')) {
-	$filename = "filename*=" . $filename_charset . "''" . rawurlencode($filename);
-} else {
-	// other browsers seem to want names in UTF-8
-	if ($filename_charset != 'utf-8' AND function_exists('iconv')) {
-		$filename = @iconv($filename_charset, 'UTF-8//IGNORE', $filename);
-	}
-
-	if (is_browser('opera')) {
-		// Opera does not support encoded file names
-		$filename = 'filename="' . str_replace('"', '', $filename) . '"';
-	} else {
-		// encode the filename to stay within spec
-		$filename = 'filename="' . rawurlencode($filename) . '"';
-	}
-}
-
-if (in_array($extension, array('jpg', 'jpe', 'jpeg', 'gif', 'png'))) {
-	// header("Content-disposition: inline; ".$filename);
-	// header('Content-transfer-encoding: binary');
-} else {
-	// force txt files to be downloaded because of a possible XSS issue
-	// header("Content-disposition: attachment; $filename");
-}
-/**/
 
 header('Content-Length: ' . $fileinfo['filesize']);
 
@@ -142,7 +99,7 @@ while (!empty($fileinfo['filedata']) && connection_status() == 0) {
 	}
 }
 
-Brick::$db->close();
+Abricos::$db->close();
 exit;
 
 function save_log($str){

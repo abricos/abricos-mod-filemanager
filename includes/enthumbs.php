@@ -18,6 +18,6 @@ foreach($arr as &$arr1){
 		"h" => $arr2[1] 
 	));
 }
-Brick::$modules->GetModule('filemanager')->EnableThumbSize($size);
+Abricos::GetModule('filemanager')->EnableThumbSize($size);
 
 ?>

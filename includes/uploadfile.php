@@ -177,8 +177,8 @@ class UploadFile {
 		
 		$this->manager = FileManagerModule::$instance->GetFileManager();
 
-		$this->user = CMSRegistry::$instance->user;
-		$this->userid = $this->user->info['userid'];
+		$this->user = Abricos::$user;
+		$this->userid = $this->user->id;
 		
 		$this->filePath = $filePath;
 		if (empty($fileName)){
@@ -188,7 +188,7 @@ class UploadFile {
 		$this->fileName = $fileName;
 		$this->folderid = $folderid;
 		
-		$this->db = CMSRegistry::$instance->db;
+		$this->db = Abricos::$db;
 	}
 	
 
@@ -267,7 +267,7 @@ class UploadFile {
 				$maxImageHeight = intval($filetype['maxheight']);
 			}
 			if (empty($filetype['mimetype'])){
-				CMSQFileManager::FileTypeUpdateMime(CMSRegistry::$instance->db, $filetype['filetypeid'], $upload->file_src_mime);
+				CMSQFileManager::FileTypeUpdateMime(Abricos::$db, $filetype['filetypeid'], $upload->file_src_mime);
 				$filetype['mimetype'] = $upload->file_src_mime;
 			}
 		}
@@ -315,7 +315,7 @@ class UploadFile {
 			$this->folderid = $this->manager->CreateFolderByPathMethod($this->folderPath);
 		}
 		
-		$db = CMSRegistry::$instance->db;
+		$db = Abricos::$db;
 		
 		if ($userid > 0){
 			// а вдруг этот файл грузят второй раз?
@@ -347,18 +347,18 @@ class UploadFile {
 			if ($first){
 				$first = false;
 				$filehash = CMSQFileManager::FileUpload(
-					CMSRegistry::$instance->db, $userid, $this->folderid, 
+					Abricos::$db, $userid, $this->folderid, 
 					$fName, $data, $fSize, $fExt, 
 					($upload->file_is_image ? 1 : 0), 
 					$imageWidth, $imageHeight, $this->fileAttribute
 				);
 			}else{
-				CMSQFileManager::FileUploadPart(CMSRegistry::$instance->db, $filehash, $data);
+				CMSQFileManager::FileUploadPart(Abricos::$db, $filehash, $data);
 			}
 		}
 		fclose($handle);
 		
-		if (empty($filehash) || CMSRegistry::$instance->db->IsError()){
+		if (empty($filehash) || Abricos::$db->IsError()){
 			@unlink($fPath);
 			return UploadError::SERVER_ERROR;
 		}

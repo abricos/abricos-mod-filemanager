@@ -9,8 +9,8 @@
  */
 
 $brick = Brick::$builder->brick;
-$mod = Brick::$modules->GetModule('sys');
-$fileManager = Brick::$modules->GetModule('filemanager')->GetFileManager();
+$mod = Abricos::GetModule('sys');
+$fileManager = Abricos::GetModule('filemanager')->GetFileManager();
 
 $ds = $mod->getDataSet();
 $ret = new stdClass();

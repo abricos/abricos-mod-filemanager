@@ -11,8 +11,8 @@
 
 
 $charset = "CHARACTER SET 'utf8' COLLATE 'utf8_general_ci'";
-$updateManager = CMSRegistry::$instance->modules->updateManager; 
-$db = CMSRegistry::$instance->db;
+$updateManager = Ab_UpdateManager::$current; 
+$db = Abricos::$db;
 $pfx = $db->prefix;
 
 if ($updateManager->isInstall()){
@@ -166,7 +166,7 @@ if ($updateManager->isInstall() || $updateManager->isUpdate('0.3')){
 }
 
 if ( $updateManager->isUpdate('0.3.1')){
-	CMSRegistry::$instance->modules->GetModule('filemanager')->permission->Install();
+	Abricos::GetModule('filemanager')->permission->Install();
 	
 	$db->query_write("
 		TRUNCATE TABLE `".$pfx."fm_usergrouplimit`

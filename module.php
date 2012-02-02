@@ -16,7 +16,7 @@
  * @package Abricos
  * @subpackage FileManager
  */
-class FileManagerModule extends CMSModule {
+class FileManagerModule extends Ab_Module {
 	
 	/**
 	 * @var FileManager
@@ -29,7 +29,7 @@ class FileManagerModule extends CMSModule {
 	public static $instance = null;
 	
 	public function __construct(){
-		$this->version = "0.3.3";
+		$this->version = "0.3.4";
 		
 		$this->name = "filemanager";
 		$this->takelink = "filemanager";
@@ -109,7 +109,7 @@ class FileManagerPermission extends CMSPermission {
 
 class FileManagerQuery {
 	
-	public static function EnThumbsAppend(CMSDatabase $db, $list){
+	public static function EnThumbsAppend(Ab_Database $db, $list){
 		if (empty($list)){ return; }
 		
 		$values = array();
@@ -125,7 +125,6 @@ class FileManagerQuery {
 	}
 }
 
-$mod = new FileManagerModule();
-CMSRegistry::$instance->modules->Register($mod);
+Abricos::ModuleRegister(new FileManagerModule());
 
 ?>

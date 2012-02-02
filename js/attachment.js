@@ -60,6 +60,7 @@ Component.entryPoint = function(){
 	};
 	NS.AttachmentListWidget = AttachmentListWidget;
 	
+	// TODO: Нет роли на загрузку, но есть список - показать только список
 	var AttachmentWidget = function(container, files){
 		this.init(container, files);
 	};

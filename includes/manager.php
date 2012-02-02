@@ -10,7 +10,7 @@
 
 require_once 'dbquery.php';
 
-class FileManager {
+class FileManager extends Ab_ModuleManager {
 	
 	/**
 	 * 
@@ -29,33 +29,12 @@ class FileManager {
 	
 	private $_userGroupSizeLimit = null;
 	
-	/**
-	 * 
-	 * @var CMSDatabase
-	 */
-	public $db = null;
-	
-	public $user = null;
-	public $userid = 0;
-	
-	/**
-	 * Ядро
-	 * @var CMSRegistry
-	 */
-	public $core = null;
 	
 	private $_rolesDisable = false;
 	private $_checkSizeDisable = false;
 	
 	public function FileManager (FileManagerModule $module){
-		$core = CMSRegistry::$instance;
-		
-		$this->module = $module;
-		$this->core = $core;
-		$this->db = $core->db;
-		
-		$this->user = $core->user->info;
-		$this->userid = $core->user->info['userid'];
+		parent::__construct($module);
 	}
 	
 	/**
@@ -101,24 +80,24 @@ class FileManager {
 	}
 	
 	public function IsAdminRole(){
-		return $this->module->permission->CheckAction(FileManagerAction::FILES_ADMIN) > 0;
+		return $this->IsRoleEnable(FileManagerAction::FILES_ADMIN);
 	}
 	
 	public function IsFileViewRole(){
 		if ($this->_rolesDisable){ return true; }
-		return $this->module->permission->CheckAction(FileManagerAction::FILES_VIEW) > 0;
+		return $this->IsRoleEnable(FileManagerAction::FILES_VIEW);
 	}
 	
 	public function IsFileUploadRole(){
 		if ($this->_rolesDisable){ return true; }
-		return $this->module->permission->CheckAction(FileManagerAction::FILES_UPLOAD) > 0;
+		return $this->IsRoleEnable(FileManagerAction::FILES_UPLOAD);
 	}
 	
 	public function IsAccessProfile($userid = 0){
 		if ($userid == 0){
-			$userid = $this->user['userid'];
+			$userid = $this->user->id;
 		}
-		if (($this->user['userid'] == $userid && $this->IsFileUploadRole())
+		if (($this->user->id == $userid && $this->IsFileUploadRole())
 			|| $this->IsAdminRole()){
 			return true;
 		}
@@ -228,13 +207,13 @@ class FileManager {
 	public function UserConfigList(){
 		if (!$this->IsFileUploadRole()){ return null; }
 		
-		return $this->core->user->GetManager()->UserConfigList($this->user['userid'], 'filemanager');
+		return Abricos::$user->GetManager()->UserConfigList($this->user->id, 'filemanager');
 	}
 
 	public function UserConfigAppend($d){
 		if (!$this->UserConfigCheckVarName($d->nm)){ return; }
 		
-		$this->core->user->GetManager()->UserConfigAppend($this->user['userid'], 'filemanager', $d->nm, $d->vl);
+		Abricos::$user->GetManager()->UserConfigAppend($this->user->id, 'filemanager', $d->nm, $d->vl);
 	}
 	
 	public function UserConfigUpdate($d){
@@ -242,11 +221,11 @@ class FileManager {
 			return;
 		}
 		
-		$this->core->user->GetManager()->UserConfigUpdate($this->user['userid'], $d->id, $d->vl);
+		Abricos::$user->GetManager()->UserConfigUpdate($this->user->id, $d->id, $d->vl);
 	}
 
 	public function FileList($folderid){
-		return $this->FileListByUser($this->user['userid'], $folderid);
+		return $this->FileListByUser($this->user->id, $folderid);
 	}
 	
 	public function FileListByUser($userid, $folderid){
@@ -257,7 +236,7 @@ class FileManager {
 	}
 	
 	public function FolderList(){
-		return $this->FolderListByUser($this->user['userid']);
+		return $this->FolderListByUser($this->user->id);
 	}
 	
 	public function FolderListByUser($userid){
@@ -316,9 +295,9 @@ class FileManager {
 			$this->_userGroupSizeLimit = $list;
 		}
 		
-		$fullsize = CMSQFileManager::FileUsedSpace($this->db, $this->userid);
+		$fullsize = CMSQFileManager::FileUsedSpace($this->db, $this->user->id);
 		
-		$user = $this->user;
+		$user = $this->user->info;
 		$limit = 0;
 		foreach ($user['group'] as $gp){
 			$limit = max(array($limit, intval($this->_userGroupSizeLimit[$gp]['lmt'])));
@@ -327,7 +306,7 @@ class FileManager {
 	}
 	
 	public function GetFreeSpace(){
-		if (!$this->IsAccessProfile($this->user->info['userid'])){
+		if (!$this->IsAccessProfile($this->user->id)){
 			return 0;
 		}
 		return $this->GetFreeSpaceMethod();
@@ -368,7 +347,7 @@ class FileManager {
 		$pathinfo = pathinfo($filename);
 		$extension = strtolower($pathinfo['extension']);
 		
-		$dbFileInfo = CMSQFileManager::FileInfoByName($this->db, $this->user['userid'], $folderid, $filename); 
+		$dbFileInfo = CMSQFileManager::FileInfoByName($this->db, $this->user->id, $folderid, $filename); 
 		if (!empty($dbFileInfo)) {
 			if (!$newNameIfFind){
 				return 7;
@@ -414,7 +393,7 @@ class FileManager {
 	}
 	
 	public function CreateUploadByVar($varname, $folderid = 0){
-		$fi = CMSRegistry::$instance->input->clean_gpc('f', $varname, TYPE_FILE);
+		$fi = Abricos::CleanGPC('f', $varname, TYPE_FILE);
 		return $this->CreateUpload($fi['tmp_name'], $fi['name'], $folderid);
 	}
 	
@@ -577,7 +556,7 @@ class FileManager {
 	
 	public function CreateFolderByPathMethod($path){
 		if (empty($path)){ return 0;}
-		$rows = CMSQFileManager::FolderList($this->db, $this->userid);
+		$rows = CMSQFileManager::FolderList($this->db, $this->user->id);
 		$folders = array();
 		while (($row = $this->db->fetch_array($rows))){
 			$folders[$row['id']] = $row;
@@ -596,7 +575,7 @@ class FileManager {
 				}
 			}
 			if (!$find){
-				$folderid = CMSQFileManager::FolderAdd($this->db, $folderid, $this->userid, $name, $arr[$i]);
+				$folderid = CMSQFileManager::FolderAdd($this->db, $folderid, $this->user->id, $name, $arr[$i]);
 			}
 		}
 		return $folderid;
@@ -612,14 +591,14 @@ class FileManager {
 	 */
 	public function FolderAppend($parentFolderId, $folderName, $folderPhrase = ''){
 		if (!$this->IsFileUploadRole()){ return; }
-		$userid = $this->user['userid'];
+		$userid = $this->user->id;
 		return CMSQFileManager::FolderAdd($this->db, $parentFolderId, $userid, $folderName, $folderPhrase);
 	}
 	
 	public function FolderAppendFromData($data){
 		if (!$this->IsFileUploadRole()){ return; }
 
-		$userid = $this->user['userid'];
+		$userid = $this->user->id;
 		$name = translateruen($data->ph);
 		return CMSQFileManager::FolderAdd($this->db, $data->pid, $userid, $name, $data->ph);
 	}
@@ -627,7 +606,7 @@ class FileManager {
 	public function FolderChangePhrase($data){
 		if (!$this->IsFileUploadRole()){ return; }
 		
-		$userid = $this->user['userid'];
+		$userid = $this->user->id;
 		$finfo = CMSQFileManager::FolderInfo($this->db, $data->id);
 		
 		if (!$this->IsAccessProfile($finfo['uid'])){
@@ -650,7 +629,7 @@ class FileManager {
 	public function FolderInfoByName($parentFolderId, $folderName){
 		if (!$this->IsFileUploadRole()){ return; }
 		
-		$userid = $this->user['userid'];
+		$userid = $this->user->id;
 		return CMSQFileManager::FolderInfoByName($this->db, $userid, $parentFolderId, $folderName);
 	}
 	
@@ -686,7 +665,7 @@ class FileManager {
 		if (empty($lastedit)){ 
 			return; 
 		}
-		$userid = $this->user['userid'];
+		$userid = $this->user->id;
 		CMSQFileManager::ImageEditorSave($this->db, $userid, $filehash, $lastedit, $data->copy);
 	}	
 
@@ -781,7 +760,7 @@ class FileManager {
 		if ($result != 0){ return $fromfilehash; }
 		
 		$newfilehash = $this->lastUploadFileHash;
-		$userid = $this->user['userid'];
+		$userid = $this->user->id;
 		CMSQFileManager::EditorAppend($this->db, $userid, $filehash, $newfilehash, $data->l, $data->t, $data->w, $data->h, $data->tools, $session);
 		
 		return $newfilehash;

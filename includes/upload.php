@@ -16,11 +16,11 @@ if (!$fileManager->IsFileUploadRole()){ return; }
 $brick = Brick::$builder->brick;
 $var = &$brick->param->var;
 
-$p_userid		= Brick::$input->clean_gpc('g', 'userid', TYPE_STR);
-$p_winid		= Brick::$input->clean_gpc('g', 'winid', TYPE_STR);
-$p_sysfolder	= Brick::$input->clean_gpc('g', 'sysfolder', TYPE_STR);
-$p_folderid		= Brick::$input->clean_gpc('g', 'folderid', TYPE_STR);
-$p_folderpath	= Brick::$input->clean_gpc('g', 'folderpath', TYPE_STR);
+$p_userid		= Abricos::CleanGPC('g', 'userid', TYPE_STR);
+$p_winid		= Abricos::CleanGPC('g', 'winid', TYPE_STR);
+$p_sysfolder	= Abricos::CleanGPC('g', 'sysfolder', TYPE_STR);
+$p_folderid		= Abricos::CleanGPC('g', 'folderid', TYPE_STR);
+$p_folderpath	= Abricos::CleanGPC('g', 'folderpath', TYPE_STR);
 
 // формирование списка разрешенных типов файлов и их макс. размеры
 $list = "";
@@ -51,10 +51,10 @@ $brick->content = Brick::ReplaceVarByData($brick->content, array(
 ));
 
 
-$p_do = Brick::$input->clean_gpc('g', 'do', TYPE_STR);
+$p_do = Abricos::CleanGPC('g', 'do', TYPE_STR);
 if ($p_do == "upload"){
 	
-	$uploadFile = FileManagerModule::$instance->GetManager()->CreateUploadByVar('uploadfile');
+	$uploadFile = $fileManager->CreateUploadByVar('uploadfile');
 	if ($p_folderid > 0){
 		$uploadFile->folderid = $p_folderid;
 	}else if (!empty($p_folderpath)){
