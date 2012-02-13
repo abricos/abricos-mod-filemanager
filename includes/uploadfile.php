@@ -148,6 +148,13 @@ class UploadFile {
 	public $maxImageHeight = 0;
 	
 	/**
+	 * Конвертировать изображение
+	 * 
+	 * @var string
+	 */
+	public $imageConvertTo = '';
+	
+	/**
 	 * Загружаемый файл должен быть картинкой.
 	 * @var integer default false
 	 */
@@ -159,12 +166,26 @@ class UploadFile {
 	 */
 	public $fileAttribute = 0;
 	
+	/**
+	 * Открытое имя файла
+	 * Если параметр не задан, имя файла устанавливается оригинальное
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $filePublicName = '';
+	
 	public $filePath = '';
 	public $fileName = '';
 	public $folderid = 0;
 	
 	public $uploadFileHash = '';
 	public $folderPath = '';
+	
+	/**
+	 * @var array  $file $_FILES['form_field']
+	 */
+	public $file = null;
 
 	/**
 	 * Конструктор
@@ -186,17 +207,21 @@ class UploadFile {
 			$fileName = $pi['basename'];
 		}
 		$this->fileName = $fileName;
+		$this->filePublicName = $fileName;
 		$this->folderid = $folderid;
 		
 		$this->db = Abricos::$db;
 	}
 	
-
 	public function IsFileUploadRole(){
 		return FileManagerModule::$instance->permission->CheckAction(FileManagerAction::FILES_UPLOAD) > 0;
 	}
 	
-	
+	/**
+	 * Загрузить картинку в базу
+	 *
+	 * @return integer 0 - нет ошибки, иначе идентификатор ошибки
+	 */
 	public function Upload(){
 		// попытка загрузить не выбранный файл
 		if (!file_exists($this->filePath)){
@@ -248,7 +273,11 @@ class UploadFile {
 		$imageHeight = 0;
 		
 		// upload для обработки картинок
-		$upload = $this->manager->GetUploadLib($fPath);
+		if (is_array($this->file)){
+			$upload = $this->manager->GetUploadLib($this->file);
+		}else{
+			$upload = $this->manager->GetUploadLib($fPath);
+		}
 		
 		// разрешенные типы файлов
 		$extensions = $this->manager->GetFileExtensionList(true);
@@ -296,6 +325,13 @@ class UploadFile {
 				$upload->image_y = $maxImageHeight;
 			}
 			$upload->image_ratio_fill = true;
+			
+			// необходимо ли конвертировать картинку
+			if (!empty($this->imageConvertTo)){
+				$upload->image_convert = $this->imageConvertTo;
+			}
+			$upload->file_new_name_body = $this->filePublicName;
+
 			$upload->process(CWD."/cache");
 			
 			$fPath = $upload->file_dst_pathname;

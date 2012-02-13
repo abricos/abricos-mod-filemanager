@@ -394,7 +394,9 @@ class FileManager extends Ab_ModuleManager {
 	
 	public function CreateUploadByVar($varname, $folderid = 0){
 		$fi = Abricos::CleanGPC('f', $varname, TYPE_FILE);
-		return $this->CreateUpload($fi['tmp_name'], $fi['name'], $folderid);
+		$upload = $this->CreateUpload($fi['tmp_name'], $fi['name'], $folderid);
+		$upload->file = $fi;
+		return $upload;
 	}
 	
 	public function GetFileData($p_filehash, $begin = 1, $end = 1048576){
