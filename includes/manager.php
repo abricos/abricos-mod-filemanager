@@ -487,7 +487,7 @@ class FileManager extends Ab_ModuleManager {
 		
 		$image = CMSQFileManager::ImageExist($this->db, $p_filehash);
 		if (empty($image)){ return $p_filehash; }// есть ли вообще такая картинка
-
+		
 		$imageName = $image['filename'];
 		
 		$dir = CWD."/cache";
@@ -525,8 +525,9 @@ class FileManager extends Ab_ModuleManager {
 		$newfilename = $newfilename."_".implode("_", $nameadd);
 		$upload->file_new_name_body = translateruen($newfilename);
 		
-		$upload->process($dir);
-		
+		if ($upload->process($dir)){
+			$upload->Clean();
+		}
 		unlink($file);
 
 		if (!file_exists($upload->file_dst_pathname)){ return $p_filehash; }

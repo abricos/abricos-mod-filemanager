@@ -311,6 +311,9 @@ class UploadFile {
 			return UploadError::IS_NOT_IMAGE;
 		}
 
+		$upload->file_new_name_body = $this->filePublicName;
+		$fName = $this->filePublicName;
+		
 		// для картинки необходимо выполнить возможные преобразования
 		if ($upload->file_is_image && !$this->ignoreImageSize 
 			&& (($maxImageWidth > 0 && $upload->image_src_x > $maxImageWidth)
@@ -329,8 +332,8 @@ class UploadFile {
 			// необходимо ли конвертировать картинку
 			if (!empty($this->imageConvertTo)){
 				$upload->image_convert = $this->imageConvertTo;
+				$fExt = $this->imageConvertTo;
 			}
-			$upload->file_new_name_body = $this->filePublicName;
 
 			$upload->process(CWD."/cache");
 			
