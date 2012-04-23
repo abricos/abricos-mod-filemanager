@@ -344,6 +344,9 @@ class UploadFile {
 			}
 			$fSize = filesize($fPath);
 		}
+		
+		$isUnlink = !empty($upload->file_dst_name) && $upload->file_src_name != $upload->file_dst_name;
+		
 		if ($upload->file_is_image){
 			$imageWidth = $upload->image_src_x;
 			$imageHeight = $upload->image_src_y;
@@ -364,7 +367,7 @@ class UploadFile {
 				if (intval($fSize) == intval($finfo['fs'])){ // размеры совпадают, нужно сравнить побайтно
 					if ($this->manager->FilesCompare($fPath, $finfo['fh'])){
 						$this->uploadFileHash = $finfo['fh'];
-						@unlink($fPath);
+						if ($isUnlink) @unlink($fPath);
 						return UploadError::NO_ERROR;
 					}
 				}
@@ -375,7 +378,7 @@ class UploadFile {
 		// все нормально, теперь можно загружать файл в базу
 		$handle = fopen($fPath, 'rb');
 		if (empty($handle)){
-			@unlink($fPath);
+			if ($isUnlink) @unlink($fPath);
 			return UploadError::SERVER_ERROR;
 		}
 		$first = true;
@@ -398,11 +401,11 @@ class UploadFile {
 		fclose($handle);
 		
 		if (empty($filehash) || Abricos::$db->IsError()){
-			@unlink($fPath);
+			if ($isUnlink) @unlink($fPath);
 			return UploadError::SERVER_ERROR;
 		}
 		$this->uploadFileHash = $filehash;
-		@unlink($fPath);
+		if ($isUnlink) @unlink($fPath);
 		return UploadError::NO_ERROR;
 	}
 	
