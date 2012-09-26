@@ -1,0 +1,60 @@
+<!--[*]
+[script]accinfo.php[/script]
+
+[bkvar=ftypelsti]
+	<tr align="center">
+		<td>{v#ext}</td>
+		<td>{v#fsize}</td>
+		<td>{v#imgsize}</td>
+	</tr>
+[/bkvar]
+
+[*]-->
+
+<style type="text/css">
+	.mod-filemanager #uploadform #errorpanel {
+		color: red;
+	}
+	.mod-filemanager #uploadform table {
+		border-width: 0;
+		width: 100%;
+	}
+	.mod-filemanager #uploadform .contflist {
+		overflow-y: auto;
+		height: 210px;
+	}
+	.mod-filemanager .errtext {
+		color: red;
+	}
+</style>
+<div class="mod-filemanager">
+	<div id="uploadform">
+
+		<fieldset>
+				<legend>Профиль</legend>
+				<div>{#filemanager.upload_freespace} <span class="{v#clerrtext}">{v#freespace}</span></div>
+		</fieldset>
+	
+		<fieldset>
+			<legend>{#content.upload.13}</legend>
+			<div class="contflist">
+				<table border="1">
+					<thead>
+						<tr align="center">
+							<td>{#filemanager.upload_filetype}</td>
+							<td>{#filemanager.upload_maxfsize}</td>
+							<td>{#filemanager.upload_maxpsize}</td>
+						</tr>
+					</thead>
+					<tbody>
+						{v#ftypelst}
+					</tbody>
+				</table>
+			</div>
+		</fieldset>
+	   	
+		<div align="center" style="margin-top:10px">
+			<input type="button" class="button" value="{#filemanager.upload_close}" onclick="window.close();" />
+		</div>	
+	</div>
+</div>

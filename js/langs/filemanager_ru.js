@@ -1,28 +1,28 @@
-Brick.util.Language.add('ru',{
-	'fm': {
+Brick.util.Language.add('ru',{'mod': {'{C#MODNAME}':{
 		'myfiles': 'Мои файлы',
-		'panel':{   
-            'hd': 'Менеджер файлов',
-			'newfolder':'Создать папку',
-			'bload':'Загрузить файл в текущую папку',
-			'bfload':'Загрузить файл',
-			'code':'HTML код: ',
-			'select':'Выбрать',
-			'cancel':'Отмена'
+		'panel': {
+			'1': 'Адрес',
+			'hd': 'Менеджер файлов',
+			'newfolder': 'Создать папку',
+			'bload': 'Загрузить файл в текущую папку',
+			'bfload': 'Загрузить файл',
+			'code': 'HTML код: ',
+			'select': 'Выбрать',
+			'cancel': 'Отмена'
 		},
 		'createfolderpanel': {
 			'hd': 'Создание папки',
-			'fname':'Имя папки:',
-			'bnew':'Создать',
-			'bcancel':'Отмена'  
+			'fname': 'Имя папки:',
+			'bnew': 'Создать',
+			'bcancel': 'Отмена'
 		},
-		'editfolderpanel':{
+		'editfolderpanel': {
 			'hd': 'Редактирование папки',
-			'fname':'Имя папки:',
-			'bsave':'Сохранить',
-			'bcancel':'Отмена'  
-		},   
-		'screenshot':{
+			'fname': 'Имя папки:',
+			'bsave': 'Сохранить',
+			'bcancel': 'Отмена'
+		},
+		'screenshot': {
 			'hd': 'Скриншот',
 			'name': 'Название: ',
 			'size': 'Размер: ',
@@ -31,19 +31,19 @@ Brick.util.Language.add('ru',{
 			'tt': 'Шаблон:',
 			'insscrn': 'Вставить скриншот'
 		},
-		'files':{
+		'files': {
 			'name': 'Имя',
 			'size': 'Размер',
 			'changed': 'Изменен'
 		},
-		'fileremovemsg':{
+		'fileremovemsg': {
 			'hd': 'Удаление файла',
 			'hd2': 'Внимание!',
 			'hd3': 'Вы действительно хотите удалить файл: ',
 			'remove': 'Удалить',
 			'cancel': 'Отмена'
 		},
-		'folderremovemsg':{
+		'folderremovemsg': {
 			'hd': 'Удаление папки',
 			'hd2': 'Внимание!',
 			'hd3': 'Вы действительно хотите удалить папку ',
@@ -51,13 +51,13 @@ Brick.util.Language.add('ru',{
 			'remove': 'Удалить',
 			'cancel': 'Отмена'
 		},
-		'filesrow':{
+		'filesrow': {
 			'edit': 'Править',
 			'remove': 'Удалить'
 		},
-		'filesrowfd':{
+		'filesrowfd': {
 			'edit': 'Править',
 			'remove': 'Удалить'
 		}
 	}
-});
+}});

@@ -80,6 +80,7 @@ class FileManager extends Ab_ModuleManager {
 	}
 	
 	public function IsAdminRole(){
+		if ($this->_rolesDisable){ return true; }
 		return $this->IsRoleEnable(FileManagerAction::FILES_ADMIN);
 	}
 	

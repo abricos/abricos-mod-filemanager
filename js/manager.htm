@@ -1,156 +1,124 @@
-<!--{panel}-->
-<div class='hd'>Панель администратора</div>
+<!--{panel}--><div class='hd'>{#mod.filemanager.manager.panel.1}</div>
 <div class='bd'>
 	<div id="{i#container}"></div>
 	<div style="text-align: right">
-		<input id="{i#bclose}" type="button" value="Закрыть" />
+		<input id="{i#bclose}" type="button" value="{#mod.filemanager.manager.panel.2}" />
 	</div>
 </div>
-
-<!--{widget}-->
-<div id="{i#id}" class="yui-navset">
+<!--{widget}--><div id="{i#id}" class="yui-navset">
 	<ul class="yui-nav">
-		<li class="selected"><a href="#{i#limit}"><em>Лимиты</em></a></li>
-		<li><a href="#{i#exten}"><em>Разрешенные типы файлов</em></a></li>
+		<li class="selected"><a href="#{i#limit}"><em>{#mod.filemanager.manager.widget.1}</em></a></li>
+		<li><a href="#{i#exten}"><em>{#mod.filemanager.manager.widget.2}</em></a></li>
 	</ul>            
   <div class="yui-content">
 	  <div id="{i#limit}"></div>
 	  <div id="{i#exten}"></div>
 	</div>
 </div>
-
-<!--{limitwidget}-->
-<div class="buttons right">
-	<input type="button" value="Добавить группу" id="{i#bappend}" />
+<!--{limitwidget}--><div class="buttons right">
+	<input type="button" value="{#mod.filemanager.manager.limitwidget.1}" id="{i#bappend}" />
 </div>
 <div id='{i#table}'></div>
-
-<!--{limittable}-->
-<table class="bk-table-def">
+<!--{limittable}--><table class="bk-table-def">
 	<thead>
 		<tr>
-			<th>Группа</th>
-			<th>Объем</th>
+			<th>{#mod.filemanager.manager.limittable.1}</th>
+			<th>{#mod.filemanager.manager.limittable.2}</th>
 			<th></th>
 			<th></th>
 		</tr>
 	</thead>
 	<tbody>{v#rows}</tbody>
 </table>
-
-<!--{limitrowwait}-->
-<tr valign="top">
-	<td colspan="4">Идет загрузка данных...</td>
+<!--{limitrowwait}--><tr valign="top">
+	<td colspan="4">{#mod.filemanager.manager.limitrowwait.1}</td>
 </tr>
-
-<!--{limitrow}-->
-<tr valign="top" class="row">
+<!--{limitrow}--><tr valign="top" class="row">
 	<td>{v#gnm}</td>
 	<td>{v#lmt}</td>
-	<td><a href="#" id="{i#edit}-{v#id}">Править</a></td>
-	<td><a href="#" id="{i#remove}-{v#id}">Удалить</a></td>
+	<td><a href="#" id="{i#edit}-{v#id}">{#mod.filemanager.manager.limitrow.1}</a></td>
+	<td><a href="#" id="{i#remove}-{v#id}">{#mod.filemanager.manager.limitrow.2}</a></td>
 </tr>
-
-<!--{limitappendpanel}-->
-<div class='hd'>Добавить квоту</div>
+<!--{limitappendpanel}--><div class='hd'>{#mod.filemanager.manager.limitappendpanel.1}</div>
 <div class='bd'>
 	<div class="field">
 		<div id="{i#table}"></div>
 		<p>
-			Квота (байт) <input id="{i#size}" type="text" style="width: 80px;" />
+			{#mod.filemanager.manager.limitappendpanel.4} <input id="{i#size}" type="text" style="width: 80px;" />
 		</p>
 		<div style="text-align: right">
-			<input id="{i#bsave}" type="button" value="Добавить" />
-			<input id="{i#bcancel}" type="button" value="Закрыть" />
+			<input id="{i#bsave}" type="button" value="{#mod.filemanager.manager.limitappendpanel.2}" />
+			<input id="{i#bcancel}" type="button" value="{#mod.filemanager.manager.limitappendpanel.3}" />
 		</div>
 	</div>
 </div>
-
-<!--{limiteditorpanel}-->
-<div class='hd'>Изменить квоту</div>
+<!--{limiteditorpanel}--><div class='hd'>{#mod.filemanager.manager.limiteditorpanel.4}</div>
 <div class='bd'>
 	<div class="field">
 		<div id="{i#table}"></div>
 		<p>
-			Квота (байт) <input id="{i#size}" type="text" style="width: 100px;" />
+			{#mod.filemanager.manager.limiteditorpanel.3} <input id="{i#size}" type="text" style="width: 100px;" />
 		</p>
 		<div style="text-align: right">
-			<input id="{i#bsave}" type="button" value="Сохранить" />
-			<input id="{i#bcancel}" type="button" value="Закрыть" />
+			<input id="{i#bsave}" type="button" value="{#mod.filemanager.manager.limiteditorpanel.1}" />
+			<input id="{i#bcancel}" type="button" value="{#mod.filemanager.manager.limiteditorpanel.2}" />
 		</div>
 	</div>
 </div>
-
-<!--{grouptable}-->
-<select id="{i#id}" style="width: 300px;" >{v#rows}</select>
-
-<!--{grouprow}-->
-<option value="{v#id}">{v#nm}</option>
-
-<!--{grouprowwait}-->
-<option>Идет загрузка...</option>
-
-
-<!--{extwidget}-->
-<div class="buttons right">
-	<input type="button" value="Добавить расширение" id="{i#bappend}" />
+<!--{grouptable}--><select id="{i#id}" style="width: 300px;" >{v#rows}</select>
+<!--{grouprow}--><option value="{v#id}">{v#nm}</option>
+<!--{grouprowwait}--><option>{#mod.filemanager.manager.grouprowwait.1}</option>
+<!--{extwidget}--><div class="buttons right">
+	<input type="button" value="{#mod.filemanager.manager.extwidget.1}" id="{i#bappend}" />
 </div>
 <div id='{i#table}'></div>
-
-<!--{exttable}-->
-<table class="bk-table-def">
+<!--{exttable}--><table class="bk-table-def">
 	<thead>
 		<tr>
-			<th>Расширение файла</th>
-			<th>MIME</th>
-			<th>Размер файла, байт</th>
-			<th>Ширина картинки, px</th>
-			<th>Высота картинки, px</th>
+			<th>{#mod.filemanager.manager.exttable.1}</th>
+			<th>{#mod.filemanager.manager.exttable.2}</th>
+			<th>{#mod.filemanager.manager.exttable.3}</th>
+			<th>{#mod.filemanager.manager.exttable.4}</th>
+			<th>{#mod.filemanager.manager.exttable.5}</th>
 			<th></th>
 		</tr>
 	</thead>
 	<tbody>{v#rows}</tbody>
 </table>
-
-<!--{extrowwait}-->
-<tr valign="top">
-	<td colspan="6">Идет загрузка данных...</td>
+<!--{extrowwait}--><tr valign="top">
+	<td colspan="6">{#mod.filemanager.manager.extrowwait.1}</td>
 </tr>
-
-<!--{extrow}-->
-<tr valign="top" class="row">
+<!--{extrow}--><tr valign="top" class="row">
 	<td>{v#ext}</td>
 	<td>{v#mime}</td>
 	<td>{v#size}</td>
 	<td>{v#width}</td>
 	<td>{v#height}</td>
-	<td><a href="#" id="{i#edit}-{v#id}">Править</a></td>
+	<td><a href="#" id="{i#edit}-{v#id}">{#mod.filemanager.manager.extrow.1}</a></td>
 </tr>
-
-<!--{exteditorpanel}-->
-<div class='hd'>Редактор</div>
+<!--{exteditorpanel}--><div class='hd'>{#mod.filemanager.manager.exteditorpanel.1}</div>
 <div class='bd'>
 
 	<div class="field">	
 		<p>
-			Расширение <input id="{i#ext}" type="text" style="width: 300px;" />
+			{#mod.filemanager.manager.exteditorpanel.2} <input id="{i#ext}" type="text" style="width: 300px;" />
 		</p>
 		<p>
-			MIME <input id="{i#mime}" type="text" style="width: 300px;" />
+			{#mod.filemanager.manager.exteditorpanel.3} <input id="{i#mime}" type="text" style="width: 300px;" />
 		</p>
 		<p>
-			Допустимый объем файла, байт <input id="{i#size}" type="text" style="width: 300px;" />
+			{#mod.filemanager.manager.exteditorpanel.4} <input id="{i#size}" type="text" style="width: 300px;" />
 		</p>
 		<p>
-			Макс. ширина картинки, px <input id="{i#width}" type="text" style="width: 300px;" />
+			{#mod.filemanager.manager.exteditorpanel.5}<input id="{i#width}" type="text" style="width: 300px;" />
 		</p>
 		<p>
-			Макс. высота картинки, px <input id="{i#height}" type="text" style="width: 300px;" />
+			{#mod.filemanager.manager.exteditorpanel.6} <input id="{i#height}" type="text" style="width: 300px;" />
 		</p>
  	
 		<div class="buttons right">
-			<input type="button" value="Сохранить" id="{i#bsave}" />
-			<input type="button" value="Отмена" id="{i#bcancel}" />
+			<input type="button" value="{#mod.filemanager.manager.exteditorpanel.7}" id="{i#bsave}" />
+			<input type="button" value="{#mod.filemanager.manager.exteditorpanel.8}" id="{i#bcancel}" />
 		</div>
 	</div>
 </div>

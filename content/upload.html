@@ -57,24 +57,24 @@
 			<input type="submit" class="button" name="upload" value="{#filemanager.upload_load}" />
 		</div>
 		<div id="loading" style="display: none">
-			<img src="/images/loading.gif" />&nbsp;Идет загрузка файла, пожалуйста, подождите...
+			<img src="/images/loading.gif" />&nbsp;{#content.upload.1}
 		</div>
 		<div id="errorpanel" style="display: none" >
-			Не удалось загрузить файл "<b>{v#fname}</b>"<br />
-			<span id="et-1" style="display: none;">Неизвестный тип файла</span>
-			<span id="et-2" style="display: none;">Размер файла превышает допустимый</span>
-			<span id="et-3" style="display: none;">Ошибка сервера</span>
-			<span id="et-4" style="display: none;">Размер изображения превышает допустимый</span>
-			<span id="et-5" style="display: none;">Недостаточно свободного места в вашем профиле</span>
-			<span id="et-6" style="display: none;">Нет прав на загрузку файла</span>
-			<span id="et-7" style="display: none;">Файл с таким именем уже загружен</span>
-			<span id="et-8" style="display: none;">Необходимо выбрать файл для загрузки</span>
-			<span id="et-9" style="display: none;">Некорректное изображение</span>
-			<span id="et-10" style="display: none;">Некорректное изображение</span>
+			{#content.upload.2} "<b>{v#fname}</b>"<br />
+			<span id="et-1" style="display: none;">{#content.upload.3}</span>
+			<span id="et-2" style="display: none;">{#content.upload.4}</span>
+			<span id="et-3" style="display: none;">{#content.upload.5}</span>
+			<span id="et-4" style="display: none;">{#content.upload.6}</span>
+			<span id="et-5" style="display: none;">{#content.upload.7}</span>
+			<span id="et-6" style="display: none;">{#content.upload.8}</span>
+			<span id="et-7" style="display: none;">{#content.upload.9}</span>
+			<span id="et-8" style="display: none;">{#content.upload.10}</span>
+			<span id="et-9" style="display: none;">{#content.upload.11}</span>
+			<span id="et-10" style="display: none;">{#content.upload.12}</span>
 		</div>						
 	</fieldset>
 	<fieldset>
-		<legend>Разрешенные типы файлов и их размеры</legend>
+		<legend>{#content.upload.13}</legend>
 		<div class="contflist">
 			<table border="1">
 				<thead>
@@ -103,7 +103,7 @@
 	var beginUpload = function(){
 		var file = document.getElementById('uploadfile');
 		if (!file.value){
-			alert('Необходимо выбрать файл');
+			alert('{#content.upload.14}');
 			return false;
 		}
 		document.getElementById('btnsUpload').style.display = 'none';

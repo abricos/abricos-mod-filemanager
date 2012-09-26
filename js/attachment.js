@@ -21,22 +21,15 @@ Component.entryPoint = function(){
 		TMG = this.template,
 		API = NS.API;
 	
-	var initCSS = false,
-		buildTemplate = function(w, ts){
-		if (!initCSS){
-			Brick.util.CSS.update(Brick.util.CSS['filemanager']['attachment']);
-			initCSS = true;
-		}
-		w._TM = TMG.build(ts); w._T = w._TM.data; w._TId = w._TM.idManager;
-	};
+	
+	var buildTemplate = this.buildTemplate;
 	
 	var AttachmentListWidget = function(container, files){
 		this.init(container, files);
 	};
 	AttachmentListWidget.prototype = {
 		init: function(container, files){
-			buildTemplate(this, 'list,viewrow');
-			container.innerHTML = this._TM.replace('list');
+			container.innerHTML = buildTemplate(this, 'list,viewrow').replace('list');
 			this.setFiles(files);
 		},
 		setFiles: function(files){

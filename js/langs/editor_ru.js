@@ -1,5 +1,5 @@
-Brick.util.Language.add('ru',{
-	'fm': {
+Brick.util.Language.add('ru',{'mod': {
+	'filemanager': {
                   'editor':{
                          'hd': 'Редактор',
                          'tools': 'Инструменты:',
@@ -11,4 +11,4 @@ Brick.util.Language.add('ru',{
                          'save': 'Сохранить'
                         }
 }
-});
+}});

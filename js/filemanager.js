@@ -49,7 +49,7 @@ Component.entryPoint = function(){
 
 	var ROOT_FOLDER = new Folder({
 		'id':'0','pid':'-1',"fn":"root",
-		'ph':Brick.util.Language.getData()['fm']['myfiles']
+		'ph':Brick.util.Language.getc('mod.filemanager.myfiles')
 	}); 
 
 	var FolderNode = function(oData, oParent, expanded) { 
