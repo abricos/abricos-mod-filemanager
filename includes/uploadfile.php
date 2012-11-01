@@ -321,13 +321,15 @@ class UploadFile {
 			){
 			
 			$upload->image_resize = true;
-			if ($maxImageWidth > 0){
+			if ($maxImageWidth > 0 && $upload->image_src_x > $maxImageWidth){
 				$upload->image_x = $maxImageWidth;
+				$upload->image_ratio_y = true;
 			}
-			if ($maxImageHeight){
+			if ($maxImageHeight > 0 && $upload->image_src_y > $maxImageHeight){
 				$upload->image_y = $maxImageHeight;
+				$upload->image_ratio_x = true;
 			}
-			$upload->image_ratio_fill = true;
+			// $upload->image_ratio_fill = true;
 			
 			// необходимо ли конвертировать картинку
 			if (!empty($this->imageConvertTo)){
