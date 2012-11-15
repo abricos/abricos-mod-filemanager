@@ -503,6 +503,24 @@ class FileManager extends Ab_ModuleManager {
 		if (!empty($p_w) || !empty($p_h)){
 			array_push($nameadd, $p_w."x".$p_h);
 			$upload->image_resize = true;
+			
+			$w = $upload->image_src_x;
+			$h = $upload->image_src_y;
+
+			if ($p_w > 0 && $w > $p_w){
+				$pr = $p_w/$w;
+				$w = $w*$pr;
+				$h = $h*$pr;
+			}
+			if ($p_h >0 && $h > $p_h){
+				$pr = $p_h/$h;
+				$w = $w*$pr;
+				$h = $h*$pr;
+			}
+			
+			$upload->image_x = $w;
+			$upload->image_y = $h;
+			/*
 			if (empty($p_w)){
 				$upload->image_ratio_x = true;
 				$upload->image_y = $p_h;
@@ -514,6 +532,7 @@ class FileManager extends Ab_ModuleManager {
 				$upload->image_y = $p_h;
 				$upload->image_ratio_fill = true;
 			}
+			/**/
 		}
 					
 		// необходимо ли конвертировать картинку

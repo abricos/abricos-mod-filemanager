@@ -321,16 +321,35 @@ class UploadFile {
 			){
 			
 			$upload->image_resize = true;
-			if ($maxImageWidth > 0 && $upload->image_src_x > $maxImageWidth){
-				$upload->image_x = $maxImageWidth;
-				$upload->image_ratio_y = true;
-			}
-			if ($maxImageHeight > 0 && $upload->image_src_y > $maxImageHeight){
-				$upload->image_y = $maxImageHeight;
-				$upload->image_ratio_x = true;
-			}
-			// $upload->image_ratio_fill = true;
 			
+			if ($maxImageWidth>0 && $maxImageHeight>0){
+				$w = $upload->image_src_x;
+				$h = $upload->image_src_y;
+				
+				if ($w > $maxImageWidth){
+					$pr = $maxImageWidth/$w;
+					$w = $w*$pr;
+					$h = $h*$pr;
+				}
+				if ($h > $maxImageHeight){
+					$pr = $maxImageHeight/$h;
+					$w = $w*$pr;
+					$h = $h*$pr;
+				}
+				$upload->image_x = $w;
+				$upload->image_y = $h;
+				
+			}else{
+				if ($maxImageWidth > 0 && $upload->image_src_x > $maxImageWidth){
+					$upload->image_x = $maxImageWidth;
+					$upload->image_ratio_y = true;
+				}
+				if ($maxImageHeight > 0 && $upload->image_src_y > $maxImageHeight){
+					$upload->image_y = $maxImageHeight;
+					$upload->image_ratio_x = true;
+				}
+			}
+					
 			// необходимо ли конвертировать картинку
 			if (!empty($this->imageConvertTo)){
 				$upload->image_convert = $this->imageConvertTo;
@@ -338,6 +357,10 @@ class UploadFile {
 			}
 
 			$upload->process(CWD."/cache");
+			
+			if (Abricos::$config['Misc']['develop_mode']){
+				@file_put_contents(CWD."/cache/#uploadlog.html", $upload->log);
+			}
 			
 			$fPath = $upload->file_dst_pathname;
 			
