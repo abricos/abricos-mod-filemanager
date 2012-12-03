@@ -227,7 +227,7 @@ class UploadFile {
 		if (!file_exists($this->filePath)){
 			return UploadError::FILE_NOT_FOUND;
 		}
-		
+		$log = "";
 		// проверка роли на выгрузку файла
 		if (!$this->ignoreUploadRole){
 			if (!$this->IsFileUploadRole()){ 
@@ -349,19 +349,24 @@ class UploadFile {
 					$upload->image_ratio_x = true;
 				}
 			}
-					
+
 			// необходимо ли конвертировать картинку
 			if (!empty($this->imageConvertTo)){
 				$upload->image_convert = $this->imageConvertTo;
 				$fExt = $this->imageConvertTo;
+				$pi = pathinfo($upload->file_new_name_body);
+				$upload->file_new_name_body = $pi['filename'];
 			}
 
 			$upload->process(CWD."/cache");
 			
+			$fName = $upload->file_dst_name;
+
 			if (Abricos::$config['Misc']['develop_mode']){
-				@file_put_contents(CWD."/cache/#uploadlog.html", $upload->log);
+				$log .= $upload->log;
+				@file_put_contents(CWD."/cache/#uploadlog.html", $log);
 			}
-			
+
 			$fPath = $upload->file_dst_pathname;
 			
 			if (!file_exists($fPath)){ 
@@ -371,10 +376,15 @@ class UploadFile {
 		}
 		
 		$isUnlink = !empty($upload->file_dst_name) && $upload->file_src_name != $upload->file_dst_name;
+		$log .= "Unlink Source File=".($isUnlink ? "true": "false")."<br />";
 		
 		if ($upload->file_is_image){
-			$imageWidth = $upload->image_src_x;
-			$imageHeight = $upload->image_src_y;
+			$imageWidth = $upload->image_dst_x;
+			$imageHeight = $upload->image_dst_y;
+			// Обязательно необходимо указывать именно размер источника
+			// TODO: необходимо исправить из-за новой технологии конвертации картинок
+			// $imageWidth = $upload->image_src_x;
+			// $imageHeight = $upload->image_src_y;
 		}
 		
 		// установить идентификатор директории, если есть
@@ -431,6 +441,7 @@ class UploadFile {
 		}
 		$this->uploadFileHash = $filehash;
 		if ($isUnlink) @unlink($fPath);
+
 		return UploadError::NO_ERROR;
 	}
 	

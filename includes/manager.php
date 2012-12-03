@@ -470,13 +470,16 @@ class FileManager extends Ab_ModuleManager {
 	public function ImageConvert($p_filehash, $p_w, $p_h, $p_cnv){
 		if (empty($p_w) && empty($p_h) && empty($p_cnv)){ return $p_filehash; }
 		
+		$log = "Image Convert <br />";
+		$log .= "Parameters: filehash=$p_filehash, w=$p_w, h=$p_h, format=$p_cnv <br />";
+				
 		if (!$this->IsFileViewRole()){
 			return $p_filehash;
 		}
 		
 		// Запрос особого размера картинки
 		$filehashdst = CMSQFileManager::ImagePreviewHash($this->db, $p_filehash, $p_w, $p_h, $p_cnv);
-		
+
 		if (!empty($filehashdst)){ return $filehashdst; }
 		
 		if (!$this->IsFileUploadRole()){
@@ -488,13 +491,14 @@ class FileManager extends Ab_ModuleManager {
 		
 		$image = CMSQFileManager::ImageExist($this->db, $p_filehash);
 		if (empty($image)){ return $p_filehash; }// есть ли вообще такая картинка
-		
+
 		$imageName = $image['filename'];
 		
 		$dir = CWD."/cache";
 		$pathinfo = pathinfo($imageName);
 		
 		$file = $this->SaveTempFile($p_filehash, $imageName);
+		
 		if (empty($file)){ return $p_filehash; }
 		
 		$upload = $this->GetUploadLib($file);
@@ -517,7 +521,7 @@ class FileManager extends Ab_ModuleManager {
 				$w = $w*$pr;
 				$h = $h*$pr;
 			}
-			
+			$log .= "New width=$w, New height=$h<br />";
 			$upload->image_x = $w;
 			$upload->image_y = $h;
 			/*
@@ -544,12 +548,17 @@ class FileManager extends Ab_ModuleManager {
 		$newfilename = str_replace(".".$pathinfo['extension'], "", $pathinfo['basename']);
 		$newfilename = $newfilename."_".implode("_", $nameadd);
 		$upload->file_new_name_body = translateruen($newfilename);
-		
+
 		if ($upload->process($dir)){
 			$upload->Clean();
 		}
 		unlink($file);
-
+		
+		if (Abricos::$config['Misc']['develop_mode']){
+			$log .= $upload->log;
+			@file_put_contents(CWD."/cache/#uploadlog.html", $log);
+		}
+				
 		if (!file_exists($upload->file_dst_pathname)){ return $p_filehash; }
 		
 		$uploadFile = $this->CreateUpload($upload->file_dst_pathname, $newfilename.".".$pathinfo['extension'], $image['folderid']);
