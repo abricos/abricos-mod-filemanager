@@ -104,7 +104,7 @@ class UploadFile {
 	 * Загрузить в глобальное хранилище (не в профиль пользователя)
 	 * @var boolean default false
 	 */
-	public $outUserProfile = false; // временно отключено
+	public $outUserProfile = false;
 	
 	/**
 	 * Отключить проверку на допустимый тип файла
