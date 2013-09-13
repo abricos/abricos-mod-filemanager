@@ -1,4 +1,5 @@
-<!--{files}--><div class="aw-filemanager" id="{i#id}" >
+<!--{files}-->
+<div class="aw-filemanager" id="{i#id}" >
 	<div class="attach">
 		<div id="{i#table}"></div>
 		<a href="#" id="{i#bshowbtns}" class="abtn">{#mod.filemanager.attachment.files.1}</a>
@@ -10,13 +11,21 @@
 		</div>
 	</div>
 </div>
-<!--{ftable}-->{v#rows}
+
+<!--{ftable}-->
+{v#rows}
 <div class="clear"></div>
-<!--{frow}--><ul class="file">
+
+<!--{frow}-->
+<ul class="file">
 	<li><a href="{v#src}" target="_blank" class="src">{v#nm}</a></li>
 	<li><div id="{i#remove}-{v#fid}" class="fremove"></div></li>
 </ul>
-<!--{list}--><div class="aw-filemanager" id="{i#id}" >
+
+<!--{list}-->
+<div class="aw-filemanager" id="{i#id}" >
 	<div class="attachview" id="{i#table}"></div>
 </div>
-<!--{viewrow}--><div class="file"><a href="{v#src}" target="_blank">{v#nm}</a>&nbsp;(<a href="{v#src}" target="_blank">{#mod.filemanager.attachment.viewrow.1}</a>)</div>
+
+<!--{viewrow}-->
+<div class="file"><a href="{v#src}" target="_blank">{v#nm}</a>&nbsp;(<a href="{v#src}" target="_blank">{#mod.filemanager.attachment.viewrow.1}</a>)</div>

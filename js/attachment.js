@@ -1,38 +1,36 @@
 /*
-@version $Id: draweditor.js 368 2011-08-08 10:07:03Z roosit $
 @package Abricos
-@copyright Copyright (C) 2011 Abricos All rights reserved.
 @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
 */
 
 var Component = new Brick.Component();
 Component.requires = {
 	mod:[
+        {name: 'widget', files: ['notice.js']},
         {name: 'filemanager', files: ['lib.js']}
 	]
 };
-Component.entryPoint = function(){
+Component.entryPoint = function(NS){
 	
 	var Dom = YAHOO.util.Dom,
 		E = YAHOO.util.Event,
-		L = YAHOO.lang;
-	
-	var NS = this.namespace, 
-		TMG = this.template,
-		API = NS.API;
-	
-	
-	var buildTemplate = this.buildTemplate;
+		L = YAHOO.lang,
+		buildTemplate = this.buildTemplate,
+		BW = Brick.mod.widget.Widget;
 	
 	var AttachmentListWidget = function(container, files){
-		this.init(container, files);
+		AttachmentListWidget.superclass.constructor.call(this, container, {
+			'buildTemplate': buildTemplate, 'tnames': 'list,viewrow' 
+		}, files);
 	};
-	AttachmentListWidget.prototype = {
-		init: function(container, files){
-			container.innerHTML = buildTemplate(this, 'list,viewrow').replace('list');
+	YAHOO.extend(AttachmentListWidget, BW, {
+		onLoad: function(files){
 			this.setFiles(files);
 		},
 		setFiles: function(files){
+			if (L.isString(files)){
+				files = files.split(',');
+			}
 			this.files = files = files || [];
 			var alst = [], lst = "", TM = this._TM;
 			for (var i=0;i<files.length;i++){
@@ -50,40 +48,41 @@ Component.entryPoint = function(){
 			lst = alst.join('');
 			TM.getEl('list.table').innerHTML = lst;
 		}
-	};
+	});
 	NS.AttachmentListWidget = AttachmentListWidget;
 	
-	// TODO: Нет роли на загрузку, но есть список - показать только список
-	var AttachmentWidget = function(container, files){
-		this.init(container, files);
+	var AttachmentWidget = function(container, files, cfg){
+		cfg = L.merge({
+			'hideFMButton': false,
+			'clickFileUploadCallback': null
+		}, cfg || {});
+		files = files || [];
+		AttachmentWidget.superclass.constructor.call(this, container, {
+			'buildTemplate': buildTemplate, 'tnames': 'files,ftable,frow' 
+		}, files, cfg);
 	};
-	AttachmentWidget.prototype = {
-		init: function(container, files){
+	YAHOO.extend(AttachmentWidget, BW, {
+		init: function(files, cfg){
 			this.files = files;
-			
-			buildTemplate(this, 'files,ftable,frow');
-			container.innerHTML = this._TM.replace('files');
-			
-			var __self = this;
-			E.on(container, 'click', function(e){
-                if (__self.onClick(E.getTarget(e))){ E.preventDefault(e); }
-			});
-			
-			this.fileUploader = new NS.FileUploader(Brick.env.user.id, function(fileid, filename){
-				__self.onFileUpload(fileid, filename);
-			});
+			this.cfg = cfg;
+		},
+		onLoad: function(files, cfg){
+			if (!L.isFunction(cfg['clickFileUploadCallback'])){
+				this.fileUploader = new NS.FileUploader(Brick.env.user.id, function(fileid, filename){
+					__self.onFileUpload(fileid, filename);
+				});
+			}
 			
 			this.showButtons(false);
-			this.render();
 		},
-		onClick: function(el){
-			var TId = this._TId, tp = TId['files'];
+		onClick: function(el, tp){
+			var TId = this._TId;
 			switch(el.id){
 			case tp['bshowbtnsex']:
 			case tp['bshowbtns']: this.showButtons(true); return true;
 			case tp['bcancel']: this.showButtons(); return true;
 			case tp['bshowfm']: this.showFileBrowser(); return true;
-			case tp['bupload']: this.fileUploader.fileUpload(); return true;
+			case tp['bupload']: this.showFileUpload(); return true;
 			}
 			
 			var arr = el.id.split('-');
@@ -94,14 +93,24 @@ Component.entryPoint = function(){
 			return false;
 		},
 		showButtons: function(en){
-			var TM = this._TM;
-			TM.elShowHide('files.bshowbtns,bshowbtnsex', false);
+			this.elHide('bshowbtns', false);
 			if (this.files.length > 0){
-				TM.elShowHide('files.bshowbtnsex', !en);
+				this.elSetVisible('bshowbtnsex', !en);
 			}else{
-				TM.elShowHide('files.bshowbtns', !en);
+				this.elSetVisible('bshowbtns', !en);
 			}
-			TM.elShowHide('files.fm', en);
+			this.elSetVisible('fm', en);
+			
+			if (this.cfg['hideFMButton']){
+				this.elHide('bshowfm');
+			}
+		},
+		showFileUpload: function(){
+			if (L.isFunction(this.cfg['clickFileUploadCallback'])){
+				this.cfg['clickFileUploadCallback']();
+			}else{
+				this.fileUploader.fileUpload();
+			}
 		},
 		showFileBrowser: function(){
 			var __self = this;
@@ -112,7 +121,7 @@ Component.entryPoint = function(){
 					'nm': fi['name'],
 					'sz': fi['size']
 				});
-        	});
+	    	});
 		},
 		removeFile: function(fid){
 			var fs = this.files, nfs = [];
@@ -150,17 +159,22 @@ Component.entryPoint = function(){
 					'src': lnk.getSrc()
 				});
 			}
-			TM.getEl('files.table').innerHTML = fs.length > 0 ? TM.replace('ftable', {
-				'rows': lst 
-			}) : "";
+			this.elSetHTML({
+				'table': fs.length > 0 ? TM.replace('ftable', {
+					'rows': lst 
+				}) : ""
+			});
 		},
 		onFileUpload: function(fileid, filename){
 			this.appendFile({
 				'id': fileid,
 				'nm': filename
 			});
-		}
-	};
+		}	
+	});
+	
+	// TODO: Нет роли на загрузку, но есть список - показать только список
+	
 	NS.AttachmentWidget = AttachmentWidget;
 
 };

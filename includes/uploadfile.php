@@ -170,10 +170,21 @@ class UploadFile {
 	 * Открытое имя файла
 	 * Если параметр не задан, имя файла устанавливается оригинальное
 	 * 
-	 * 
 	 * @var string
 	 */
 	public $filePublicName = '';
+	
+	/**
+	 * Разрешенные типы файлов и их размеры
+	 * Если null, то применяется правила настроек модуля
+	 * Параметр должен содержать именованный массив: array(
+	 *  '[extension]' => array(
+	 *    'maxsize' => [допустимый_размер_файла]
+	 *  ), ...
+	 * )
+	 * @var array|null
+	 */
+	public $cfgFileExtensions = null;
 	
 	public $filePath = '';
 	public $fileName = '';
@@ -181,6 +192,7 @@ class UploadFile {
 	
 	public $uploadFileHash = '';
 	public $folderPath = '';
+	
 	
 	/**
 	 * @var array  $file $_FILES['form_field']
@@ -280,24 +292,28 @@ class UploadFile {
 		}
 		
 		// разрешенные типы файлов
-		$extensions = $this->manager->GetFileExtensionList(true);
 		if (!$this->ignoreFileExtension){ // проверка на допустимые типы файлов включена
-			$filetype = $extensions[$fExt];
-			if (empty($filetype)){ // нет в списке разрешенных типов файлов
-				return UploadError::UNKNOWN_TYPE;
-			}
-			if (!$this->ignoreFileSize){
-				$maxFileSize = intval($filetype['maxsize']);
-			}
-			if ($maxImageWidth == 0){
-				$maxImageWidth = intval($filetype['maxwidth']);
-			}
-			if ($maxImageHeight == 0){
-				$maxImageHeight = intval($filetype['maxheight']);
-			}
-			if (empty($filetype['mimetype'])){
-				CMSQFileManager::FileTypeUpdateMime(Abricos::$db, $filetype['filetypeid'], $upload->file_src_mime);
-				$filetype['mimetype'] = $upload->file_src_mime;
+			if (!empty($this->cfgFileExtensions) && count($this->cfgFileExtensions)){
+				
+			}else{
+				$extensions = $this->manager->GetFileExtensionList(true);
+				$filetype = $extensions[$fExt];
+				if (empty($filetype)){ // нет в списке разрешенных типов файлов
+					return UploadError::UNKNOWN_TYPE;
+				}
+				if (!$this->ignoreFileSize){
+					$maxFileSize = intval($filetype['maxsize']);
+				}
+				if ($maxImageWidth == 0){
+					$maxImageWidth = intval($filetype['maxwidth']);
+				}
+				if ($maxImageHeight == 0){
+					$maxImageHeight = intval($filetype['maxheight']);
+				}
+				if (empty($filetype['mimetype'])){
+					CMSQFileManager::FileTypeUpdateMime(Abricos::$db, $filetype['filetypeid'], $upload->file_src_mime);
+					$filetype['mimetype'] = $upload->file_src_mime;
+				}
 			}
 		}
 

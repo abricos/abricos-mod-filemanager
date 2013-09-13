@@ -1,8 +1,6 @@
 /*
-* @version $Id$
-* @copyright Copyright (C) 2008 Abricos All rights reserved.
-* @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
-*/
+ * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
+ */
 var Component = new Brick.Component();
 Component.requires = {};
 Component.entryPoint = function(){
@@ -178,8 +176,7 @@ Component.entryPoint = function(){
 				this.uploadWindow.focus();
 				return;
 			}
-			var element = this.row,
-				cfg = L.merge(this.cfg, ucfg || {});
+			var cfg = L.merge(this.cfg, ucfg || {});
 			
 			var url = '/filemanager/upload.html?userid='+this.userid+'&winid='+this.id+'&sysfolder='+(cfg.sysfolder ? '1' : '0')+'&folderid='+cfg.folderid+"&folderpath="+cfg.folderpath;
 			this.uploadWindow = window.open(
