@@ -9,6 +9,16 @@
 	</tr>
 [/bkvar]
 
+[p=hideuserspace][/p]
+[p=fextobj][/p]
+
+[bkvar=userspace]
+	<fieldset style="display: {v#hideuserspace}">
+			<legend>Профиль</legend>
+			<div>{#filemanager.upload_freespace} <span class="{v#clerrtext}">{v#freespace}</span></div>
+	</fieldset>
+[/bkvar]
+
 [*]-->
 
 <style type="text/css">
@@ -30,11 +40,8 @@
 <div class="mod-filemanager">
 	<div id="uploadform">
 
-		<fieldset>
-				<legend>Профиль</legend>
-				<div>{#filemanager.upload_freespace} <span class="{v#clerrtext}">{v#freespace}</span></div>
-		</fieldset>
-	
+		{v#userspace}
+
 		<fieldset>
 			<legend>{#content.upload.13}</legend>
 			<div class="contflist">

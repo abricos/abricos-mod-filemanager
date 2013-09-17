@@ -93,7 +93,8 @@ Component.entryPoint = function(NS){
 			return false;
 		},
 		showButtons: function(en){
-			this.elHide('bshowbtns', false);
+			this.elHide('bshowbtns,bshowbtnsex,bshowbtns', false);
+			
 			if (this.files.length > 0){
 				this.elSetVisible('bshowbtnsex', !en);
 			}else{

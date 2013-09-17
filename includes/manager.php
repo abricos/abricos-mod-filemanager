@@ -13,6 +13,11 @@ require_once 'dbquery.php';
 class FileManager extends Ab_ModuleManager {
 	
 	/**
+	 * @var FileManager
+	 */
+	public static $instance;
+	
+	/**
 	 * 
 	 * @var FileManagerModule
 	 */
@@ -35,6 +40,8 @@ class FileManager extends Ab_ModuleManager {
 	
 	public function FileManager (FileManagerModule $module){
 		parent::__construct($module);
+		
+		FileManager::$instance = $this;
 	}
 	
 	/**
