@@ -68,6 +68,7 @@ Component.entryPoint = function(NS){
 		},
 		onLoad: function(files, cfg){
 			if (!L.isFunction(cfg['clickFileUploadCallback'])){
+				var __self = this;
 				this.fileUploader = new NS.FileUploader(Brick.env.user.id, function(fileid, filename){
 					__self.onFileUpload(fileid, filename);
 				});
