@@ -469,6 +469,28 @@ class FileManager extends Ab_ModuleManager {
 		return $file;
 	}
 	
+	public function SaveFileTo($filehash, $file){
+		if (!($handle = fopen($file, 'w'))){
+			return false;
+		}
+		$fileinfo = CMSQFileManager::FileData($this->db, $filehash);
+		$count = 1;
+		while (!empty($fileinfo['filedata']) && connection_status() == 0) {
+			fwrite($handle, $fileinfo['filedata']);
+			if (strlen($fileinfo['filedata']) == 1048576) {
+				$startat = (1048576 * $count) + 1;
+				$fileinfo = CMSQFileManager::FileData($this->db, $filehash, $startat);
+				$count++;
+			} else {
+				$fileinfo['filedata'] = '';
+			}
+		}
+		fclose($handle);
+	
+		return true;
+	}
+	
+	
 	public function GetUploadLib($file){
 		require_once CWD.'/modules/filemanager/lib/class.upload/class.upload.php';
 		return new upload($file);
