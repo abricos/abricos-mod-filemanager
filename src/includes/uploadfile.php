@@ -264,7 +264,7 @@ class UploadFile {
 		$fExt = strtolower($pi['extension']);
 		$fPath = $this->filePath;
 		$fSize = filesize($fPath);
-		
+
 		if (!file_exists($fPath)){
 			return UploadError::SERVER_ERROR;
 		}
@@ -290,7 +290,7 @@ class UploadFile {
 		}else{
 			$upload = $this->manager->GetUploadLib($fPath);
 		}
-		
+
 		// разрешенные типы файлов
 		if (!$this->ignoreFileExtension){ // проверка на допустимые типы файлов включена
 			if (!empty($this->cfgFileExtensions) && count($this->cfgFileExtensions)){
