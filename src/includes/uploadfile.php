@@ -321,7 +321,7 @@ class UploadFile {
 		if ($maxFileSize > 0 && $fSize > $maxFileSize){
 			return UploadError::FILESIZE_IS_LARGER;
 		}
-		
+
 		// Если файл должен быть только картинкой
 		if ($this->isOnlyImage && !$upload->file_is_image){
 			return UploadError::IS_NOT_IMAGE;
