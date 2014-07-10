@@ -1,31 +1,47 @@
 <!--{files}-->
-<div class="aw-filemanager" id="{i#id}" >
-	<div class="attach">
-		<div id="{i#table}"></div>
-		<a href="#" id="{i#bshowbtns}" class="abtn">{#mod.filemanager.attachment.files.1}</a>
-		<a href="#" id="{i#bshowbtnsex}" class="abtn" style="display: none;" >{#mod.filemanager.attachment.files.2}</a>
-		<div id="{i#fm}" style="display: none;">
-			<input id="{i#bupload}" class="btn" type="button" value="{#mod.filemanager.attachment.files.3}" />
-			<input id="{i#bshowfm}" class="btn" type="button" value="{#mod.filemanager.attachment.files.4}" />
-			<a href="#" id="{i#bcancel}" class="abtn">{#mod.filemanager.attachment.files.5}</a>
-		</div>
-	</div>
+<div class="aw-filemanager" id="{i#id}">
+    <div class="attach">
+        <div id="{i#table}"></div>
+        <a href="#" id="{i#bshowbtns}" class="abtn">{#mod.filemanager.attachment.files.1}</a>
+        <a href="#" id="{i#bshowbtnsex}" class="abtn" style="display: none;">{#mod.filemanager.attachment.files.2}</a>
+
+        <div id="{i#fm}" style="display: none;" class="btn-toolbar">
+            <button id="{i#bupload}" class="btn btn-default btn-sm">
+                {#mod.filemanager.attachment.files.3}
+            </button>
+            <button id="{i#bshowfm}" class="btn btn-default btn-sm">
+                {#mod.filemanager.attachment.files.4}
+            </button>
+            <a href="#" id="{i#bcancel}" class="btn btn-link">{#mod.filemanager.attachment.files.5}</a>
+        </div>
+    </div>
 </div>
 
 <!--{ftable}-->
-{v#rows}
-<div class="clear"></div>
-
-<!--{frow}-->
-<ul class="file">
-	<li><a href="{v#src}" target="_blank" class="src">{v#nm}</a></li>
-	<li><div id="{i#remove}-{v#fid}" class="fremove"></div></li>
+<ul class="list-group">
+    {v#rows}
 </ul>
 
+<!--{frow}-->
+<a href="{v#src}" target="_blank" class="list-group-item">
+    <div class="row">
+        <div class="col-md-10">
+            {v#nm}
+        </div>
+        <div class="col-md-2 text-right">
+            <button id="{i#remove}-{v#fid}" class="btn btn-default btn-xs">
+                Удалить
+            </button>
+        </div>
+    </div>
+</a>
+
 <!--{list}-->
-<div class="aw-filemanager" id="{i#id}" >
-	<div class="attachview" id="{i#table}"></div>
+<div class="aw-filemanager" id="{i#id}">
+    <div class="list-group" id="{i#table}"></div>
 </div>
 
 <!--{viewrow}-->
-<div class="file"><a href="{v#src}" target="_blank">{v#nm}</a>&nbsp;(<a href="{v#src}" target="_blank">{#mod.filemanager.attachment.viewrow.1}</a>)</div>
+<a href="{v#src}" target="_blank" class="list-group-item" title="{#mod.filemanager.attachment.viewrow.1}">
+    {v#nm}
+</a>
