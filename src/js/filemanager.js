@@ -37,8 +37,8 @@ Component.entryPoint = function(){
 		NS.data = new Brick.util.data.byid.DataSet('filemanager');
 	}
 	var DATA = NS.data;
-	
-	Brick.util.CSS.update(Brick.util.CSS['filemanager']['filemanager']);
+
+    this.buildTemplate({});
 	
 (function(){
 	
