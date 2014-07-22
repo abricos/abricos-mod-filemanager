@@ -12,7 +12,7 @@ var Component = new Brick.Component();
 Component.requires = {
 	yahoo: ['animation','container','dragdrop','treeview','imagecropper'],
 	mod:[
-	     {name: 'sys', files: ['form.js','data.js']},
+	     {name: 'sys', files: ['old-form.js','data.js']},
 	     {name: 'filemanager', files: ['api.js','lib.js']}
 	]
 };
