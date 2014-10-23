@@ -82,19 +82,19 @@ class FileManagerAction {
 	const FILES_ADMIN = 50;
 }
 
-class FileManagerPermission extends CMSPermission {
+class FileManagerPermission extends Ab_UserPermission {
 	
-	public function FileManagerPermission(FileManagerModule $module){
+	public function __construct(FileManagerModule $module){
 		
 		$defRoles = array(
-			new CMSRole(FileManagerAction::FILES_VIEW, 1, User::UG_GUEST),
-			new CMSRole(FileManagerAction::FILES_VIEW, 1, User::UG_REGISTERED),
-			new CMSRole(FileManagerAction::FILES_VIEW, 1, User::UG_ADMIN),
+			new Ab_UserRole(FileManagerAction::FILES_VIEW, Ab_UserGroup::GUEST),
+			new Ab_UserRole(FileManagerAction::FILES_VIEW, Ab_UserGroup::REGISTERED),
+			new Ab_UserRole(FileManagerAction::FILES_VIEW, Ab_UserGroup::ADMIN),
 			
-			new CMSRole(FileManagerAction::FILES_UPLOAD, 1, User::UG_ADMIN),
-			new CMSRole(FileManagerAction::FILES_ADMIN, 1, User::UG_ADMIN)
+			new Ab_UserRole(FileManagerAction::FILES_UPLOAD, Ab_UserGroup::ADMIN),
+			new Ab_UserRole(FileManagerAction::FILES_ADMIN, Ab_UserGroup::ADMIN)
 		);
-		parent::CMSPermission($module, $defRoles);
+        parent::__construct($module, $defRoles);
 	}
 	
 	public function GetRoles(){
