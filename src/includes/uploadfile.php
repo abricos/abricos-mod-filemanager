@@ -312,7 +312,7 @@ class UploadFile {
 				$maxImageHeight = intval($filetype['maxheight']);
 			}
 			if (empty($filetype['mimetype'])){
-				CMSQFileManager::FileTypeUpdateMime(Abricos::$db, $filetype['filetypeid'], $upload->file_src_mime);
+				FileManagerQuery::FileTypeUpdateMime(Abricos::$db, $filetype['filetypeid'], $upload->file_src_mime);
 				$filetype['mimetype'] = $upload->file_src_mime;
 			}
 		}
@@ -412,7 +412,7 @@ class UploadFile {
 		
 		if ($userid > 0){
 			// а вдруг этот файл грузят второй раз?
-			$finfo = CMSQFileManager::FileInfoByName($db, $userid, $this->folderid, $fName);
+			$finfo = FileManagerQuery::FileInfoByName($db, $userid, $this->folderid, $fName);
 			if (!empty($finfo)){ // точно! так оно и есть.
 				// а может быть этот файл тот же самый?
 				if (intval($fSize) == intval($finfo['fs'])){ // размеры совпадают, нужно сравнить побайтно
@@ -439,14 +439,14 @@ class UploadFile {
 			
 			if ($first){
 				$first = false;
-				$filehash = CMSQFileManager::FileUpload(
+				$filehash = FileManagerQuery::FileUpload(
 					Abricos::$db, $userid, $this->folderid, 
 					$fName, $data, $fSize, $fExt, 
 					($upload->file_is_image ? 1 : 0), 
 					$imageWidth, $imageHeight, $this->fileAttribute
 				);
 			}else{
-				CMSQFileManager::FileUploadPart(Abricos::$db, $filehash, $data);
+				FileManagerQuery::FileUploadPart(Abricos::$db, $filehash, $data);
 			}
 		}
 		fclose($handle);

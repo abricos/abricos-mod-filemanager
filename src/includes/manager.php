@@ -43,21 +43,7 @@ class FileManager extends Ab_ModuleManager {
 		
 		FileManager::$instance = $this;
 	}
-	
-	/**
-	 * Получить менеджер загрузки
-	 *
-	 * @return CMSUpload
-	 */
-	public function GetUpload(){
-		if (!empty($this->upload)){
-			return $this->upload;
-		}
-		require_once 'cmsupload.php';
-		$this->upload = new CMSUpload($this->registry);
-		return $this->upload;
-	}
-	
+
 	/**
 	 * Отключить проверку ролей
 	 */
@@ -240,7 +226,7 @@ class FileManager extends Ab_ModuleManager {
 		if (!$this->IsAccessProfile($userid)){
 			return null;
 		}
-		return CMSQFileManager::FileList($this->db, $userid, $folderid, CMSQFileManager::FILEATTRIBUTE_NONE);
+		return FileManagerQuery::FileList($this->db, $userid, $folderid, FileManagerQuery::FILEATTRIBUTE_NONE);
 	}
 	
 	public function FolderList(){
@@ -251,14 +237,14 @@ class FileManager extends Ab_ModuleManager {
 		if (!$this->IsAccessProfile($userid)){
 			return null;
 		}
-		return CMSQFileManager::FolderList($this->db, $userid); 
+		return FileManagerQuery::FolderList($this->db, $userid);
 	}
 	
 	public function EditorList($filehash, $session){
 		if (!$this->IsAccessProfile()){
 			return null;
 		}
-		return CMSQFileManager::EditorList($this->db, $filehash, $session);
+		return FileManagerQuery::EditorList($this->db, $filehash, $session);
 	}
 	
 	public function FileTypeUpdate($d){
@@ -303,7 +289,7 @@ class FileManager extends Ab_ModuleManager {
 			$this->_userGroupSizeLimit = $list;
 		}
 		
-		$fullsize = CMSQFileManager::FileUsedSpace($this->db, $this->user->id);
+		$fullsize = FileManagerQuery::FileUsedSpace($this->db, $this->user->id);
 		
 		$user = $this->user->info;
 		$limit = 0;
@@ -355,7 +341,7 @@ class FileManager extends Ab_ModuleManager {
 		$pathinfo = pathinfo($filename);
 		$extension = strtolower($pathinfo['extension']);
 		
-		$dbFileInfo = CMSQFileManager::FileInfoByName($this->db, $this->user->id, $folderid, $filename); 
+		$dbFileInfo = FileManagerQuery::FileInfoByName($this->db, $this->user->id, $folderid, $filename);
 		if (!empty($dbFileInfo)) {
 			if (!$newNameIfFind){
 				return 7;
@@ -410,7 +396,7 @@ class FileManager extends Ab_ModuleManager {
 	public function GetFileData($p_filehash, $begin = 1, $end = 1048576){
 		if (!$this->IsFileViewRole()){ return; }
 		
-		return CMSQFileManager::FileData($this->db, $p_filehash, $begin, $end);
+		return FileManagerQuery::FileData($this->db, $p_filehash, $begin, $end);
 	}
 	
 	/**
@@ -421,7 +407,7 @@ class FileManager extends Ab_ModuleManager {
 	public function FilesCompare($filePath, $fileHash){
 		$handle = fopen($filePath, 'rb');
 		if (empty($handle)){ return false; }
-		$fileinfo = CMSQFileManager::FileData($this->db, $fileHash);
+		$fileinfo = FileManagerQuery::FileData($this->db, $fileHash);
 
 		$count = 1;
 		while (!empty($fileinfo['filedata']) && connection_status() == 0) {
@@ -435,7 +421,7 @@ class FileManager extends Ab_ModuleManager {
 			
 			if (strlen($fileinfo['filedata']) == 1048576) {
 				$startat = (1048576 * $count) + 1;
-				$fileinfo = CMSQFileManager::FileData($this->db, $fileHash, $startat);
+				$fileinfo = FileManagerQuery::FileData($this->db, $fileHash, $startat);
 				$count++;
 			} else {
 				$fileinfo['filedata'] = '';
@@ -452,13 +438,13 @@ class FileManager extends Ab_ModuleManager {
 		$file = CWD."/cache/".(md5(TIMENOW.$imgname)).".".$pinfo['extension'];
 				
 		if (!($handle = fopen($file, 'w'))){ return false; }
-		$fileinfo = CMSQFileManager::FileData($this->db, $filehash);
+		$fileinfo = FileManagerQuery::FileData($this->db, $filehash);
 		$count = 1;
 		while (!empty($fileinfo['filedata']) && connection_status() == 0) {
 			fwrite($handle, $fileinfo['filedata']);
 			if (strlen($fileinfo['filedata']) == 1048576) {
 				$startat = (1048576 * $count) + 1;
-				$fileinfo = CMSQFileManager::FileData($this->db, $filehash, $startat);
+				$fileinfo = FileManagerQuery::FileData($this->db, $filehash, $startat);
 				$count++;
 			} else {
 				$fileinfo['filedata'] = '';
@@ -473,13 +459,13 @@ class FileManager extends Ab_ModuleManager {
 		if (!($handle = fopen($file, 'w'))){
 			return false;
 		}
-		$fileinfo = CMSQFileManager::FileData($this->db, $filehash);
+		$fileinfo = FileManagerQuery::FileData($this->db, $filehash);
 		$count = 1;
 		while (!empty($fileinfo['filedata']) && connection_status() == 0) {
 			fwrite($handle, $fileinfo['filedata']);
 			if (strlen($fileinfo['filedata']) == 1048576) {
 				$startat = (1048576 * $count) + 1;
-				$fileinfo = CMSQFileManager::FileData($this->db, $filehash, $startat);
+				$fileinfo = FileManagerQuery::FileData($this->db, $filehash, $startat);
 				$count++;
 			} else {
 				$fileinfo['filedata'] = '';
@@ -507,18 +493,18 @@ class FileManager extends Ab_ModuleManager {
 		}
 		
 		// Запрос особого размера картинки
-		$filehashdst = CMSQFileManager::ImagePreviewHash($this->db, $p_filehash, $p_w, $p_h, $p_cnv);
+		$filehashdst = FileManagerQuery::ImagePreviewHash($this->db, $p_filehash, $p_w, $p_h, $p_cnv);
 
 		if (!empty($filehashdst)){ return $filehashdst; }
 		
 		if (!$this->IsFileUploadRole()){
 			// доступ на изменение картинки закрыт, есть ли особые разрешения?
-			if (!CMSQFileManager::EnThumbsCheck($this->db, $p_w, $p_h)){
+			if (!FileManagerQuery::EnThumbsCheck($this->db, $p_w, $p_h)){
 				return $p_filehash;
 			}
 		}
 		
-		$image = CMSQFileManager::ImageExist($this->db, $p_filehash);
+		$image = FileManagerQuery::ImageExist($this->db, $p_filehash);
 		if (empty($image)){ return $p_filehash; }// есть ли вообще такая картинка
 
 		$imageName = $image['filename'];
@@ -591,7 +577,7 @@ class FileManager extends Ab_ModuleManager {
 		if (!file_exists($upload->file_dst_pathname)){ return $p_filehash; }
 		
 		$uploadFile = $this->CreateUpload($upload->file_dst_pathname, $newfilename.".".$pathinfo['extension'], $image['folderid']);
-		$uploadFile->fileAttribute = CMSQFileManager::FILEATTRIBUTE_HIDEN;
+		$uploadFile->fileAttribute = FileManagerQuery::FILEATTRIBUTE_HIDEN;
 		$uploadFile->ignoreImageSize = false;
 		$uploadFile->ignoreUploadRole = true;
 		$uploadFile->ignoreFreeSpace = true;
@@ -602,7 +588,7 @@ class FileManager extends Ab_ModuleManager {
 		if (!empty($error) || empty($this->lastUploadFileHash)){
 			return $p_filehash;
 		}
-		CMSQFileManager::ImagePreviewAdd($this->db, $p_filehash, $this->lastUploadFileHash, $p_w, $p_h, $p_cnv);
+		FileManagerQuery::ImagePreviewAdd($this->db, $p_filehash, $this->lastUploadFileHash, $p_w, $p_h, $p_cnv);
 		unlink($upload->file_dst_pathname);
 		
 		return $this->lastUploadFileHash;
@@ -612,12 +598,12 @@ class FileManager extends Ab_ModuleManager {
 		if (!$this->IsFileViewRole()){
 			return ;
 		}
-		return CMSQFileManager::FileInfo($this->db, $p_filehash);
+		return FileManagerQuery::FileInfo($this->db, $p_filehash);
 	}
 	
 	public function CreateFolderByPathMethod($path){
 		if (empty($path)){ return 0;}
-		$rows = CMSQFileManager::FolderList($this->db, $this->user->id);
+		$rows = FileManagerQuery::FolderList($this->db, $this->user->id);
 		$folders = array();
 		while (($row = $this->db->fetch_array($rows))){
 			$folders[$row['id']] = $row;
@@ -636,7 +622,7 @@ class FileManager extends Ab_ModuleManager {
 				}
 			}
 			if (!$find){
-				$folderid = CMSQFileManager::FolderAdd($this->db, $folderid, $this->user->id, $name, $arr[$i]);
+				$folderid = FileManagerQuery::FolderAdd($this->db, $folderid, $this->user->id, $name, $arr[$i]);
 			}
 		}
 		return $folderid;
@@ -653,7 +639,7 @@ class FileManager extends Ab_ModuleManager {
 	public function FolderAppend($parentFolderId, $folderName, $folderPhrase = ''){
 		if (!$this->IsFileUploadRole()){ return; }
 		$userid = $this->user->id;
-		return CMSQFileManager::FolderAdd($this->db, $parentFolderId, $userid, $folderName, $folderPhrase);
+		return FileManagerQuery::FolderAdd($this->db, $parentFolderId, $userid, $folderName, $folderPhrase);
 	}
 	
 	public function FolderAppendFromData($data){
@@ -661,48 +647,48 @@ class FileManager extends Ab_ModuleManager {
 
 		$userid = $this->user->id;
 		$name = translateruen($data->ph);
-		return CMSQFileManager::FolderAdd($this->db, $data->pid, $userid, $name, $data->ph);
+		return FileManagerQuery::FolderAdd($this->db, $data->pid, $userid, $name, $data->ph);
 	}
 	
 	public function FolderChangePhrase($data){
 		if (!$this->IsFileUploadRole()){ return; }
 		
 		$userid = $this->user->id;
-		$finfo = CMSQFileManager::FolderInfo($this->db, $data->id);
+		$finfo = FileManagerQuery::FolderInfo($this->db, $data->id);
 		
 		if (!$this->IsAccessProfile($finfo['uid'])){
 			return null;
 		}
-		CMSQFileManager::FolderChangePhrase($this->db, $data->id, $data->ph);
+		FileManagerQuery::FolderChangePhrase($this->db, $data->id, $data->ph);
 	}
 
 	public function FolderRemove($data){
 		if (!$this->IsFileUploadRole()){ return; }
 		
-		$finfo = CMSQFileManager::FolderInfo($this->db, $data->id);
+		$finfo = FileManagerQuery::FolderInfo($this->db, $data->id);
 		
 		if (!$this->IsAccessProfile($finfo['uid'])){
 			return null;
 		}
-		CMSQFileManager::FolderRemove($this->db, $data->id);
+		FileManagerQuery::FolderRemove($this->db, $data->id);
 	}
 	
 	public function FolderInfoByName($parentFolderId, $folderName){
 		if (!$this->IsFileUploadRole()){ return; }
 		
 		$userid = $this->user->id;
-		return CMSQFileManager::FolderInfoByName($this->db, $userid, $parentFolderId, $folderName);
+		return FileManagerQuery::FolderInfoByName($this->db, $userid, $parentFolderId, $folderName);
 	}
 	
 	public function FileRemove($filehash){
 		if (!$this->IsFileUploadRole()){ return; }
 		
-		$finfo = CMSQFileManager::FileInfo($this->db, $filehash);
+		$finfo = FileManagerQuery::FileInfo($this->db, $filehash);
 		
 		if (!$this->IsAccessProfile($finfo['uid'])){
 			return null;
 		}
-		CMSQFileManager::FilesDelete($this->db, array($filehash));
+		FileManagerQuery::FilesDelete($this->db, array($filehash));
 	}
 	
 	
@@ -715,24 +701,24 @@ class FileManager extends Ab_ModuleManager {
 		$filehash = $data->fh;
 		$session = $data->session;
 		// получить информацию редактируемой картинки
-		$finfo = CMSQFileManager::FileInfo($this->db, $filehash);
+		$finfo = FileManagerQuery::FileInfo($this->db, $filehash);
 		
 		if (!$this->IsAccessProfile($finfo['uid'])){
 			return null;
 		}
 		// картинка с последними изменения в редакторе
-		$lastedit = CMSQFileManager::EditorInfo($this->db, $filehash, $session);
+		$lastedit = FileManagerQuery::EditorInfo($this->db, $filehash, $session);
 		
 		if (empty($lastedit)){ 
 			return; 
 		}
 		$userid = $this->user->id;
-		CMSQFileManager::ImageEditorSave($this->db, $userid, $filehash, $lastedit, $data->copy);
+		FileManagerQuery::ImageEditorSave($this->db, $userid, $filehash, $lastedit, $data->copy);
 	}	
 
 	public function ImageChange($filehash, $tools, $d){
 		// получить файл из БД
-		$finfo = CMSQFileManager::FileInfo($this->db, $filehash);
+		$finfo = FileManagerQuery::FileInfo($this->db, $filehash);
 		if (empty($finfo) || !$this->IsAccessProfile($finfo['uid'])){
 			return -1;
 		}
@@ -781,7 +767,7 @@ class FileManager extends Ab_ModuleManager {
 			$pathinfo['basename'], 
 			$upload->file_dst_name_ext, 
 			filesize($upload->file_dst_pathname), 
-			CMSQFileManager::FILEATTRIBUTE_TEMP
+			FileManagerQuery::FILEATTRIBUTE_TEMP
 		);
 		unlink($upload->file_dst_pathname);
 		return $result;
@@ -797,14 +783,14 @@ class FileManager extends Ab_ModuleManager {
 	public function ImageEditorChange($filehash, $session, $data){
 		
 		// получить информацию редактируемой картинки
-		$finfo = CMSQFileManager::FileInfo($this->db, $filehash);
+		$finfo = FileManagerQuery::FileInfo($this->db, $filehash);
 		
 		if (empty($finfo) || !$this->IsAccessProfile($finfo['uid'])){
 			return -1;
 		}
 		
 		// картинка с последними изменения в редакторе
-		$lastedit = CMSQFileManager::EditorInfo($this->db, $filehash, $session);
+		$lastedit = FileManagerQuery::EditorInfo($this->db, $filehash, $session);
 
 		$fromfilehash = $filehash;
 		
@@ -822,7 +808,7 @@ class FileManager extends Ab_ModuleManager {
 		
 		$newfilehash = $this->lastUploadFileHash;
 		$userid = $this->user->id;
-		CMSQFileManager::EditorAppend($this->db, $userid, $filehash, $newfilehash, $data->l, $data->t, $data->w, $data->h, $data->tools, $session);
+		FileManagerQuery::EditorAppend($this->db, $userid, $filehash, $newfilehash, $data->l, $data->t, $data->w, $data->h, $data->tools, $session);
 		
 		return $newfilehash;
 	}

@@ -1,6 +1,5 @@
 <?php
 /**
- * @version $Id$
  * @package Abricos
  * @subpackage FileManager
  * @copyright Copyright (C) 2011 Abricos All rights reserved.

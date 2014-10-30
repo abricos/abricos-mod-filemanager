@@ -57,7 +57,7 @@ if (isset($_SERVER['HTTP_IF_NONE_MATCH'])){
 	$client_etag = false;
 
 // Обновить счетчик
-CMSQFileManager::FileUpdateCounter(Abricos::$db, $p_filehash);
+FileManagerQuery::FileUpdateCounter(Abricos::$db, $p_filehash);
 
 if ($client_etag == $etag){
 	header($_SERVER['SERVER_PROTOCOL'].' 304 Not Modified', true, 304);

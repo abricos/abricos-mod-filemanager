@@ -1,6 +1,5 @@
 <?php
 /**
- * @version $Id: dbquery.php 572 2010-05-21 12:17:26Z roosit $
  * @package Abricos
  * @subpackage User
  * @copyright Copyright (C) 2008 Abricos. All rights reserved.
@@ -125,7 +124,7 @@ class FileManagerQueryExt extends FileManagerQuery {
  * @package Abricos
  * @subpackage FileManager
  */
-class CMSQFileManager {
+class FileManagerQuery {
 	
 	/**
 	 * Атрибут файла: стандартный
@@ -141,7 +140,7 @@ class CMSQFileManager {
 	const FILEATTRIBUTE_TEMP = 2;
 	
 	public static function FileCopy(Ab_Database $db, $filehash){
-		$newfilehash = CMSQFileManager::GetFileHash($db);
+		$newfilehash = FileManagerQuery::GetFileHash($db);
 		
 		$sql = "
 			INSERT INTO ".$db->prefix."fm_file 
@@ -162,10 +161,10 @@ class CMSQFileManager {
 		
 		$newfilehash = $lastedit['fhdst'];
 		
-		CMSQFileManager::FileSetAttribute($db, $newfilehash, CMSQFileManager::FILEATTRIBUTE_NONE);
+		FileManagerQuery::FileSetAttribute($db, $newfilehash, FileManagerQuery::FILEATTRIBUTE_NONE);
 		
 		if (!$iscopy){
-			CMSQFileManager::FileDelete($db, $filehash);
+			FileManagerQuery::FileDelete($db, $filehash);
 			$sql = "
 				UPDATE ".$db->prefix."fm_file
 				SET filehash='".bkint($filehash)."' 
@@ -183,7 +182,7 @@ class CMSQFileManager {
 
 		$sql = "
 			DELETE FROM ".$db->prefix."fm_file
-			WHERE userid=".bkint($userid)." AND attribute=".CMSQFileManager::FILEATTRIBUTE_TEMP."
+			WHERE userid=".bkint($userid)." AND attribute=".FileManagerQuery::FILEATTRIBUTE_TEMP."
 		";
 		$db->query_write($sql);
 	}
@@ -235,7 +234,7 @@ class CMSQFileManager {
 	public static function EditorList(Ab_Database $db, $filehash, $session){
 		$sql = "
 			SELECT
-				".CMSQFileManager::EDITOR_FIELD."
+				".FileManagerQuery::EDITOR_FIELD."
 			FROM ".$db->prefix."fm_editor
 			WHERE filehashsrc='".bkstr($filehash)."' AND session='".bkstr($session)."'
 			ORDER BY dateline DESC
@@ -249,7 +248,7 @@ class CMSQFileManager {
 	public static function EditorInfo(Ab_Database $db, $filehash, $session){
 		$sql = "
 			SELECT
-				".CMSQFileManager::EDITOR_FIELD."
+				".FileManagerQuery::EDITOR_FIELD."
 			FROM ".$db->prefix."fm_editor
 			WHERE filehashsrc='".bkstr($filehash)."' AND session='".bkstr($session)."'
 			ORDER BY dateline DESC
@@ -289,14 +288,14 @@ class CMSQFileManager {
 	}
 	
 	public static function FolderRemove(Ab_Database $db, $folderid){
-		$rows = CMSQFileManager::FolderChildIdList($db, $folderid);
+		$rows = FileManagerQuery::FolderChildIdList($db, $folderid);
 		while (($row = $db->fetch_array($rows))){
-			CMSQFileManager::FolderRemove($db, $row['id']);
+			FileManagerQuery::FolderRemove($db, $row['id']);
 		}
 		
-		$rows = CMSQFileManager::FileListInFolder($db, $folderid);
+		$rows = FileManagerQuery::FileListInFolder($db, $folderid);
 		while (($row = $db->fetch_array($rows))){
-			CMSQFileManager::FileDelete($db, $row['fh']);
+			FileManagerQuery::FileDelete($db, $row['fh']);
 		}
 		$sql = "
 			DELETE FROM ".$db->prefix."fm_folder
@@ -379,7 +378,7 @@ class CMSQFileManager {
 	}
 	
 	public static function FileDelete(Ab_Database $db, $fileid){
-		CMSQFileManager::FilesDelete($db, array($fileid));
+		FileManagerQuery::FilesDelete($db, array($fileid));
 	}
 	
 	/**
@@ -394,7 +393,7 @@ class CMSQFileManager {
 			array_push($whereprev, "filehashsrc='".bkstr($filehash)."'");
 			array_push($where, "filehash='".bkstr($filehash)."'");
 			
-			$fsFile = CMSQFileManager::FSPathGet($db, $filehash);
+			$fsFile = FileManagerQuery::FSPathGet($db, $filehash);
 			if (file_exists($fsFile)){
 				@unlink($fsFile);
 			}
@@ -511,7 +510,7 @@ class CMSQFileManager {
 
 		return $row;
 		/*
-		$fsPath = CMSQFileManager::FSPathGetByEls($row['userid'], $row['folderid'], $row['fsname']);
+		$fsPath = FileManagerQuery::FSPathGetByEls($row['userid'], $row['folderid'], $row['fsname']);
 		$row['fsname'] = '';
 		
 		if (!file_exists($fsPath)){
@@ -545,10 +544,10 @@ class CMSQFileManager {
 	";
 	
 	public static function FSPathCreate(Ab_Database $db, $filehash){
-		$finfo = CMSQFileManager::FileInfo($db, $filehash);
+		$finfo = FileManagerQuery::FileInfo($db, $filehash);
 		if (empty($finfo)){ return; }
 		
-		$fsfn = CMSQFileManager::GenerateFileHash()."_".$filehash."_".$finfo['ext'];
+		$fsfn = FileManagerQuery::GenerateFileHash()."_".$filehash."_".$finfo['ext'];
 		
 		$sql = "
 			UPDATE ".$db->prefix."fm_file
@@ -557,17 +556,17 @@ class CMSQFileManager {
 		";
 		$db->query_write($sql);
 		
-		return CMSQFileManager::FSPathGet($db, $filehash);
+		return FileManagerQuery::FSPathGet($db, $filehash);
 	}
 	
 	public static function FSPathGet(Ab_Database $db, $filehash){
-		$finfo = CMSQFileManager::FileInfo($db, $filehash, true);
+		$finfo = FileManagerQuery::FileInfo($db, $filehash, true);
 		if (empty($finfo)){ return; }
-		return CMSQFileManager::FSPathGetByInfo($db, $finfo);	
+		return FileManagerQuery::FSPathGetByInfo($db, $finfo);
 	}
 	
 	public static function FSPathGetByInfo(Ab_Database $db, $fi){
-		return CMSQFileManager::FSPathGetByEls($fi['uid'], $fi['fdid'], $fi['fsnm']);
+		return FileManagerQuery::FSPathGetByEls($fi['uid'], $fi['fdid'], $fi['fsnm']);
 	}
 	
 	public static function FSPathGetByEls($userid, $folderid, $fsname){
@@ -579,7 +578,7 @@ class CMSQFileManager {
 	 * Получить информацию о файле
 	 */
 	public static function FileInfo(Ab_Database $db, $filehash, $withFSName = false){
-		$select = CMSQFileManager::FILE_FIELD;
+		$select = FileManagerQuery::FILE_FIELD;
 		if ($withFSName){
 			$select .= ",fsname as fsnm ";
 		}
@@ -595,7 +594,7 @@ class CMSQFileManager {
 	public static function FileInfoByName(Ab_Database $db, $userid, $folderid, $filename){
 		$sql = "
 			SELECT
-				".CMSQFileManager::FILE_FIELD." 
+				".FileManagerQuery::FILE_FIELD."
 			FROM ".$db->prefix."fm_file
 			WHERE
 				userid=".bkint($userid)." 
@@ -609,7 +608,7 @@ class CMSQFileManager {
 	public static function FileListInFolder(Ab_Database $db, $folderid){
 		$sql = "
 			SELECT 
-				".CMSQFileManager::FILE_FIELD." 
+				".FileManagerQuery::FILE_FIELD."
 			FROM ".$db->prefix."fm_file
 			WHERE folderid=".bkint($folderid)."
 		";
@@ -619,7 +618,7 @@ class CMSQFileManager {
 	public static function FileList(Ab_Database $db, $userid, $folderId, $attribute = -1){
 		$sql = "
 			SELECT 
-				".CMSQFileManager::FILE_FIELD." 
+				".FileManagerQuery::FILE_FIELD."
 			FROM ".$db->prefix."fm_file
 			WHERE userid = ".bkint($userid)."
 			".($attribute>-1?" AND attribute=".$attribute:"")."
@@ -649,14 +648,14 @@ class CMSQFileManager {
 	public static function GetFileHash(Ab_Database $db){
 		$i = 0;
 		do{
-			$filehash = CMSQFileManager::GenerateFileHash($i++);
-		}while(CMSQFileManager::FileHashCheck($db, $filehash));
+			$filehash = FileManagerQuery::GenerateFileHash($i++);
+		}while(FileManagerQuery::FileHashCheck($db, $filehash));
 		
 		return $filehash;
 	}
 	
 	public static function FileUpload(Ab_Database $db, $userid, $folderid, $filename, $filedata, $filesize, $extension, $isimage=0, $imgwidth=0, $imgheight=0, $attribute = 0){
-		$filehash = CMSQFileManager::GetFileHash($db);
+		$filehash = FileManagerQuery::GetFileHash($db);
 		$sql = "
 			INSERT INTO ".$db->prefix."fm_file 
 				(filehash, userid, filename, filedata, filesize, extension, isimage, imgwidth, imgheight, attribute, folderid, dateline ) VALUES (

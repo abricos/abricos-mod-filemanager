@@ -40,7 +40,7 @@ class FileManagerModule extends Ab_Module {
 	}
 	
 	public function GetContentName(){
-		$adress = $this->registry->adress;
+		$adress = Abricos::$adress;
 		$cname = parent::GetContentName();
 		
 		if($adress->level > 2 && $adress->dir[1] == 'i'){
@@ -72,7 +72,7 @@ class FileManagerModule extends Ab_Module {
 	}
 	
 	public function EnableThumbSize($list){
-		FileManagerQuery::EnThumbsAppend($this->registry->db, $list);
+		FileManagerQuery::EnThumbsAppend(Abricos::$db, $list);
 	}
 }
 
