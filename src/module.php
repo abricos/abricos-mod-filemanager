@@ -29,7 +29,7 @@ class FileManagerModule extends Ab_Module {
 	public static $instance = null;
 	
 	public function __construct(){
-		$this->version = "0.3.6-dev";
+		$this->version = "0.3.6";
 		
 		$this->name = "filemanager";
 		$this->takelink = "filemanager";
