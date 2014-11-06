@@ -1,5 +1,6 @@
 <?php
 return array(
+    "title" => "Менеджер файлов",
 	"upload_unknowntype" => "Неизвестный тип файла",
 	"upload_filesizelimit" => "Размер файла превышает допустимый",
 	"upload_servererror" => "Ошибка на стороне сервера",
