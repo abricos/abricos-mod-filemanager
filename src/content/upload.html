@@ -41,20 +41,20 @@
 </style>
 <div class="mod-filemanager">
 <div>
-	{#filemanager.upload_freespace} {v#freespace}
+	{#upload_freespace} {v#freespace}
 </div> 
 <form onsubmit="return beginUpload();" id="uploadform" action="/filemanager/upload.html?do=upload&userid={v#userid}&winid={v#winid}&sysfolder={v#sysfolder}&folderid={v#folderid}&folderpath={v#folderpath}" enctype="multipart/form-data" method="post">
 
 	<div style="text-align: right;">
-		<a href="#" onclick="self.close()">{#filemanager.upload_close}</a>
+		<a href="#" onclick="self.close()">{#upload_close}</a>
 	</div>
 
 	<fieldset>
-		<legend>{#filemanager.upload_loadfile}</legend>
+		<legend>{#upload_loadfile}</legend>
 		
 		<div id="btnsUpload">
 			<input type="file" name="uploadfile" id="uploadfile" size="30" />
-			<input type="submit" class="button" name="upload" value="{#filemanager.upload_load}" />
+			<input type="submit" class="button" name="upload" value="{#upload_load}" />
 		</div>
 		<div id="loading" style="display: none">
 			<img src="/images/loading.gif" />&nbsp;{#content.upload.1}
@@ -79,9 +79,9 @@
 			<table border="1">
 				<thead>
 					<tr align="center">
-						<td>{#filemanager.upload_filetype}</td>
-						<td>{#filemanager.upload_maxfsize}</td>
-						<td>{#filemanager.upload_maxpsize}</td>
+						<td>{#upload_filetype}</td>
+						<td>{#upload_maxfsize}</td>
+						<td>{#upload_maxpsize}</td>
 					</tr>
 				</thead>
 				<tbody>
@@ -92,7 +92,7 @@
 	</fieldset>
    	
 	<div align="center" style="margin-top:10px">
-		<input type="button" class="button" value="{#filemanager.upload_close}" onclick="window.close();" />
+		<input type="button" class="button" value="{#upload_close}" onclick="window.close();" />
 	</div>	
 </form>
 
