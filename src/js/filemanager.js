@@ -17,9 +17,10 @@ Component.requires = {
     ]
 };
 Component.entryPoint = function(){
+
+    var Y = Brick.YUI;
+
     var Dom = YAHOO.util.Dom,
-        E = YAHOO.util.Event,
-        L = YAHOO.lang,
         W = YAHOO.widget;
 
     var tSetVar = Brick.util.Template.setProperty;
@@ -155,7 +156,7 @@ Component.entryPoint = function(){
                 }
                 var index = this.index[data['id']];
                 var node = this.tv.getNodeByIndex(index);
-                if (!L.isNull(node)){
+                if (!Y.Lang.isNull(node)){
                     node.expand();
                     node.focus();
                 }
@@ -163,7 +164,7 @@ Component.entryPoint = function(){
             },
             fullPath: function(folderid){
                 var row = this.rows.getById(folderid);
-                if (L.isNull(row)){
+                if (Y.Lang.isNull(row)){
                     return '//' + ROOT_FOLDER.phrase;
                 }
                 return this.fullPath(row.cell['pid']) + "/" + row.cell['ph'];
@@ -303,7 +304,7 @@ Component.entryPoint = function(){
             },
             onSelectItem_filesPanel: function(item){
                 var fname = '', fsrc = '', fpath = '';
-                if (!L.isNull(item)){
+                if (!Y.Lang.isNull(item)){
                     if (item.type == 'file'){
                         fname = item.name;
                         var lnk = new NS.Linker(item);
@@ -315,7 +316,7 @@ Component.entryPoint = function(){
                 }
                 this.setelv('filesrchtml', fsrc);
                 this.setelv('filesrc', fpath);
-                this.el('bselect').disabled = L.isNull(item) ? "disabled" : "";
+                this.el('bselect').disabled = Y.Lang.isNull(item) ? "disabled" : "";
                 this.screenshot.setImage(item);
                 this.refreshPath();
             },
@@ -356,7 +357,7 @@ Component.entryPoint = function(){
                 this.files.refresh();
             },
             selectItem: function(){
-                if (L.isNull(this.files.selectedItem)){
+                if (Y.Lang.isNull(this.files.selectedItem)){
                     return;
                 }
                 var item = this.files.selectedItem;
@@ -402,40 +403,51 @@ Component.entryPoint = function(){
                 };
             },
             init: function(owner, container){
-
                 this.owner = owner;
 
                 container.innerHTML = T['screenshot'];
                 this.setImage(null);
 
-                var tables = {
-                    'userconfig': DATA.get('userconfig', true)
-                };
-                if (DATA.isFill(tables)){
-                    this.render();
-                }
-                DATA.onComplete.subscribe(this.onDSUpdate, this, true);
-            },
-            onDSUpdate: function(type, args){
-                if (args[0].check(['userconfig'])){
-                    this.render();
-                }
+                var instance = this;
+                Brick.appFunc('user', 'userOptionList', '{C#MODNAME}', function(err, res){
+                    instance.userOptionList = res.userOptionList;
+                    instance.render();
+                });
             },
             render: function(){
-                var row = this._getRow();
-                if (L.isNull(row)){
+                var uOptions = this.userOptionList;
+                if (!uOptions){
+                    return;
+                }
+                var tplVal = uOptions.getById('tpl-screenshot'),
+                    scsTemplate = uOptions.getById('scsTemplate'),
+                    scsWidth = uOptions.getById('scsWidth'),
+                    scsHeight = uOptions.getById('scsHeight');
+
+                if (!scsTemplate){
+                    return;
+                }
+
+                if (tplVal && tplVal.get('value') && tplVal.get('value').length > 0){
+                    var val = Y.JSON.parse(tplVal.get('value'));
+
+                    scsTemplate.set('value', val['tpl']);
+                    scsWidth.set('value', val['w']);
+                    scsHeight.set('value', val['h']);
+                }
+
+                if (!scsTemplate.get('value') || scsTemplate.get('value').length === 0){
                     this.setelv('code', T['screenshottemplate']);
                     return;
                 }
-                var val = YAHOO.lang.JSON.parse(row.cell['vl']);
 
-                this.setelv('code', val['tpl']);
-                this.setelv('width', val['w']);
-                this.setelv('height', val['h']);
+                this.setelv('code', scsTemplate.get('value'));
+                this.setelv('width', scsWidth.get('value'));
+                this.setelv('height', scsHeight.get('value'));
             },
 
             setImage: function(file){
-                if (L.isNull(file) || file.type != 'file' || L.isNull(file.image)){
+                if (Y.Lang.isNull(file) || file.type != 'file' || Y.Lang.isNull(file.image)){
                     file = null;
                 }
                 this.file = file;
@@ -446,7 +458,7 @@ Component.entryPoint = function(){
                 var elImgHeight = this.el('height');
                 var elImgCode = this.el('code');
 
-                this.disabled([elBSelect, elImgTitle, elImgWidth, elImgHeight, elImgCode], L.isNull(file));
+                this.disabled([elBSelect, elImgTitle, elImgWidth, elImgHeight, elImgCode], Y.Lang.isNull(file));
             },
             disabled: function(els, disabled){
                 for (var i = 0; i < els.length; i++){
@@ -459,7 +471,7 @@ Component.entryPoint = function(){
                 }
             },
             onClick: function(el){
-                if (L.isNull(this.file)){
+                if (Y.Lang.isNull(this.file)){
                     return false;
                 }
                 var tp = TId['screenshot'];
@@ -470,28 +482,22 @@ Component.entryPoint = function(){
                 }
                 return false;
             },
-            _getRow: function(){
-                return DATA.get('userconfig').getRows().find({'nm': 'tpl-screenshot'});
-            },
             save: function(){
-                var d = this.getData();
-
-                var J = YAHOO.lang.JSON;
-                var table = DATA.get('userconfig');
-
-                var row = this._getRow();
-                if (L.isNull(row)){
-                    row = table.newRow();
-                    table.getRows().add(row);
-                    row.update({
-                        'nm': 'tpl-screenshot'
-                    });
+                var uOptions = this.userOptionList;
+                if (!uOptions){
+                    return;
                 }
-                row.update({
-                    'vl': J.stringify(d)
-                });
-                table.applyChanges();
-                API.dsRequest();
+
+                var d = this.getData(),
+                    scsTemplate = uOptions.getById('scsTemplate'),
+                    scsWidth = uOptions.getById('scsWidth'),
+                    scsHeight = uOptions.getById('scsHeight');
+
+                scsTemplate.set('value', d['tpl']);
+                scsWidth.set('value', d['w']);
+                scsHeight.set('value', d['h']);
+
+                Brick.appFunc('user', 'userOptionSave', '{C#MODNAME}', [scsTemplate, scsWidth, scsHeight]);
             },
             selectItem: function(){
                 if (!this.owner.callback){
@@ -729,7 +735,7 @@ Component.entryPoint = function(){
                     var file = new File(di);
                     var img = T['imagefile'];
                     ;
-                    if (!L.isNull(file.image)){
+                    if (!Y.Lang.isNull(file.image)){
                         var linker = new NS.Linker(file);
                         linker.setSize(16, 16);
                         img = linker.getHTML();

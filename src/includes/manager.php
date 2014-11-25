@@ -78,10 +78,10 @@ class FileManager extends Ab_ModuleManager {
     }
 
     public function IsAccessProfile($userid = 0) {
-        if ($userid == 0) {
-            $userid = $this->user->id;
+        if ($userid === 0) {
+            $userid = Abricos::$user->id;
         }
-        if (($this->user->id == $userid && $this->IsFileUploadRole())
+        if ((Abricos::$user->id == $userid && $this->IsFileUploadRole())
             || $this->IsAdminRole()
         ) {
             return true;
@@ -101,6 +101,7 @@ class FileManager extends Ab_ModuleManager {
                     }
                 }
                 break;
+            /*
             case 'editor':
                 foreach ($rows->r as $r) {
                     if ($r->f == 'a') {
@@ -108,6 +109,7 @@ class FileManager extends Ab_ModuleManager {
                     }
                 }
                 break;
+            /**/
             case 'folders':
                 foreach ($rows->r as $r) {
                     if ($r->f == 'a') {
@@ -118,16 +120,6 @@ class FileManager extends Ab_ModuleManager {
                     }
                     if ($r->f == 'u') {
                         $this->FolderChangePhrase($r->d);
-                    }
-                }
-                break;
-            case 'userconfig':
-                foreach ($rows->r as $r) {
-                    if ($r->f == 'u') {
-                        $this->UserConfigUpdate($r->d);
-                    }
-                    if ($r->f == 'a') {
-                        $this->UserConfigAppend($r->d);
                     }
                 }
                 break;
@@ -166,8 +158,6 @@ class FileManager extends Ab_ModuleManager {
                 return $this->FolderList();
             case 'editor':
                 return $this->EditorList($p->filehash, $p->session);
-            case 'userconfig':
-                return $this->UserConfigList();
             case 'usergrouplimit':
                 return $this->UserGroupLimitList();
             case 'extensions':
@@ -214,43 +204,21 @@ class FileManager extends Ab_ModuleManager {
         return FileManagerQuery::UserGroupLimitList($this->db);
     }
 
-    private function UserConfigCheckVarName($name) {
+    public function User_OptionNames() {
         if (!$this->IsFileUploadRole()) {
-            return false;
-        }
-        switch ($name) {
-            case "tpl-screenshot":
-                return true;
-        }
-        return false;
-    }
-
-    public function UserConfigList() {
-        if (!$this->IsFileUploadRole()) {
-            return null;
+            return array();
         }
 
-        return Abricos::$user->GetManager()->UserConfigList($this->user->id, 'filemanager');
-    }
-
-    public function UserConfigAppend($d) {
-        if (!$this->UserConfigCheckVarName($d->nm)) {
-            return;
-        }
-
-        Abricos::$user->GetManager()->UserConfigAppend($this->user->id, 'filemanager', $d->nm, $d->vl);
-    }
-
-    public function UserConfigUpdate($d) {
-        if (!$this->UserConfigCheckVarName($d->nm)) {
-            return;
-        }
-
-        Abricos::$user->GetManager()->UserConfigUpdate($this->user->id, $d->id, $d->vl);
+        return array(
+            "tpl-screenshot",
+            "scsTemplate",
+            "scsWidth",
+            "scsHeight"
+        );
     }
 
     public function FileList($folderid) {
-        return $this->FileListByUser($this->user->id, $folderid);
+        return $this->FileListByUser(Abricos::$user->id, $folderid);
     }
 
     public function FileListByUser($userid, $folderid) {
@@ -261,7 +229,7 @@ class FileManager extends Ab_ModuleManager {
     }
 
     public function FolderList() {
-        return $this->FolderListByUser($this->user->id);
+        return $this->FolderListByUser(Abricos::$user->id);
     }
 
     public function FolderListByUser($userid) {
@@ -326,11 +294,13 @@ class FileManager extends Ab_ModuleManager {
             $this->_userGroupSizeLimit = $list;
         }
 
-        $fullsize = FileManagerQuery::FileUsedSpace($this->db, $this->user->id);
+        $user = Abricos::$user;
 
-        $user = $this->user->info;
+        $fullsize = FileManagerQuery::FileUsedSpace($this->db, $user->id);
+        $groups = $user->GetGroupList();
+
         $limit = 0;
-        foreach ($user['group'] as $gp) {
+        foreach ($groups as $gp) {
             $limit = max(array(
                 $limit,
                 intval($this->_userGroupSizeLimit[$gp]['lmt'])
@@ -340,16 +310,11 @@ class FileManager extends Ab_ModuleManager {
     }
 
     public function GetFreeSpace() {
-        if (!$this->IsAccessProfile($this->user->id)) {
+        if (!$this->IsAccessProfile(Abricos::$user->id)) {
             return 0;
         }
         return $this->GetFreeSpaceMethod();
     }
-
-    private function GetFreeSpaceByUser() {
-        return 0;
-    }
-
 
     /**
      * Выгрузка файлов в базу данных.
@@ -381,7 +346,7 @@ class FileManager extends Ab_ModuleManager {
         $pathinfo = pathinfo($filename);
         $extension = strtolower($pathinfo['extension']);
 
-        $dbFileInfo = FileManagerQuery::FileInfoByName($this->db, $this->user->id, $folderid, $filename);
+        $dbFileInfo = FileManagerQuery::FileInfoByName($this->db, Abricos::$user->id, $folderid, $filename);
         if (!empty($dbFileInfo)) {
             if (!$newNameIfFind) {
                 return 7;
@@ -663,7 +628,7 @@ class FileManager extends Ab_ModuleManager {
         if (empty($path)) {
             return 0;
         }
-        $rows = FileManagerQuery::FolderList($this->db, $this->user->id);
+        $rows = FileManagerQuery::FolderList($this->db, Abricos::$user->id);
         $folders = array();
         while (($row = $this->db->fetch_array($rows))) {
             $folders[$row['id']] = $row;
@@ -682,7 +647,7 @@ class FileManager extends Ab_ModuleManager {
                 }
             }
             if (!$find) {
-                $folderid = FileManagerQuery::FolderAdd($this->db, $folderid, $this->user->id, $name, $arr[$i]);
+                $folderid = FileManagerQuery::FolderAdd($this->db, $folderid, Abricos::$user->id, $name, $arr[$i]);
             }
         }
         return $folderid;
@@ -700,7 +665,7 @@ class FileManager extends Ab_ModuleManager {
         if (!$this->IsFileUploadRole()) {
             return;
         }
-        $userid = $this->user->id;
+        $userid = Abricos::$user->id;
         return FileManagerQuery::FolderAdd($this->db, $parentFolderId, $userid, $folderName, $folderPhrase);
     }
 
@@ -709,7 +674,7 @@ class FileManager extends Ab_ModuleManager {
             return;
         }
 
-        $userid = $this->user->id;
+        $userid = Abricos::$user->id;
         $name = translateruen($data->ph);
         return FileManagerQuery::FolderAdd($this->db, $data->pid, $userid, $name, $data->ph);
     }
@@ -719,7 +684,7 @@ class FileManager extends Ab_ModuleManager {
             return;
         }
 
-        $userid = $this->user->id;
+        $userid = Abricos::$user->id;
         $finfo = FileManagerQuery::FolderInfo($this->db, $data->id);
 
         if (!$this->IsAccessProfile($finfo['uid'])) {
@@ -746,7 +711,7 @@ class FileManager extends Ab_ModuleManager {
             return;
         }
 
-        $userid = $this->user->id;
+        $userid = Abricos::$user->id;
         return FileManagerQuery::FolderInfoByName($this->db, $userid, $parentFolderId, $folderName);
     }
 
@@ -784,7 +749,7 @@ class FileManager extends Ab_ModuleManager {
         if (empty($lastedit)) {
             return;
         }
-        $userid = $this->user->id;
+        $userid = Abricos::$user->id;
         FileManagerQuery::ImageEditorSave($this->db, $userid, $filehash, $lastedit, $data->copy);
     }
 
@@ -883,7 +848,7 @@ class FileManager extends Ab_ModuleManager {
         }
 
         $newfilehash = $this->lastUploadFileHash;
-        $userid = $this->user->id;
+        $userid = Abricos::$user->id;
         FileManagerQuery::EditorAppend($this->db, $userid, $filehash, $newfilehash, $data->l, $data->t, $data->w, $data->h, $data->tools, $session);
 
         return $newfilehash;
