@@ -299,11 +299,12 @@ class FileManager extends Ab_ModuleManager {
         $fullsize = FileManagerQuery::FileUsedSpace($this->db, $user->id);
         $groups = $user->GetGroupList();
 
+        $list = $this->_userGroupSizeLimit;
         $limit = 0;
         foreach ($groups as $gp) {
             $limit = max(array(
                 $limit,
-                intval($this->_userGroupSizeLimit[$gp]['lmt'])
+                isset($list[$gp]) ? intval($list[$gp]['lmt']) : 0
             ));
         }
         return $limit - $fullsize;
