@@ -1,24 +1,24 @@
 {
   "name": "abricos-mod-filemanager",
-  "description": "Abricos File Manager Module",
-  "version": "0.3.6-dev",
+  "description": "File Manager Module for Abricos Platform",
+  "version": "0.3.7",
   "author": {
     "name": "Alexander Kuzmin",
     "email": "roosit@abricos.org",
     "web": "http://abricos.org",
     "twitter": "roositab"
   },
-  "license": "GPLv2",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/abricos/abricos-mod-filemanager.git"
   },
   "keywords": [
     "abricos",
-    "sitemap"
+    "filemanager"
   ],
   "bugs": {
     "url": "https://github.com/abricos/abricos-mod-filemanager/issues"
   },
-  "homepage": "http://abricoscms.com/mods/filemanager/"
+  "homepage": "http://abricos.org/mods/filemanager/"
 }

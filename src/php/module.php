@@ -31,7 +31,7 @@ class FileManagerModule extends Ab_Module {
     public function __construct() {
         FileManagerModule::$instance = $this;
 
-        $this->version = "0.3.6";
+        $this->version = "{C#VERSION}";
 
         $this->name = "filemanager";
         $this->takelink = "filemanager";
