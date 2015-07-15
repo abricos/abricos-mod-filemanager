@@ -1,18 +1,10 @@
-/*
- @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
- */
-
-/**
- * @module Sys
- */
-
 var Component = new Brick.Component();
 Component.requires = {
     mod: [{name: 'user', files: ['cpanel.js']}]
 };
 Component.entryPoint = function(){
 
-    if (!Brick.AppRoles.check('user', '50')){
+    if (Brick.AppRoles.check('user', '50')){
         return;
     }
     var cp = Brick.mod.user.cp;

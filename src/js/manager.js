@@ -14,7 +14,7 @@ Component.requires = {
 	yahoo: ['tabview','dragdrop'],
 	mod:[
 		{name: 'filemanager', files: ['api.js']},
-		{name: 'sys', files: ['data.js', 'form.js']}
+		{name: 'sys', files: ['data.js', 'old-form.js']}
 	]
 };
 Component.entryPoint = function(){
