@@ -1,8 +1,3 @@
-/*
- * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
- */
-
-
 /**
  * @module FileManager
  * @namespace Brick.mod.filemanager
@@ -16,30 +11,20 @@ Component.requires = {
         {name: 'filemanager', files: ['api.js', 'lib.js']}
     ]
 };
-Component.entryPoint = function(){
+Component.entryPoint = function(NS){
 
     var Y = Brick.YUI;
 
     var Dom = YAHOO.util.Dom,
         W = YAHOO.widget;
 
-    var tSetVar = Brick.util.Template.setProperty;
-    var tSetVarA = Brick.util.Template.setPropertyArray;
-
-    var NS = this.namespace,
-        TMG = this.template,
+    var buildTemplate = this.buildTemplate,
         API = NS.API;
-
-    var TM = TMG.build(),
-        T = TM.data,
-        TId = TM.idManager;
 
     if (!NS.data){
         NS.data = new Brick.util.data.byid.DataSet('filemanager');
     }
     var DATA = NS.data;
-
-    this.buildTemplate({});
 
     Brick.byteToString = function(byte){
         var ret = byte;
@@ -72,16 +57,17 @@ Component.entryPoint = function(){
         };
         YAHOO.extend(FolderNode, YAHOO.widget.TextNode, {});
 
-        var FolderPanel = function(onSelectItem){
-            this.init(onSelectItem);
+        var FolderPanel = function(owner, onSelectItem){
+            this.init(owner, onSelectItem);
         };
         FolderPanel.prototype = {
-            init: function(onSelectItem){
+            init: function(owner, onSelectItem){
+                this.owner = owner;
                 this.onSelectItem = onSelectItem;
                 this.index = {};
 
                 var __self = this;
-                this.tv = new W.TreeView(TId['panel']['folders']);
+                this.tv = new W.TreeView(owner.el('folders'));
                 this.tv.subscribe("clickEvent", function(event){
                     __self.setFolderId(event.node.data.folder.id);
                     return true;
@@ -177,16 +163,16 @@ Component.entryPoint = function(){
         };
         YAHOO.extend(CreateFolderPanel, Brick.widget.Dialog, {
             el: function(name){
-                return Dom.get(TId['createfolderpanel'][name]);
+                return this._TM.gel(name);
             },
             elv: function(name){
                 return Brick.util.Form.getValue(this.el(name));
             },
             initTemplate: function(){
-                return T['createfolderpanel'];
+                return buildTemplate(this, 'createfolderpanel').replace('createfolderpanel');
             },
             onClick: function(el){
-                var tp = TId['createfolderpanel'];
+                var tp = this._TId['createfolderpanel'];
                 switch (el.id) {
                     case tp['bcreate']:
                         this.callback(this.elv('name'));
@@ -207,7 +193,7 @@ Component.entryPoint = function(){
         };
         YAHOO.extend(FolderEditPanel, Brick.widget.Dialog, {
             el: function(name){
-                return Dom.get(TId['editfolderpanel'][name]);
+                return this._TM.gel(name);
             },
             elv: function(name){
                 return Brick.util.Form.getValue(this.el(name));
@@ -216,13 +202,13 @@ Component.entryPoint = function(){
                 Brick.util.Form.setValue(this.el(name), value);
             },
             initTemplate: function(){
-                return T['editfolderpanel'];
+                return buildTemplate(this, 'editfolderpanel').replace('editfolderpanel');
             },
             onLoad: function(){
                 this.setelv('name', this.row.cell['ph']);
             },
             onClick: function(el){
-                var tp = TId['editfolderpanel'];
+                var tp = this._TId['editfolderpanel'];
                 switch (el.id) {
                     case tp['bsave']:
                         this.callback(this.elv('name'));
@@ -243,11 +229,12 @@ Component.entryPoint = function(){
         };
         YAHOO.extend(FolderRemoveMsg, Brick.widget.Dialog, {
             initTemplate: function(){
-                var t = T['folderremovemsg'];
-                return tSetVar(t, 'info', this.row.cell['ph']);
+                return buildTemlate(this, 'folderremovemsg').replace('folderremovemsg', {
+                    info: this.row.cell['ph']
+                });
             },
             onClick: function(el){
-                var tp = TId['folderremovemsg'];
+                var tp = this._TId['folderremovemsg'];
                 switch (el.id) {
                     case tp['bremove']:
                         this.close();
@@ -267,7 +254,7 @@ Component.entryPoint = function(){
         };
         YAHOO.extend(BrowserPanel, Brick.widget.Dialog, {
             el: function(name){
-                return Dom.get(TId['panel'][name]);
+                return this._TM.gel(name);
             },
             elv: function(name){
                 return Brick.util.Form.getValue(this.el(name));
@@ -279,15 +266,15 @@ Component.entryPoint = function(){
                 Brick.util.Form.setValue(this.el(name), value);
             },
             initTemplate: function(){
-                return T['panel'];
+                return buildTemplate(this, 'panel').replace('panel');
             },
             onLoad: function(){
                 var __self = this;
                 this.screenshot = new Screenshot(this, this.el('screenshot'));
-                this.folders = new FolderPanel(function(item){
+                this.folders = new FolderPanel(this, function(item){
                     __self.onSelectItem_foldersPanel(item);
                 });
-                this.files = new FilesPanel(this.el('files'), '0', function(item){
+                this.files = new FilesPanel(this, this.el('files'), '0', function(item){
                     __self.onSelectItem_filesPanel(item);
                 });
 
@@ -321,7 +308,7 @@ Component.entryPoint = function(){
                 this.refreshPath();
             },
             onClick: function(el){
-                var tp = TId['panel'];
+                var tp = this._TId['panel'];
                 switch (el.id) {
                     case tp['bnewfolder']:
                         this.folders.createFolder();
@@ -384,7 +371,7 @@ Component.entryPoint = function(){
         };
         Screenshot.prototype = {
             el: function(name){
-                return Dom.get(TId['screenshot'][name]);
+                return this._TM.gel(name);
             },
             elv: function(name){
                 return Brick.util.Form.getValue(this.el(name));
@@ -405,7 +392,8 @@ Component.entryPoint = function(){
             init: function(owner, container){
                 this.owner = owner;
 
-                container.innerHTML = T['screenshot'];
+                container.innerHTML = buildTemplate(this, 'screenshot').replace('screenshot');
+
                 this.setImage(null);
 
                 var instance = this;
@@ -474,7 +462,7 @@ Component.entryPoint = function(){
                 if (Y.Lang.isNull(this.file)){
                     return false;
                 }
-                var tp = TId['screenshot'];
+                var tp = this._TId['screenshot'];
                 switch (el.id) {
                     case tp['bselect']:
                         this.selectItem();
@@ -516,11 +504,13 @@ Component.entryPoint = function(){
                 var smallLinker = new NS.Linker(item);
                 smallLinker.setSize(width, height);
 
-                var html = tSetVarA(this.elv('code'), {
-                    'isrc': linker.getSrc(),
-                    'sisrc': smallLinker.getSrc(),
-                    'siw': width, 'sih': height,
-                    'sialt': title, 'sitl': title
+                var html = Abricos.TemplateManager.replace(this.elv('code'), {
+                    isrc: linker.getSrc(),
+                    sisrc: smallLinker.getSrc(),
+                    siw: width,
+                    sih: height,
+                    sialt: title,
+                    sitl: title
                 });
 
                 this.owner.callback({
@@ -533,16 +523,19 @@ Component.entryPoint = function(){
             }
         };
 
-        var FilesPanel = function(container, folderid, onSelect){
+        var FilesPanel = function(owner, container, folderid, onSelect){
             folderid = folderid || '0';
             this.onSelect = onSelect;
-            this.init(container, folderid);
+            this.init(owner, container, folderid);
         };
         FilesPanel.prototype = {
-            init: function(container, folderid){
+            init: function(owner, container, folderid){
+                this.owner = owner;
                 this.folderid = -1;
                 this.selectedItem = null;
                 this.isinit = true;
+
+                buildTemplate(this, 'filesrow,filesrowparent,filesrowfd,imagefile,files');
 
                 this.tables = {
                     'files': DATA.get('files', true),
@@ -580,8 +573,9 @@ Component.entryPoint = function(){
                 DATA.request();
             },
             onClick: function(el){
-                var prefix = el.id.replace(/([0-9]+$)/, '');
-                var numid = el.id.replace(prefix, "");
+                var TId = this._TId,
+                    prefix = el.id.replace(/([0-9]+$)/, ''),
+                    numid = el.id.replace(prefix, "");
 
                 switch (prefix) {
                     case TId['filesrow']['edit'] + '-':
@@ -631,6 +625,7 @@ Component.entryPoint = function(){
                 isParent = isParent || false;
                 this.selectedItem = null;
                 var item = null;
+                var TId = this._TId;
 
                 var pparentFolderId = '0';
                 var row;
@@ -674,7 +669,6 @@ Component.entryPoint = function(){
                 if (this.onSelect){
                     this.onSelect(item);
                 }
-                ;
             },
             itemEdit: function(itemid, isFolder){
                 if (!isFolder){
@@ -713,9 +707,11 @@ Component.entryPoint = function(){
                 var lstFolders = "";
                 var rowsFD = DATA.get('folders').getRows();
                 var folderid = this.folderid;
+                var TM = this._TM;
+
                 if (folderid > 0){
                     var row = rowsFD.getById(folderid);
-                    lstFolders += tSetVarA(T['filesrowparent'], {
+                    lstFolders += TM.replace('filesrowparent', {
                         'id': row.cell['pid']
                     });
                 }
@@ -724,7 +720,7 @@ Component.entryPoint = function(){
                     if (folderid != di['pid']){
                         return;
                     }
-                    lstFolders += tSetVarA(T['filesrowfd'], {
+                    lstFolders += TM.replace('filesrowfd', {
                         'id': di['id'], 'fn': di['ph']
                     });
                 });
@@ -733,21 +729,28 @@ Component.entryPoint = function(){
                 this.rows.foreach(function(row){
                     var di = row.cell;
                     var file = new File(di);
-                    var img = T['imagefile'];
-                    ;
+                    var img = TM.replace('imagefile');
+
                     if (!Y.Lang.isNull(file.image)){
                         var linker = new NS.Linker(file);
                         linker.setSize(16, 16);
                         img = linker.getHTML();
                     }
+
                     lstFiles += TM.replace('filesrow', {
-                        'id': di['id'], 'img': img, 'fn': di['fn'],
-                        'fs': Brick.byteToString(di['fs']), 'dl': Brick.dateExt.convert(di['d'], 1)
+                        'id': di['id'],
+                        'img': img,
+                        'fn': di['fn'],
+                        'fs': Brick.byteToString(di['fs']),
+                        'dl': Brick.dateExt.convert(di['d'], 1)
                     });
                 });
 
-                var el = Dom.get(TId['panel']['files']);
-                el.innerHTML = tSetVarA(T['files'], {'files': lstFiles, 'folders': lstFolders});
+                var el = this.owner._TM.gel('files');
+                el.innerHTML = TM.replace('files', {
+                    files: lstFiles,
+                    folders: lstFolders
+                });
                 this.selectItem(null);
             }
         };

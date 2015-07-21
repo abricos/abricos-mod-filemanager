@@ -13,8 +13,6 @@ Component.entryPoint = function(NS){
 
     var L = YAHOO.lang;
 
-    var NS = this.namespace;
-
     var File = function(d){
         this.init(d);
     };
@@ -126,7 +124,7 @@ Component.entryPoint = function(NS){
                 }
                 var src = this._getSrc(f.id, f.name, w, h);
                 var t = "<img {v#id} src='{v#src}' title='{v#title}' alt='{v#alt}' width='{v#width}' height='{v#height}' />";
-                var html = Brick.util.Template.setPropertyArray(t, {
+                var html = Abricos.TemplateManager.replace(t, {
                     'src': src,
                     'width': width + 'px',
                     'height': height + 'px',
