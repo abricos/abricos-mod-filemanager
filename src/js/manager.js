@@ -1,377 +1,387 @@
-/*
-@version $Id$
-@package Abricos
-@copyright Copyright (C) 2008 Abricos All rights reserved.
-@license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
-*/
-
-/**
- * @module Feedback
- * @namespace Brick.mod.feedback
- */
 var Component = new Brick.Component();
 Component.requires = {
-	yahoo: ['tabview','dragdrop'],
-	mod:[
-		{name: 'filemanager', files: ['api.js']},
-		{name: 'sys', files: ['data.js', 'old-form.js']}
-	]
+    yahoo: ['tabview', 'dragdrop'],
+    mod: [
+        {name: 'filemanager', files: ['api.js']},
+        {name: 'sys', files: ['data.js', 'old-form.js']}
+    ]
 };
-Component.entryPoint = function(){
-	
-	var Dom = YAHOO.util.Dom,
-		E = YAHOO.util.Event,
-		L = YAHOO.lang;
-	
-	var NS = this.namespace, 
-		TMG = this.template; 
-	
-	var API = NS.API;
-	
-	
-	if (!NS.data){
-		NS.data = new Brick.util.data.byid.DataSet('filemanager');
-	}
-	var DATA = NS.data;
-	
-	var buildTemplate = function(widget, templates){
-		var TM = TMG.build(templates), T = TM.data, TId = TM.idManager;
-		widget._TM = TM; widget._T = T; widget._TId = TId;
-	};
-	
-	var ManagerWidget = function(container){
-		buildTemplate(this, 'widget');
+Component.entryPoint = function(NS){
 
-		container = L.isString(container) ? Dom.get(container) : container;
-		this.init(container);
-	};
-	ManagerWidget.prototype = {
-		init: function(container){
-		
-			var T = this._T, TId = this._TId;
-		
-			container.innerHTML = T['widget'];
-			
-			var tabView = new YAHOO.widget.TabView(TId['widget']['id']);
-			this.pages = {
-				'limit': new NS.UserGroupLimitWidget(Dom.get(TId['widget']['limit'])),
-				'ext': new NS.ExtensionFileWidget(Dom.get(TId['widget']['exten']))
-			};
-	
-			var __self = this;
-			E.on(container, 'click', function(e){
-				if (__self.onClick(E.getTarget(e))){ E.stopEvent(e); }
-			});
-			DATA.request();
-		}, 
-		onClick: function(el){
-			for (var n in this.pages){
-				if (this.pages[n].onClick(el)){ return true; }
-			}
-			return false;
-		}
-	};
-	NS.ManagerWidget = ManagerWidget;
-	API.showManagerWidget = function(container){
-		return new NS.ManagerWidget(container);
-	};
+    var Dom = YAHOO.util.Dom,
+        E = YAHOO.util.Event,
+        L = YAHOO.lang;
+
+    var buildTemplate = this.buildTemplate;
+
+    var API = NS.API;
+
+    if (!NS.data){
+        NS.data = new Brick.util.data.byid.DataSet('filemanager');
+    }
+    var DATA = NS.data;
+
+    var ManagerWidget = function(container){
+        buildTemplate(this, 'widget');
+
+        container = L.isString(container) ? Dom.get(container) : container;
+        this.init(container);
+    };
+    ManagerWidget.prototype = {
+        init: function(container){
+            var TM = this._TM;
+
+            container.innerHTML = TM.replace('widget');
+
+            new YAHOO.widget.TabView(TM.gelid('id'));
+            this.pages = {
+                'limit': new NS.UserGroupLimitWidget(TM.gelid('limit')),
+                'ext': new NS.ExtensionFileWidget(TM.gelid('exten'))
+            };
+
+            var __self = this;
+            E.on(container, 'click', function(e){
+                if (__self.onClick(E.getTarget(e))){
+                    E.stopEvent(e);
+                }
+            });
+            DATA.request();
+        },
+        onClick: function(el){
+            for (var n in this.pages){
+                if (this.pages[n].onClick(el)){
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
+    NS.ManagerWidget = ManagerWidget;
+    API.showManagerWidget = function(container){
+        return new NS.ManagerWidget(container);
+    };
 
 
-	var UserGroupLimitWidget = function(container){
-		var TM = TMG.build('limitwidget,limitrowwait,limitrow,limittable'), 
-			T = TM.data, TId = TM.idManager;
-		this._TM = TM; this._T = T; this._TId = TId;
+    var UserGroupLimitWidget = function(container){
+        var TM = buildTemplate(this, 'limitwidget,limitrowwait,limitrow,limittable');
 
-		container = L.isString(container) ? Dom.get(container) : container;
-		this.init(container);
-	};
-	UserGroupLimitWidget.prototype = {
-		init: function(container){
-			container.innerHTML = this._T['limitwidget'];
-			var tables = {
-				'usergrouplimit': DATA.get('usergrouplimit', true)
-			};
-			DATA.onStart.subscribe(this.dsEvent, this, true);
-			DATA.onComplete.subscribe(this.dsEvent, this, true);
-			if (DATA.isFill(tables)){
-				this.renderElements();
-			}else{
-				this.renderWait();
-			}
-		},
-		dsEvent: function(type, args){
-			if (args[0].checkWithParam('usergrouplimit', {})){
-				if (type == 'onComplete'){
-					this.renderElements(); 
-				}else{
-					this.renderWait();
-				}
-			}
-		},
-		destroy: function(){
-			DATA.onComplete.unsubscribe(this.dsEvent);
-			DATA.onStart.unsubscribe(this.dsEvent);
-		},
-		renderElements: function(){
-			var TM = this._TM, T = this._T, TId = this._TId, 
-				lst = "";
-			DATA.get('usergrouplimit').getRows().foreach(function(row){
-				var di = row.cell;
-				lst += TM.replace('limitrow', {
-					'id': di['id'],
-					'lmt': di['lmt'],
-					'gnm': di['gnm']
-				});
-			});
-			this._TM.getEl('limitwidget.table').innerHTML = this._TM.replace('limittable', {'rows': lst});
-		},
-		renderWait: function(){
-			this._TM.getEl('limitwidget.table').innerHTML = this._TM.replace('limittable', {'rows': this._T['limitrowwait']});
-		},
-		onClick: function(el){
-			var TId = this._TId, tp = TId['limitwidget'];
-			switch(el.id){
-			case tp['bappend']:  this.editGroupLimit(0); return true;
-			}
+        container = L.isString(container) ? Dom.get(container) : container;
+        this.init(container);
+    };
+    UserGroupLimitWidget.prototype = {
+        init: function(container){
+            container.innerHTML = this._TM.replace('limitwidget');
+            var tables = {
+                'usergrouplimit': DATA.get('usergrouplimit', true)
+            };
+            DATA.onStart.subscribe(this.dsEvent, this, true);
+            DATA.onComplete.subscribe(this.dsEvent, this, true);
+            if (DATA.isFill(tables)){
+                this.renderElements();
+            } else {
+                this.renderWait();
+            }
+        },
+        dsEvent: function(type, args){
+            if (args[0].checkWithParam('usergrouplimit', {})){
+                if (type == 'onComplete'){
+                    this.renderElements();
+                } else {
+                    this.renderWait();
+                }
+            }
+        },
+        destroy: function(){
+            DATA.onComplete.unsubscribe(this.dsEvent);
+            DATA.onStart.unsubscribe(this.dsEvent);
+        },
+        renderElements: function(){
+            var TM = this._TM,
+                lst = "";
 
-			var prefix = el.id.replace(/([0-9]+$)/, '');
-			var numid = el.id.replace(prefix, "");
-			
-			switch(prefix){
-			case (TId['limitrow']['edit']+'-'):
-				this.editGroupLimit(numid);
-				return true;
-			case (TId['limitrow']['remove']+'-'):
-				this.removeGroupLimit(numid);
-				return true;
-			}
-			return false;
-		},
-		editGroupLimit: function(id){
-			var table = DATA.get('usergrouplimit'),
-				rows = table.getRows(),
-				row = id == 0 ? table.newRow() : rows.getById(id);
-			new GroupLimitEditorPanel(row, function(){
-				if (id == 0){ rows.add(row); }
-				table.applyChanges();
-				DATA.request();
-			});
-		},
-		removeGroupLimit: function(id){
-			var table = DATA.get('usergrouplimit'),
-			rows = table.getRows(),
-			row = id == 0 ? table.newRow() : rows.getById(id);
-			row.remove();
-			table.applyChanges();
-			DATA.request();
-		}
-	};
-	NS.UserGroupLimitWidget = UserGroupLimitWidget;
-	
-	
-	var GroupLimitEditorPanel = function(row, callback){
-		this.row = row;
-		this.tname = row.isNew() ? 'limitappendpanel' : 'limiteditorpanel';
-		this.callback = callback;
-		GroupLimitEditorPanel.superclass.constructor.call(this, {
-			width: '400px', resize: true
-		});
-	};
-	YAHOO.extend(GroupLimitEditorPanel, Brick.widget.Dialog, {
-		el: function(name){ return Dom.get(this._TId[this.tname][name]); },
-		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
-		setelv: function(name, value){ Brick.util.Form.setValue(this.el(name), value); },
-		initTemplate: function(){
-			buildTemplate(this, this.tname+',grouptable,grouprow,grouprowwait');
-			return this._T[this.tname];
-		},
-		onLoad: function(){
-			
-			DATA.onStart.subscribe(this.dsEvent, this, true);
-			DATA.onComplete.subscribe(this.dsEvent, this, true);
-			DATA.isFill({
-				'grouplist': DATA.get('grouplist', true)
-			}) ? this.renderTable() : this.renderWait();  
+            DATA.get('usergrouplimit').getRows().foreach(function(row){
+                var di = row.cell;
+                lst += TM.replace('limitrow', {
+                    'id': di['id'],
+                    'lmt': di['lmt'],
+                    'gnm': di['gnm']
+                });
+            });
+            TM.gel('limitwidget.table').innerHTML = TM.replace('limittable', {'rows': lst});
+        },
+        renderWait: function(){
+            var TM = this._TM;
+            TM.gel('limitwidget.table').innerHTML = TM.replace('limittable', {'rows': TM.replace('limitrowwait')});
+        },
+        onClick: function(el){
+            var TId = this._TId, tp = TId['limitwidget'];
+            switch (el.id) {
+                case tp['bappend']:
+                    this.editGroupLimit(0);
+                    return true;
+            }
 
-			var di = this.row.cell;
-			this.setelv('size', di['lmt']);
-			DATA.request();
-		},
-		dsEvent: function(type, args){
-			if (args[0].checkWithParam('grouplist')){ type == 'onComplete' ? this.renderTable() : this.renderWait(); }
-		},
-		destroy: function(){
-			DATA.onComplete.unsubscribe(this.dsEvent);
-			DATA.onStart.unsubscribe(this.dsEvent);
-			GroupLimitEditorPanel.superclass.destroy.call(this);
-		},
-		renderWait: function(){
-			var TM = this._TM, T = this._T;
-			TM.getEl(this.tname+ '.table').innerHTML = TM.replace('grouptable', {'rows': T['grouprowwait']});
-		},
-		renderTable: function(){
-			var TM = this._TM, lst = "";
-			DATA.get('grouplist').getRows().foreach(function(row){
-				var di = row.cell;
-				lst += TM.replace('grouprow', {
-					'id': di['id'],
-					'nm': di['gnm']
-				});
-			});
-			TM.getEl(this.tname+'.table').innerHTML = TM.replace('grouptable', {'rows': lst});
-			
-			var tbl = this._TM.getEl('grouptable.id');
-			if (!this.row.isNew()){
-				tbl.disabled = 'disabled';
-				tbl.value = this.row.cell['gid'];
-			}
+            var prefix = el.id.replace(/([0-9]+$)/, '');
+            var numid = el.id.replace(prefix, "");
 
-		},
-		onClick: function(el){
-			var tp = this._TId[this.tname];
-			switch(el.id){
-			case tp['bcancel']: this.close(); return true;
-			case tp['bsave']: this.save(); return true;
-			}
-			return false;
-		},
-		save: function(){
-			this.row.update({
-				'lmt': this.elv('size'),
-				'gid': this._TM.getEl('grouptable.id').value
-			});
-			this.callback();
-			this.close();
-		}
-	});
-	NS.GroupLimitEditorPanel = GroupLimitEditorPanel;
-	
-	
-	
-	var ExtensionFileWidget = function(container){
-		var TM = TMG.build('extwidget,extrowwait,extrow,exttable'), 
-			T = TM.data, TId = TM.idManager;
-		this._TM = TM; this._T = T; this._TId = TId;
+            switch (prefix) {
+                case (TId['limitrow']['edit'] + '-'):
+                    this.editGroupLimit(numid);
+                    return true;
+                case (TId['limitrow']['remove'] + '-'):
+                    this.removeGroupLimit(numid);
+                    return true;
+            }
+            return false;
+        },
+        editGroupLimit: function(id){
+            var table = DATA.get('usergrouplimit'),
+                rows = table.getRows(),
+                row = id == 0 ? table.newRow() : rows.getById(id);
+            new GroupLimitEditorPanel(row, function(){
+                if (id == 0){
+                    rows.add(row);
+                }
+                table.applyChanges();
+                DATA.request();
+            });
+        },
+        removeGroupLimit: function(id){
+            var table = DATA.get('usergrouplimit'),
+                rows = table.getRows(),
+                row = id == 0 ? table.newRow() : rows.getById(id);
+            row.remove();
+            table.applyChanges();
+            DATA.request();
+        }
+    };
+    NS.UserGroupLimitWidget = UserGroupLimitWidget;
 
-		container = L.isString(container) ? Dom.get(container) : container;
-		this.init(container);
-	};
-	ExtensionFileWidget.prototype = {
-		init: function(container){
-			container.innerHTML = this._T['extwidget'];
-			var tables = {
-				'extensions': DATA.get('extensions', true)
-			};
-			DATA.onStart.subscribe(this.dsEvent, this, true);
-			DATA.onComplete.subscribe(this.dsEvent, this, true);
-			DATA.isFill(tables) ? this.renderElements() :  this.renderWait();
-		},
-		dsEvent: function(type, args){
-			if (args[0].checkWithParam('extensions', {})){
-				type == 'onComplete' ?  this.renderElements() : this.renderWait();
-			}
-		},
-		destroy: function(){
-			DATA.onComplete.unsubscribe(this.dsEvent);
-			DATA.onStart.unsubscribe(this.dsEvent);
-		},
-		renderElements: function(){
-			var TM = this._TM, T = this._T, TId = this._TId, 
-				lst = "";
-			DATA.get('extensions').getRows().foreach(function(row){
-				var di = row.cell;
-				lst += TM.replace('extrow', {
-					'id': di['filetypeid'],
-					'ext': di['extension'],
-					'mime': di['mimetype'],
-					'size': di['maxsize'],
-					'width': di['maxwidth'],
-					'height': di['maxheight']
-				});
-			});
-			this._TM.getEl('extwidget.table').innerHTML = this._TM.replace('exttable', {'rows': lst});
-		},
-		renderWait: function(){
-			this._TM.getEl('extwidget.table').innerHTML = this._TM.replace('exttable', {'rows': this._T['extrowwait']});
-		},
-		onClick: function(el){
-			var TId = this._TId;
-			
-			if (el.id == TId['extwidget']['bappend']){
-				this.editExtension(0);
-				return true;
-			}
-			
-			var prefix = el.id.replace(/([0-9]+$)/, '');
-			var numid = el.id.replace(prefix, "");
-			
-			switch(prefix){
-			case (TId['extrow']['edit']+'-'):
-				this.editExtension(numid);
-				return true;
-			}
 
-			return false;
-		},
-		editExtension: function(id){
-			var table = DATA.get('extensions'),
-				rows = table.getRows(),
-				row = id == 0 ? table.newRow() : rows.getById(id);
-			new ExtensionEditorPanel(row, function(){
-				if (id == 0){ rows.add(row); }
-				table.applyChanges();
-				DATA.request();
-			});
-		}
-	};
-	NS.ExtensionFileWidget = ExtensionFileWidget;
-	
-	
-	var ExtensionEditorPanel = function(row, callback){
-		this.row = row;
-		this.callback = callback;
-		ExtensionEditorPanel.superclass.constructor.call(this, {
-			width: '600px', resize: true
-		});
-	};
-	
-	YAHOO.extend(ExtensionEditorPanel, Brick.widget.Dialog, {
-		el: function(name){ return Dom.get(this._TId['exteditorpanel'][name]); },
-		elv: function(name){ return Brick.util.Form.getValue(this.el(name)); },
-		setelv: function(name, value){ Brick.util.Form.setValue(this.el(name), value); },
-		initTemplate: function(){
-			buildTemplate(this, 'exteditorpanel');
-			return this._T['exteditorpanel'];
-		},
-		onLoad: function(){
-			var di = this.row.cell;
-			this.setelv('ext', di['extension']);
-			this.setelv('mime', di['mimetype']);
-			this.setelv('size', di['maxsize']);
-			this.setelv('width', di['maxwidth']);
-			this.setelv('height', di['maxheight']);
-		},
-		onClick: function(el){
-			var tp = this._TId['exteditorpanel'];
-			switch(el.id){
-			case tp['bcancel']: this.close(); return true;
-			case tp['bsave']: this.save(); return true;
-			}
-			return false;
-		},
-		save: function(){
-			
-			this.row.update({
-				'extension': this.elv('ext'),
-				'mimetype': this.elv('mime'),
-				'maxsize': this.elv('size'),
-				'maxwidth': this.elv('width'),
-				'maxheight': this.elv('height')
-			});
-			
-			this.callback();
-			this.close();
-		}
-	});
-	NS.ExtensionEditorPanel = ExtensionEditorPanel;
+    var GroupLimitEditorPanel = function(row, callback){
+        this.row = row;
+        this.tname = row.isNew() ? 'limitappendpanel' : 'limiteditorpanel';
+        this.callback = callback;
+        GroupLimitEditorPanel.superclass.constructor.call(this, {
+            width: '400px', resize: true
+        });
+    };
+    YAHOO.extend(GroupLimitEditorPanel, Brick.widget.Dialog, {
+        el: function(name){
+            return Dom.get(this._TId[this.tname][name]);
+        },
+        elv: function(name){
+            return Brick.util.Form.getValue(this.el(name));
+        },
+        setelv: function(name, value){
+            Brick.util.Form.setValue(this.el(name), value);
+        },
+        initTemplate: function(){
+            buildTemplate(this, this.tname + ',grouptable,grouprow,grouprowwait');
+            return this._TM.replace(this.tname);
+        },
+        onLoad: function(){
+
+            DATA.onStart.subscribe(this.dsEvent, this, true);
+            DATA.onComplete.subscribe(this.dsEvent, this, true);
+            DATA.isFill({
+                'grouplist': DATA.get('grouplist', true)
+            }) ? this.renderTable() : this.renderWait();
+
+            var di = this.row.cell;
+            this.setelv('size', di['lmt']);
+            DATA.request();
+        },
+        dsEvent: function(type, args){
+            if (args[0].checkWithParam('grouplist')){
+                type == 'onComplete' ? this.renderTable() : this.renderWait();
+            }
+        },
+        destroy: function(){
+            DATA.onComplete.unsubscribe(this.dsEvent);
+            DATA.onStart.unsubscribe(this.dsEvent);
+            GroupLimitEditorPanel.superclass.destroy.call(this);
+        },
+        renderWait: function(){
+            var TM = this._TM;
+            TM.gel(this.tname + '.table').innerHTML = TM.replace('grouptable', {'rows': TM.replace('grouprowwait')});
+        },
+        renderTable: function(){
+            var TM = this._TM, lst = "";
+            DATA.get('grouplist').getRows().foreach(function(row){
+                var di = row.cell;
+                lst += TM.replace('grouprow', {
+                    'id': di['id'],
+                    'nm': di['gnm']
+                });
+            });
+            TM.getEl(this.tname + '.table').innerHTML = TM.replace('grouptable', {'rows': lst});
+
+            var tbl = this._TM.getEl('grouptable.id');
+            if (!this.row.isNew()){
+                tbl.disabled = 'disabled';
+                tbl.value = this.row.cell['gid'];
+            }
+
+        },
+        onClick: function(el){
+            var tp = this._TId[this.tname];
+            switch (el.id) {
+                case tp['bcancel']:
+                    this.close();
+                    return true;
+                case tp['bsave']:
+                    this.save();
+                    return true;
+            }
+            return false;
+        },
+        save: function(){
+            this.row.update({
+                'lmt': this.elv('size'),
+                'gid': this._TM.getEl('grouptable.id').value
+            });
+            this.callback();
+            this.close();
+        }
+    });
+    NS.GroupLimitEditorPanel = GroupLimitEditorPanel;
+
+
+    var ExtensionFileWidget = function(container){
+        var TM = buildTemplate(this, 'extwidget,extrowwait,extrow,exttable');
+
+        container = L.isString(container) ? Dom.get(container) : container;
+        this.init(container);
+    };
+    ExtensionFileWidget.prototype = {
+        init: function(container){
+            container.innerHTML = this._TM.replace('extwidget');
+            var tables = {
+                'extensions': DATA.get('extensions', true)
+            };
+            DATA.onStart.subscribe(this.dsEvent, this, true);
+            DATA.onComplete.subscribe(this.dsEvent, this, true);
+            DATA.isFill(tables) ? this.renderElements() : this.renderWait();
+        },
+        dsEvent: function(type, args){
+            if (args[0].checkWithParam('extensions', {})){
+                type == 'onComplete' ? this.renderElements() : this.renderWait();
+            }
+        },
+        destroy: function(){
+            DATA.onComplete.unsubscribe(this.dsEvent);
+            DATA.onStart.unsubscribe(this.dsEvent);
+        },
+        renderElements: function(){
+            var TM = this._TM,
+                lst = "";
+
+            DATA.get('extensions').getRows().foreach(function(row){
+                var di = row.cell;
+                lst += TM.replace('extrow', {
+                    'id': di['filetypeid'],
+                    'ext': di['extension'],
+                    'mime': di['mimetype'],
+                    'size': di['maxsize'],
+                    'width': di['maxwidth'],
+                    'height': di['maxheight']
+                });
+            });
+            this._TM.getEl('extwidget.table').innerHTML = this._TM.replace('exttable', {'rows': lst});
+        },
+        renderWait: function(){
+            this._TM.getEl('extwidget.table').innerHTML = this._TM.replace('exttable', {'rows': this._TM.replace('extrowwait')});
+        },
+        onClick: function(el){
+            var TId = this._TId;
+
+            if (el.id == TId['extwidget']['bappend']){
+                this.editExtension(0);
+                return true;
+            }
+
+            var prefix = el.id.replace(/([0-9]+$)/, '');
+            var numid = el.id.replace(prefix, "");
+
+            switch (prefix) {
+                case (TId['extrow']['edit'] + '-'):
+                    this.editExtension(numid);
+                    return true;
+            }
+
+            return false;
+        },
+        editExtension: function(id){
+            var table = DATA.get('extensions'),
+                rows = table.getRows(),
+                row = id == 0 ? table.newRow() : rows.getById(id);
+            new ExtensionEditorPanel(row, function(){
+                if (id == 0){
+                    rows.add(row);
+                }
+                table.applyChanges();
+                DATA.request();
+            });
+        }
+    };
+    NS.ExtensionFileWidget = ExtensionFileWidget;
+
+
+    var ExtensionEditorPanel = function(row, callback){
+        this.row = row;
+        this.callback = callback;
+        ExtensionEditorPanel.superclass.constructor.call(this, {
+            width: '600px', resize: true
+        });
+    };
+
+    YAHOO.extend(ExtensionEditorPanel, Brick.widget.Dialog, {
+        el: function(name){
+            return Dom.get(this._TId['exteditorpanel'][name]);
+        },
+        elv: function(name){
+            return Brick.util.Form.getValue(this.el(name));
+        },
+        setelv: function(name, value){
+            Brick.util.Form.setValue(this.el(name), value);
+        },
+        initTemplate: function(){
+            return buildTemplate(this, 'exteditorpanel').replace('exteditorpanel');
+        },
+        onLoad: function(){
+            var di = this.row.cell;
+            this.setelv('ext', di['extension']);
+            this.setelv('mime', di['mimetype']);
+            this.setelv('size', di['maxsize']);
+            this.setelv('width', di['maxwidth']);
+            this.setelv('height', di['maxheight']);
+        },
+        onClick: function(el){
+            var tp = this._TId['exteditorpanel'];
+            switch (el.id) {
+                case tp['bcancel']:
+                    this.close();
+                    return true;
+                case tp['bsave']:
+                    this.save();
+                    return true;
+            }
+            return false;
+        },
+        save: function(){
+
+            this.row.update({
+                'extension': this.elv('ext'),
+                'mimetype': this.elv('mime'),
+                'maxsize': this.elv('size'),
+                'maxwidth': this.elv('width'),
+                'maxheight': this.elv('height')
+            });
+
+            this.callback();
+            this.close();
+        }
+    });
+    NS.ExtensionEditorPanel = ExtensionEditorPanel;
 };
