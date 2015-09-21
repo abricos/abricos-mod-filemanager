@@ -7,7 +7,7 @@ var Component = new Brick.Component();
 Component.requires = {
     yahoo: ['animation', 'container', 'dragdrop', 'treeview', 'imagecropper'],
     mod: [
-        {name: 'sys', files: ['old-form.js', 'data.js']},
+        {name: 'sys', files: ['old-form.js', 'data.js', 'container.js']},
         {name: 'filemanager', files: ['api.js', 'lib.js']}
     ]
 };
@@ -425,7 +425,7 @@ Component.entryPoint = function(NS){
                 }
 
                 if (!scsTemplate.get('value') || scsTemplate.get('value').length === 0){
-                    this.setelv('code', T['screenshottemplate']);
+                    this.setelv('code', this._TM.replace('screenshottemplate'));
                     return;
                 }
 
