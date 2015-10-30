@@ -5,13 +5,14 @@ var Component = new Brick.Component();
 Component.requires = {};
 Component.entryPoint = function(NS){
 
+    var Y = Brick.YUI,
+        L = Y.Lang;
+
     NS.roles = new Brick.AppRoles('{C#MODNAME}', {
         isAdmin: 50,
         isWrite: 30,
         isView: 10
     });
-
-    var L = YAHOO.lang;
 
     var File = function(d){
         this.init(d);
@@ -175,7 +176,7 @@ Component.entryPoint = function(NS){
     NS.fileUploaders = new FileUploaders();
 
     var FileUploader = function(userid, callback, cfg){
-        cfg = L.merge({
+        cfg = Y.merge({
             'folderid': 0,
             'folderpath': '',
             'sysfolder': false
@@ -198,7 +199,7 @@ Component.entryPoint = function(NS){
                 this.uploadWindow.focus();
                 return;
             }
-            var cfg = L.merge(this.cfg, ucfg || {});
+            var cfg = Y.merge(this.cfg, ucfg || {});
 
             var url = '/filemanager/upload.html?userid=' + this.userid + '&winid=' + this.id + '&sysfolder=' + (cfg.sysfolder ? '1' : '0') + '&folderid=' + cfg.folderid + "&folderpath=" + cfg.folderpath;
             this.uploadWindow = window.open(
