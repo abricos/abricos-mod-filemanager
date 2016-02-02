@@ -9,7 +9,7 @@
 $list = Brick::$builder->brick->param->param['list'];
 $arr = explode("/", $list);
 $size = array();
-foreach ($arr as &$arr1) {
+foreach ($arr as &$arr1){
     $arr2 = explode("x", $arr1);
     array_push($size, array(
         "w" => $arr2[0],

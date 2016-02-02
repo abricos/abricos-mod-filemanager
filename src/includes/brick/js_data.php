@@ -17,9 +17,9 @@ $ret->_ds = array();
 
 $newMessageId = 0;
 // Первым шагом необходимо выполнить все комманды по добавлению/обновлению таблиц
-foreach ($ds->ts as $ts) {
-    foreach ($ts->rs as $tsrs) {
-        if (empty($tsrs->r)) {
+foreach ($ds->ts as $ts){
+    foreach ($ts->rs as $tsrs){
+        if (empty($tsrs->r)){
             continue;
         }
         $fileManager->DSProcess($ts->nm, $tsrs);
@@ -27,23 +27,23 @@ foreach ($ds->ts as $ts) {
 }
 
 // Вторым шагом выдать запрашиваемые таблицы 
-foreach ($ds->ts as $ts) {
+foreach ($ds->ts as $ts){
     $table = new stdClass();
     $table->nm = $ts->nm;
     // нужно ли запрашивать колонки таблицы
     $qcol = false;
-    foreach ($ts->cmd as $cmd) {
-        if ($cmd == 'i') {
+    foreach ($ts->cmd as $cmd){
+        if ($cmd == 'i'){
             $qcol = true;
         }
     }
 
     $table->rs = array();
-    foreach ($ts->rs as $tsrs) {
+    foreach ($ts->rs as $tsrs){
         $rows = $fileManager->DSGetData($ts->nm, $tsrs);
 
-        if (!is_null($rows)) {
-            if ($qcol) {
+        if (!is_null($rows)){
+            if ($qcol){
                 $table->cs = $mod->columnToObj($rows);
                 $qcol = false;
             }

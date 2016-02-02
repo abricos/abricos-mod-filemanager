@@ -1,8 +1,3 @@
-/**
- * @module FileManager
- * @namespace Brick.mod.filemanager
- */
-
 var Component = new Brick.Component();
 Component.requires = {
     yahoo: ['animation', 'container', 'dragdrop', 'treeview', 'imagecropper'],

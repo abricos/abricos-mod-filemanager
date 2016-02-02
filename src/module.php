@@ -15,6 +15,8 @@
  *
  * @package Abricos
  * @subpackage FileManager
+ *
+ * @method FileManager GetManager()
  */
 class FileManagerModule extends Ab_Module {
 
@@ -28,7 +30,7 @@ class FileManagerModule extends Ab_Module {
      */
     public static $instance = null;
 
-    public function __construct() {
+    public function __construct(){
         FileManagerModule::$instance = $this;
 
         $this->version = "0.3.6";
@@ -39,11 +41,11 @@ class FileManagerModule extends Ab_Module {
         $this->permission = new FileManagerPermission($this);
     }
 
-    public function GetContentName() {
+    public function GetContentName(){
         $adress = Abricos::$adress;
         $cname = parent::GetContentName();
 
-        if ($adress->level > 2 && $adress->dir[1] == 'i') {
+        if ($adress->level > 2 && $adress->dir[1] == 'i'){
             $cname = 'file';
         }
 
@@ -55,24 +57,11 @@ class FileManagerModule extends Ab_Module {
      *
      * @return FileManager
      */
-    public function GetFileManager() {
+    public function GetFileManager(){
         return $this->GetManager();
     }
 
-    /**
-     * Получить менеджер
-     *
-     * @return FileManager
-     */
-    public function GetManager() {
-        if (is_null($this->_fileManager)) {
-            require_once 'includes/manager.php';
-            $this->_fileManager = new FileManager($this);
-        }
-        return $this->_fileManager;
-    }
-
-    public function EnableThumbSize($list) {
+    public function EnableThumbSize($list){
         FileManagerQueryModule::EnThumbsAppend(Abricos::$db, $list);
     }
 }
@@ -85,7 +74,7 @@ class FileManagerAction {
 
 class FileManagerPermission extends Ab_UserPermission {
 
-    public function __construct(FileManagerModule $module) {
+    public function __construct(FileManagerModule $module){
 
         $defRoles = array(
             new Ab_UserRole(FileManagerAction::FILES_VIEW, Ab_UserGroup::GUEST),
@@ -98,7 +87,7 @@ class FileManagerPermission extends Ab_UserPermission {
         parent::__construct($module, $defRoles);
     }
 
-    public function GetRoles() {
+    public function GetRoles(){
 
         return array(
             FileManagerAction::FILES_VIEW => $this->CheckAction(FileManagerAction::FILES_VIEW),
@@ -110,13 +99,13 @@ class FileManagerPermission extends Ab_UserPermission {
 
 class FileManagerQueryModule {
 
-    public static function EnThumbsAppend(Ab_Database $db, $list) {
-        if (empty($list)) {
+    public static function EnThumbsAppend(Ab_Database $db, $list){
+        if (empty($list)){
             return;
         }
 
         $values = array();
-        foreach ($list as $size) {
+        foreach ($list as $size){
             array_push($values, "(".bkint($size['w']).",".bkint($size['h']).")");
         }
         $sql = "

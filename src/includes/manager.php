@@ -36,7 +36,7 @@ class FileManager extends Ab_ModuleManager {
 
     private $_checkSizeDisable = false;
 
-    public function FileManager(FileManagerModule $module) {
+    public function FileManager(FileManagerModule $module){
         parent::__construct($module);
 
         FileManager::$instance = $this;
@@ -45,58 +45,58 @@ class FileManager extends Ab_ModuleManager {
     /**
      * Отключить проверку свободного места в профиле пользователя
      */
-    public function CheckSizeDisable() {
+    public function CheckSizeDisable(){
         $this->_checkSizeDisable = true;
     }
 
     /**
      * Включить проверку свободного места в профиле пользователя
      */
-    public function CheckSizeEnable() {
+    public function CheckSizeEnable(){
         $this->_checkSizeDisable = false;
     }
 
-    public function IsAdminRole() {
-        if ($this->IsRolesDisable()) {
+    public function IsAdminRole(){
+        if ($this->IsRolesDisable()){
             return true;
         }
         return $this->IsRoleEnable(FileManagerAction::FILES_ADMIN);
     }
 
-    public function IsFileViewRole() {
-        if ($this->IsRolesDisable()) {
+    public function IsFileViewRole(){
+        if ($this->IsRolesDisable()){
             return true;
         }
         return $this->IsRoleEnable(FileManagerAction::FILES_VIEW);
     }
 
-    public function IsFileUploadRole() {
-        if ($this->IsRolesDisable()) {
+    public function IsFileUploadRole(){
+        if ($this->IsRolesDisable()){
             return true;
         }
         return $this->IsRoleEnable(FileManagerAction::FILES_UPLOAD);
     }
 
-    public function IsAccessProfile($userid = 0) {
-        if ($userid === 0) {
+    public function IsAccessProfile($userid = 0){
+        if ($userid === 0){
             $userid = Abricos::$user->id;
         }
         if ((Abricos::$user->id == $userid && $this->IsFileUploadRole())
             || $this->IsAdminRole()
-        ) {
+        ){
             return true;
         }
         return false;
     }
 
-    public function DSProcess($name, $rows) {
-        switch ($name) {
+    public function DSProcess($name, $rows){
+        switch ($name){
             case 'files':
-                foreach ($rows->r as $r) {
-                    if ($r->f == 'u' && $r->d->act == 'editor') {
+                foreach ($rows->r as $r){
+                    if ($r->f == 'u' && $r->d->act == 'editor'){
                         $this->ImageEditorSave($r->d);
                     }
-                    if ($r->f == 'd') {
+                    if ($r->f == 'd'){
                         $this->FileRemove($r->d->fh);
                     }
                 }
@@ -111,37 +111,37 @@ class FileManager extends Ab_ModuleManager {
                 break;
             /**/
             case 'folders':
-                foreach ($rows->r as $r) {
-                    if ($r->f == 'a') {
+                foreach ($rows->r as $r){
+                    if ($r->f == 'a'){
                         $this->FolderAppendFromData($r->d);
                     }
-                    if ($r->f == 'd') {
+                    if ($r->f == 'd'){
                         $this->FolderRemove($r->d);
                     }
-                    if ($r->f == 'u') {
+                    if ($r->f == 'u'){
                         $this->FolderChangePhrase($r->d);
                     }
                 }
                 break;
             case 'extensions':
-                foreach ($rows->r as $r) {
-                    if ($r->f == 'a') {
+                foreach ($rows->r as $r){
+                    if ($r->f == 'a'){
                         $this->FileTypeAppend($r->d);
                     }
-                    if ($r->f == 'u') {
+                    if ($r->f == 'u'){
                         $this->FileTypeUpdate($r->d);
                     }
                 }
                 break;
             case 'usergrouplimit':
-                foreach ($rows->r as $r) {
-                    if ($r->f == 'a') {
+                foreach ($rows->r as $r){
+                    if ($r->f == 'a'){
                         $this->UserGroupLimitAppend($r->d);
                     }
-                    if ($r->f == 'u') {
+                    if ($r->f == 'u'){
                         $this->UserGroupLimitUpdate($r->d);
                     }
-                    if ($r->f == 'd') {
+                    if ($r->f == 'd'){
                         $this->UserGroupLimitRemove($r->d->id);
                     }
                 }
@@ -149,9 +149,9 @@ class FileManager extends Ab_ModuleManager {
         }
     }
 
-    public function DSGetData($name, $rows) {
+    public function DSGetData($name, $rows){
         $p = $rows->p;
-        switch ($name) {
+        switch ($name){
             case 'files':
                 return $this->FileList($p->folderid);
             case 'folders':
@@ -169,43 +169,43 @@ class FileManager extends Ab_ModuleManager {
         return null;
     }
 
-    public function GroupList() {
-        if (!$this->IsAdminRole()) {
+    public function GroupList(){
+        if (!$this->IsAdminRole()){
             return null;
         }
         return FileManagerQuery::GroupList($this->db);
     }
 
-    public function UserGroupLimitRemove($id) {
-        if (!$this->IsAdminRole()) {
+    public function UserGroupLimitRemove($id){
+        if (!$this->IsAdminRole()){
             return null;
         }
         FileManagerQuery::UserGroupLimitRemove($this->db, $id);
     }
 
-    public function UserGroupLimitAppend($d) {
-        if (!$this->IsAdminRole()) {
+    public function UserGroupLimitAppend($d){
+        if (!$this->IsAdminRole()){
             return null;
         }
         return FileManagerQuery::UserGroupLimitAppend($this->db, $d);
     }
 
-    public function UserGroupLimitUpdate($d) {
-        if (!$this->IsAdminRole()) {
+    public function UserGroupLimitUpdate($d){
+        if (!$this->IsAdminRole()){
             return null;
         }
         FileManagerQuery::UserGroupLimitUpdate($this->db, $d);
     }
 
-    public function UserGroupLimitList() {
-        if (!$this->IsAdminRole()) {
+    public function UserGroupLimitList(){
+        if (!$this->IsAdminRole()){
             return null;
         }
         return FileManagerQuery::UserGroupLimitList($this->db);
     }
 
-    public function User_OptionNames() {
-        if (!$this->IsFileUploadRole()) {
+    public function User_OptionNames(){
+        if (!$this->IsFileUploadRole()){
             return array();
         }
 
@@ -217,78 +217,78 @@ class FileManager extends Ab_ModuleManager {
         );
     }
 
-    public function FileList($folderid) {
+    public function FileList($folderid){
         return $this->FileListByUser(Abricos::$user->id, $folderid);
     }
 
-    public function FileListByUser($userid, $folderid) {
-        if (!$this->IsAccessProfile($userid)) {
+    public function FileListByUser($userid, $folderid){
+        if (!$this->IsAccessProfile($userid)){
             return null;
         }
         return FileManagerQuery::FileList($this->db, $userid, $folderid, FileManagerQuery::FILEATTRIBUTE_NONE);
     }
 
-    public function FolderList() {
+    public function FolderList(){
         return $this->FolderListByUser(Abricos::$user->id);
     }
 
-    public function FolderListByUser($userid) {
-        if (!$this->IsAccessProfile($userid)) {
+    public function FolderListByUser($userid){
+        if (!$this->IsAccessProfile($userid)){
             return null;
         }
         return FileManagerQuery::FolderList($this->db, $userid);
     }
 
-    public function EditorList($filehash, $session) {
-        if (!$this->IsAccessProfile()) {
+    public function EditorList($filehash, $session){
+        if (!$this->IsAccessProfile()){
             return null;
         }
         return FileManagerQuery::EditorList($this->db, $filehash, $session);
     }
 
-    public function FileTypeUpdate($d) {
-        if (!$this->IsAdminRole()) {
+    public function FileTypeUpdate($d){
+        if (!$this->IsAdminRole()){
             return;
         }
         FileManagerQuery::FileTypeUpdate($this->db, $d);
     }
 
-    public function FileTypeAppend($d) {
-        if (!$this->IsAdminRole()) {
+    public function FileTypeAppend($d){
+        if (!$this->IsAdminRole()){
             return;
         }
         FileManagerQuery::FileTypeAppend($this->db, $d);
     }
 
-    public function GetFileExtensionList($ignoreRole = false, $forDataSet = false) {
-        if (!$ignoreRole) {
-            if (!$this->IsFileUploadRole()) {
+    public function GetFileExtensionList($ignoreRole = false, $forDataSet = false){
+        if (!$ignoreRole){
+            if (!$this->IsFileUploadRole()){
                 return null;
             }
         }
 
-        if (!is_null($this->_fileExtensionList)) {
+        if (!is_null($this->_fileExtensionList)){
             return $this->_fileExtensionList;
         }
         $list = array();
 
         $rows = FileManagerQuery::FileTypeList($this->db);
-        if ($forDataSet) {
+        if ($forDataSet){
             return $rows;
         }
-        while (($row = $this->db->fetch_array($rows))) {
+        while (($row = $this->db->fetch_array($rows))){
             $list[$row['extension']] = $row;
         }
         $this->_fileExtensionList = $list;
         return $list;
     }
 
-    public function GetFreeSpaceMethod() {
+    public function GetFreeSpaceMethod(){
 
-        if (is_null($this->_userGroupSizeLimit)) {
+        if (is_null($this->_userGroupSizeLimit)){
             $list = array();
             $rows = FileManagerQuery::UserGroupLimitList($this->db);
-            while (($row = $this->db->fetch_array($rows))) {
+            while (($row = $this->db->fetch_array($rows))){
                 $list[$row['gid']] = $row;
             }
             $this->_userGroupSizeLimit = $list;
@@ -301,7 +301,7 @@ class FileManager extends Ab_ModuleManager {
 
         $list = $this->_userGroupSizeLimit;
         $limit = 0;
-        foreach ($groups as $gp) {
+        foreach ($groups as $gp){
             $limit = max(array(
                 $limit,
                 isset($list[$gp]) ? intval($list[$gp]['lmt']) : 0
@@ -310,8 +310,8 @@ class FileManager extends Ab_ModuleManager {
         return $limit - $fullsize;
     }
 
-    public function GetFreeSpace() {
-        if (!$this->IsAccessProfile(Abricos::$user->id)) {
+    public function GetFreeSpace(){
+        if (!$this->IsAccessProfile(Abricos::$user->id)){
             return 0;
         }
         return $this->GetFreeSpaceMethod();
@@ -332,15 +332,15 @@ class FileManager extends Ab_ModuleManager {
      * @param $fileinfo
      * @param $newNameIfFind Назначить новое имя, если файл с таким именем уже есть в папке
      */
-    public function UploadFiles($folderid, $fileinfo, $newNameIfFind = false) {
+    public function UploadFiles($folderid, $fileinfo, $newNameIfFind = false){
 
-        if (!$this->IsFileUploadRole()) {
+        if (!$this->IsFileUploadRole()){
             return 6;
         }
 
         $filecount = count($fileinfo['name']);
 
-        if (empty($filecount)) {
+        if (empty($filecount)){
             return 0;
         }
         $filename = trim($fileinfo['name']);
@@ -348,8 +348,8 @@ class FileManager extends Ab_ModuleManager {
         $extension = strtolower($pathinfo['extension']);
 
         $dbFileInfo = FileManagerQuery::FileInfoByName($this->db, Abricos::$user->id, $folderid, $filename);
-        if (!empty($dbFileInfo)) {
-            if (!$newNameIfFind) {
+        if (!empty($dbFileInfo)){
+            if (!$newNameIfFind){
                 return 7;
             }
             $filename = str_replace(".".$extension, "", $filename)."_".substr(md5(time()), 1, 8).".".$extension;
@@ -357,7 +357,7 @@ class FileManager extends Ab_ModuleManager {
         $filelocation = trim($fileinfo['tmp_name']);
         $filesize = intval($fileinfo['size']);
 
-        if (!is_uploaded_file($filelocation)) {
+        if (!is_uploaded_file($filelocation)){
             return 3;
         }
 
@@ -370,7 +370,7 @@ class FileManager extends Ab_ModuleManager {
      * Устаревший метод загрузки файлов. Оставлен для совместимости.
      */
     public function UploadFile($folderid, $filelocation, $filename, $extension, $filesize,
-                               $atrribute = 0, $ignoreImageSize = false, $ignoreRole = false, $ignoreFreeSpace = false) {
+                               $atrribute = 0, $ignoreImageSize = false, $ignoreRole = false, $ignoreFreeSpace = false){
 
         $uploadFile = $this->CreateUpload($filelocation, $filename, $folderid);
         $uploadFile->fileAttribute = $atrribute;
@@ -388,20 +388,20 @@ class FileManager extends Ab_ModuleManager {
      *
      * @return UploadFile
      */
-    public function CreateUpload($filePath, $fileName = '', $folderid = 0) {
+    public function CreateUpload($filePath, $fileName = '', $folderid = 0){
         require_once 'uploadfile.php';
         return new UploadFile($filePath, $fileName, $folderid);
     }
 
-    public function CreateUploadByVar($varname, $folderid = 0) {
+    public function CreateUploadByVar($varname, $folderid = 0){
         $fi = Abricos::CleanGPC('f', $varname, TYPE_FILE);
         $upload = $this->CreateUpload($fi['tmp_name'], $fi['name'], $folderid);
         $upload->file = $fi;
         return $upload;
     }
 
-    public function GetFileData($p_filehash, $begin = 1, $end = 1048576) {
-        if (!$this->IsFileViewRole()) {
+    public function GetFileData($p_filehash, $begin = 1, $end = 1048576){
+        if (!$this->IsFileViewRole()){
             return;
         }
 
@@ -414,24 +414,24 @@ class FileManager extends Ab_ModuleManager {
      * @param $filePath путь к физическому файлы
      * @param $fileHash идентификатор файла в базе
      */
-    public function FilesCompare($filePath, $fileHash) {
+    public function FilesCompare($filePath, $fileHash){
         $handle = fopen($filePath, 'rb');
-        if (empty($handle)) {
+        if (empty($handle)){
             return false;
         }
         $fileinfo = FileManagerQuery::FileData($this->db, $fileHash);
 
         $count = 1;
-        while (!empty($fileinfo['filedata']) && connection_status() == 0) {
+        while (!empty($fileinfo['filedata']) && connection_status() == 0){
 
             $data = fread($handle, 1048576);
 
-            if ($data != $fileinfo['filedata']) {
+            if ($data != $fileinfo['filedata']){
                 fclose($handle);
                 return false;
             }
 
-            if (strlen($fileinfo['filedata']) == 1048576) {
+            if (strlen($fileinfo['filedata']) == 1048576){
                 $startat = (1048576 * $count) + 1;
                 $fileinfo = FileManagerQuery::FileData($this->db, $fileHash, $startat);
                 $count++;
@@ -443,20 +443,20 @@ class FileManager extends Ab_ModuleManager {
         return true;
     }
 
-    private function SaveTempFile($filehash, $imgname) {
+    private function SaveTempFile($filehash, $imgname){
         // выгрузка картинки во временный файл для его обработки
         $pinfo = pathinfo($imgname);
 
         $file = CWD."/cache/".(md5(TIMENOW.$imgname)).".".$pinfo['extension'];
 
-        if (!($handle = fopen($file, 'w'))) {
+        if (!($handle = fopen($file, 'w'))){
             return false;
         }
         $fileinfo = FileManagerQuery::FileData($this->db, $filehash);
         $count = 1;
-        while (!empty($fileinfo['filedata']) && connection_status() == 0) {
+        while (!empty($fileinfo['filedata']) && connection_status() == 0){
             fwrite($handle, $fileinfo['filedata']);
-            if (strlen($fileinfo['filedata']) == 1048576) {
+            if (strlen($fileinfo['filedata']) == 1048576){
                 $startat = (1048576 * $count) + 1;
                 $fileinfo = FileManagerQuery::FileData($this->db, $filehash, $startat);
                 $count++;
@@ -469,15 +469,15 @@ class FileManager extends Ab_ModuleManager {
         return $file;
     }
 
-    public function SaveFileTo($filehash, $file) {
-        if (!($handle = fopen($file, 'w'))) {
+    public function SaveFileTo($filehash, $file){
+        if (!($handle = fopen($file, 'w'))){
             return false;
         }
         $fileinfo = FileManagerQuery::FileData($this->db, $filehash);
         $count = 1;
-        while (!empty($fileinfo['filedata']) && connection_status() == 0) {
+        while (!empty($fileinfo['filedata']) && connection_status() == 0){
             fwrite($handle, $fileinfo['filedata']);
-            if (strlen($fileinfo['filedata']) == 1048576) {
+            if (strlen($fileinfo['filedata']) == 1048576){
                 $startat = (1048576 * $count) + 1;
                 $fileinfo = FileManagerQuery::FileData($this->db, $filehash, $startat);
                 $count++;
@@ -491,39 +491,39 @@ class FileManager extends Ab_ModuleManager {
     }
 
 
-    public function GetUploadLib($file) {
+    public function GetUploadLib($file){
         require_once CWD.'/modules/filemanager/lib/class.upload/class.upload.php';
         return new upload($file);
     }
 
-    public function ImageConvert($p_filehash, $p_w, $p_h, $p_cnv) {
-        if (empty($p_w) && empty($p_h) && empty($p_cnv)) {
+    public function ImageConvert($p_filehash, $p_w, $p_h, $p_cnv){
+        if (empty($p_w) && empty($p_h) && empty($p_cnv)){
             return $p_filehash;
         }
 
         $log = "Image Convert <br />";
         $log .= "Parameters: filehash=$p_filehash, w=$p_w, h=$p_h, format=$p_cnv <br />";
 
-        if (!$this->IsFileViewRole()) {
+        if (!$this->IsFileViewRole()){
             return $p_filehash;
         }
 
         // Запрос особого размера картинки
         $filehashdst = FileManagerQuery::ImagePreviewHash($this->db, $p_filehash, $p_w, $p_h, $p_cnv);
 
-        if (!empty($filehashdst)) {
+        if (!empty($filehashdst)){
             return $filehashdst;
         }
 
-        if (!$this->IsFileUploadRole()) {
+        if (!$this->IsFileUploadRole()){
             // доступ на изменение картинки закрыт, есть ли особые разрешения?
-            if (!FileManagerQuery::EnThumbsCheck($this->db, $p_w, $p_h)) {
+            if (!FileManagerQuery::EnThumbsCheck($this->db, $p_w, $p_h)){
                 return $p_filehash;
             }
         }
 
         $image = FileManagerQuery::ImageExist($this->db, $p_filehash);
-        if (empty($image)) {
+        if (empty($image)){
             return $p_filehash;
         }// есть ли вообще такая картинка
 
@@ -534,26 +534,26 @@ class FileManager extends Ab_ModuleManager {
 
         $file = $this->SaveTempFile($p_filehash, $imageName);
 
-        if (empty($file)) {
+        if (empty($file)){
             return $p_filehash;
         }
 
         $upload = $this->GetUploadLib($file);
         $nameadd = array();
 
-        if (!empty($p_w) || !empty($p_h)) {
+        if (!empty($p_w) || !empty($p_h)){
             array_push($nameadd, $p_w."x".$p_h);
             $upload->image_resize = true;
 
             $w = $upload->image_src_x;
             $h = $upload->image_src_y;
 
-            if ($p_w > 0 && $w > $p_w) {
+            if ($p_w > 0 && $w > $p_w){
                 $pr = $p_w / $w;
                 $w = $w * $pr;
                 $h = $h * $pr;
             }
-            if ($p_h > 0 && $h > $p_h) {
+            if ($p_h > 0 && $h > $p_h){
                 $pr = $p_h / $h;
                 $w = $w * $pr;
                 $h = $h * $pr;
@@ -577,7 +577,7 @@ class FileManager extends Ab_ModuleManager {
         }
 
         // необходимо ли конвертировать картинку
-        if (!empty($p_cnv)) {
+        if (!empty($p_cnv)){
             array_push($nameadd, $p_cnv);
             $upload->image_convert = $p_cnv;
         }
@@ -586,17 +586,17 @@ class FileManager extends Ab_ModuleManager {
         $newfilename = $newfilename."_".implode("_", $nameadd);
         $upload->file_new_name_body = translateruen($newfilename);
 
-        if ($upload->process($dir)) {
+        if ($upload->process($dir)){
             $upload->Clean();
         }
         unlink($file);
 
-        if (Abricos::$config['Misc']['develop_mode']) {
+        if (Abricos::$config['Misc']['develop_mode']){
             $log .= $upload->log;
             @file_put_contents(CWD."/cache/#uploadlog.html", $log);
         }
 
-        if (!file_exists($upload->file_dst_pathname)) {
+        if (!file_exists($upload->file_dst_pathname)){
             return $p_filehash;
         }
 
@@ -609,7 +609,7 @@ class FileManager extends Ab_ModuleManager {
 
         $this->lastUploadFileHash = $uploadFile->uploadFileHash;
 
-        if (!empty($error) || empty($this->lastUploadFileHash)) {
+        if (!empty($error) || empty($this->lastUploadFileHash)){
             return $p_filehash;
         }
         FileManagerQuery::ImagePreviewAdd($this->db, $p_filehash, $this->lastUploadFileHash, $p_w, $p_h, $p_cnv);
@@ -618,36 +618,36 @@ class FileManager extends Ab_ModuleManager {
         return $this->lastUploadFileHash;
     }
 
-    public function GetFileInfo($p_filehash) {
-        if (!$this->IsFileViewRole()) {
+    public function GetFileInfo($p_filehash){
+        if (!$this->IsFileViewRole()){
             return;
         }
         return FileManagerQuery::FileInfo($this->db, $p_filehash);
     }
 
-    public function CreateFolderByPathMethod($path) {
-        if (empty($path)) {
+    public function CreateFolderByPathMethod($path){
+        if (empty($path)){
             return 0;
         }
         $rows = FileManagerQuery::FolderList($this->db, Abricos::$user->id);
         $folders = array();
-        while (($row = $this->db->fetch_array($rows))) {
+        while (($row = $this->db->fetch_array($rows))){
             $folders[$row['id']] = $row;
         }
         $folderid = 0;
         $arr = explode("/", $path);
-        for ($i = 0; $i < count($arr); $i++) {
+        for ($i = 0; $i < count($arr); $i++){
             $name = translateruen($arr[$i]);
 
             $find = false;
-            foreach ($folders as $key => $value) {
-                if ($value['pid'] == $folderid && $name == $value['fn']) {
+            foreach ($folders as $key => $value){
+                if ($value['pid'] == $folderid && $name == $value['fn']){
                     $folderid = $key;
                     $find = true;
                     break;
                 }
             }
-            if (!$find) {
+            if (!$find){
                 $folderid = FileManagerQuery::FolderAdd($this->db, $folderid, Abricos::$user->id, $name, $arr[$i]);
             }
         }
@@ -662,16 +662,16 @@ class FileManager extends Ab_ModuleManager {
      * @param string $folderName Имя папки
      * @param string $folderPhrase
      */
-    public function FolderAppend($parentFolderId, $folderName, $folderPhrase = '') {
-        if (!$this->IsFileUploadRole()) {
+    public function FolderAppend($parentFolderId, $folderName, $folderPhrase = ''){
+        if (!$this->IsFileUploadRole()){
             return;
         }
         $userid = Abricos::$user->id;
         return FileManagerQuery::FolderAdd($this->db, $parentFolderId, $userid, $folderName, $folderPhrase);
     }
 
-    public function FolderAppendFromData($data) {
-        if (!$this->IsFileUploadRole()) {
+    public function FolderAppendFromData($data){
+        if (!$this->IsFileUploadRole()){
             return;
         }
 
@@ -680,35 +680,35 @@ class FileManager extends Ab_ModuleManager {
         return FileManagerQuery::FolderAdd($this->db, $data->pid, $userid, $name, $data->ph);
     }
 
-    public function FolderChangePhrase($data) {
-        if (!$this->IsFileUploadRole()) {
+    public function FolderChangePhrase($data){
+        if (!$this->IsFileUploadRole()){
             return;
         }
 
         $userid = Abricos::$user->id;
         $finfo = FileManagerQuery::FolderInfo($this->db, $data->id);
 
-        if (!$this->IsAccessProfile($finfo['uid'])) {
+        if (!$this->IsAccessProfile($finfo['uid'])){
             return null;
         }
         FileManagerQuery::FolderChangePhrase($this->db, $data->id, $data->ph);
     }
 
-    public function FolderRemove($data) {
-        if (!$this->IsFileUploadRole()) {
+    public function FolderRemove($data){
+        if (!$this->IsFileUploadRole()){
             return;
         }
 
         $finfo = FileManagerQuery::FolderInfo($this->db, $data->id);
 
-        if (!$this->IsAccessProfile($finfo['uid'])) {
+        if (!$this->IsAccessProfile($finfo['uid'])){
             return null;
         }
         FileManagerQuery::FolderRemove($this->db, $data->id);
     }
 
-    public function FolderInfoByName($parentFolderId, $folderName) {
-        if (!$this->IsFileUploadRole()) {
+    public function FolderInfoByName($parentFolderId, $folderName){
+        if (!$this->IsFileUploadRole()){
             return;
         }
 
@@ -716,14 +716,14 @@ class FileManager extends Ab_ModuleManager {
         return FileManagerQuery::FolderInfoByName($this->db, $userid, $parentFolderId, $folderName);
     }
 
-    public function FileRemove($filehash) {
-        if (!$this->IsFileUploadRole()) {
+    public function FileRemove($filehash){
+        if (!$this->IsFileUploadRole()){
             return;
         }
 
         $finfo = FileManagerQuery::FileInfo($this->db, $filehash);
 
-        if (!$this->IsAccessProfile($finfo['uid'])) {
+        if (!$this->IsAccessProfile($finfo['uid'])){
             return null;
         }
         FileManagerQuery::FilesDelete($this->db, array($filehash));
@@ -735,29 +735,29 @@ class FileManager extends Ab_ModuleManager {
      *
      * @param $data данные по изменению
      */
-    public function ImageEditorSave($data) {
+    public function ImageEditorSave($data){
         $filehash = $data->fh;
         $session = $data->session;
         // получить информацию редактируемой картинки
         $finfo = FileManagerQuery::FileInfo($this->db, $filehash);
 
-        if (!$this->IsAccessProfile($finfo['uid'])) {
+        if (!$this->IsAccessProfile($finfo['uid'])){
             return null;
         }
         // картинка с последними изменения в редакторе
         $lastedit = FileManagerQuery::EditorInfo($this->db, $filehash, $session);
 
-        if (empty($lastedit)) {
+        if (empty($lastedit)){
             return;
         }
         $userid = Abricos::$user->id;
         FileManagerQuery::ImageEditorSave($this->db, $userid, $filehash, $lastedit, $data->copy);
     }
 
-    public function ImageChange($filehash, $tools, $d) {
+    public function ImageChange($filehash, $tools, $d){
         // получить файл из БД
         $finfo = FileManagerQuery::FileInfo($this->db, $filehash);
-        if (empty($finfo) || !$this->IsAccessProfile($finfo['uid'])) {
+        if (empty($finfo) || !$this->IsAccessProfile($finfo['uid'])){
             return -1;
         }
 
@@ -765,13 +765,13 @@ class FileManager extends Ab_ModuleManager {
         $dir = CWD."/cache";
         $upload = $this->GetUploadLib($file);
 
-        switch ($tools) {
+        switch ($tools){
             case 'size':
                 $upload->image_resize = true;
-                if (empty($d['width'])) {
+                if (empty($d['width'])){
                     $upload->image_ratio_x = true;
                     $upload->image_y = $d['height'];
-                } else if (empty($d['height'])) {
+                } else if (empty($d['height'])){
                     $upload->image_x = $d['width'];
                     $upload->image_ratio_y = true;
                 } else {
@@ -793,7 +793,7 @@ class FileManager extends Ab_ModuleManager {
         $upload->process($dir);
         unlink($file);
 
-        if (!file_exists($upload->file_dst_pathname)) {
+        if (!file_exists($upload->file_dst_pathname)){
             return -1;
         }
 
@@ -818,12 +818,12 @@ class FileManager extends Ab_ModuleManager {
      * @param $session текущая сессия редактора
      * @param $data данные по изменению
      */
-    public function ImageEditorChange($filehash, $session, $data) {
+    public function ImageEditorChange($filehash, $session, $data){
 
         // получить информацию редактируемой картинки
         $finfo = FileManagerQuery::FileInfo($this->db, $filehash);
 
-        if (empty($finfo) || !$this->IsAccessProfile($finfo['uid'])) {
+        if (empty($finfo) || !$this->IsAccessProfile($finfo['uid'])){
             return -1;
         }
 
@@ -832,7 +832,7 @@ class FileManager extends Ab_ModuleManager {
 
         $fromfilehash = $filehash;
 
-        if (!empty($lastedit)) {
+        if (!empty($lastedit)){
             $fromfilehash = $lastedit['fhdst'];
         }
 
@@ -844,7 +844,7 @@ class FileManager extends Ab_ModuleManager {
         );
 
         $result = $this->ImageChange($fromfilehash, $data->tools, $d);
-        if ($result != 0) {
+        if ($result != 0){
             return $fromfilehash;
         }
 

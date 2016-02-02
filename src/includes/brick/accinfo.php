@@ -11,7 +11,7 @@ $fileManager = FileManagerModule::$instance->GetManager();
 
 $brick = Brick::$builder->brick;
 
-if (!$fileManager->IsFileUploadRole()) {
+if (!$fileManager->IsFileUploadRole()){
     $brick->content = "";
     return;
 }
@@ -22,15 +22,15 @@ $v = &$brick->param->var;
 // формирование списка разрешенных типов файлов и их макс. размеры
 $list = "";
 
-if (!empty($p['fextobj'])) {
+if (!empty($p['fextobj'])){
     $fexts = $p['fextobj'];
 } else {
     $fexts = $fileManager->GetFileExtensionList();
 }
 
-foreach ($fexts as $key => $value) {
+foreach ($fexts as $key => $value){
     $imgSize = "&nbsp;";
-    if (!empty($value['maxwidth'])) {
+    if (!empty($value['maxwidth'])){
         $imgSize = $value['maxwidth']."x".$value['maxheight'];
     }
     $list .= Brick::ReplaceVarByData($v["ftypelsti"], array(
