@@ -35,10 +35,10 @@ Component.entryPoint = function(NS){
             ws: "#app={C#MODNAMEURI}/wspace/ws/",
             manager: {
                 limit: function(){
-                    return this.getURL('ws') + 'manager/LimitManagerWidget/';
+                    return this.getURL('ws') + 'limitManager/LimitManagerWidget/';
                 },
                 extension: function(){
-                    return this.getURL('ws') + 'manager/ExtenstionManagerWidget/';
+                    return this.getURL('ws') + 'extensionManager/ExtensionManagerWidget/';
                 },
             }
         }

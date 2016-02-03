@@ -1,0 +1,84 @@
+<!--{limitwidget}-->
+<div class="panel panel-default limitManager">
+    <div class="panel-heading text-center">
+
+        <h3 class="panel-title pull-left">
+            Настройка лимитов
+        </h3>
+
+        <div class="btn-toolbar pull-right">
+            <button data-click="create" class="btn btn-default btn-sm" type="button" data-wait="disable">
+                Добавить группу
+            </button>
+        </div>
+
+        <span data-wait="show">
+            <img src="/images/loading.gif"/> Загрузка...
+        </span>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="panel-body">
+        <div id='{i#table}'></div>
+    </div>
+</div>
+
+
+<!--{limittable}-->
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Группа</th>
+        <th>Объем</th>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>{v#rows}</tbody>
+</table>
+
+<!--{limitrow}-->
+<tr>
+    <td>{v#gnm}</td>
+    <td>{v#lmt}</td>
+    <td>
+        <button data-click="edit" data-id="{v#id}" class="btn btn-xs btn-default">
+            Править
+        </button>
+    </td>
+    <td>
+        <button data-click="remove" data-id="{v#id}" class="btn btn-xs btn-default">
+            Удалить
+        </button>
+    </td>
+</tr>
+
+<!--{limiteditorpanel}-->
+<div class='hd'>Редактор квоты</div>
+<div class='bd'>
+    <div class="form-group">
+        <div id="{i#table}"></div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-6">
+            Квота (байт)
+        </div>
+        <div class="col-sm-6">
+            <input id="{i#size}" type="text" class="form-control input-sm"/>
+        </div>
+    </div>
+
+</div>
+<div class='ft'>
+    <button data-click="save" type="button" class="btn btn-default">
+        Сохранить
+    </button>
+    <button data-click="cancel" type="button" class="btn btn-default">
+        Отмена
+    </button>
+</div>
+
+<!--{select}--><select id="{i#id}" class="form-control input-sm">{v#rows}</select>
+
+<!--{option}--><option value="{v#id}">{v#nm}</option>

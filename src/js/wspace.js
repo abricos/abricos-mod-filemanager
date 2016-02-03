@@ -18,7 +18,7 @@ Component.entryPoint = function(NS){
             templateBlockName: {value: 'widget'},
             defaultPage: {
                 value: {
-                    component: 'manager',
+                    component: 'limitManager',
                     widget: 'LimitManagerWidget'
                 }
             }
