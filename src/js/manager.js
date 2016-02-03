@@ -2,75 +2,25 @@ var Component = new Brick.Component();
 Component.requires = {
     yahoo: ['tabview', 'dragdrop'],
     mod: [
-        {name: 'filemanager', files: ['api.js']},
-        {name: 'sys', files: ['data.js', 'old-form.js']}
+        {name: 'sys', files: ['panel.js', 'widgets.js', 'data.js', 'old-form.js']},
+        {name: '{C#MODNAME}', files: ['lib.js']}
     ]
 };
 Component.entryPoint = function(NS){
 
-    var Dom = YAHOO.util.Dom,
-        E = YAHOO.util.Event,
-        L = YAHOO.lang;
-
-    var buildTemplate = this.buildTemplate;
-
-    var API = NS.API;
+    var Y = Brick.YUI,
+        COMPONENT = this,
+        SYS = Brick.mod.sys;
 
     if (!NS.data){
         NS.data = new Brick.util.data.byid.DataSet('filemanager');
     }
     var DATA = NS.data;
 
-    var ManagerWidget = function(container){
-        buildTemplate(this, 'widget');
+    NS.LimitManagerWidget = Y.Base.create('limitManagerWidget', SYS.AppWidget, [], {
+        onInitAppWidget: function(err, appInstance, options){
+            var tp = this.template;
 
-        container = L.isString(container) ? Dom.get(container) : container;
-        this.init(container);
-    };
-    ManagerWidget.prototype = {
-        init: function(container){
-            var TM = this._TM;
-
-            container.innerHTML = TM.replace('widget');
-
-            new YAHOO.widget.TabView(TM.gelid('id'));
-            this.pages = {
-                'limit': new NS.UserGroupLimitWidget(TM.gelid('limit')),
-                'ext': new NS.ExtensionFileWidget(TM.gelid('exten'))
-            };
-
-            var __self = this;
-            E.on(container, 'click', function(e){
-                if (__self.onClick(E.getTarget(e))){
-                    E.stopEvent(e);
-                }
-            });
-            DATA.request();
-        },
-        onClick: function(el){
-            for (var n in this.pages){
-                if (this.pages[n].onClick(el)){
-                    return true;
-                }
-            }
-            return false;
-        }
-    };
-    NS.ManagerWidget = ManagerWidget;
-    API.showManagerWidget = function(container){
-        return new NS.ManagerWidget(container);
-    };
-
-
-    var UserGroupLimitWidget = function(container){
-        var TM = buildTemplate(this, 'limitwidget,limitrowwait,limitrow,limittable');
-
-        container = L.isString(container) ? Dom.get(container) : container;
-        this.init(container);
-    };
-    UserGroupLimitWidget.prototype = {
-        init: function(container){
-            container.innerHTML = this._TM.replace('limitwidget');
             var tables = {
                 'usergrouplimit': DATA.get('usergrouplimit', true)
             };
@@ -79,173 +29,205 @@ Component.entryPoint = function(NS){
             if (DATA.isFill(tables)){
                 this.renderElements();
             } else {
-                this.renderWait();
+                this.set('waiting', true);
+                DATA.request();
             }
+        },
+        destructor: function(){
+            DATA.onComplete.unsubscribe(this.dsEvent);
+            DATA.onStart.unsubscribe(this.dsEvent);
         },
         dsEvent: function(type, args){
             if (args[0].checkWithParam('usergrouplimit', {})){
                 if (type == 'onComplete'){
                     this.renderElements();
                 } else {
-                    this.renderWait();
+                    this.set('waiting', true);
                 }
             }
         },
-        destroy: function(){
-            DATA.onComplete.unsubscribe(this.dsEvent);
-            DATA.onStart.unsubscribe(this.dsEvent);
-        },
         renderElements: function(){
-            var TM = this._TM,
+            this.set('waiting', false);
+            var tp = this.template,
                 lst = "";
 
             DATA.get('usergrouplimit').getRows().foreach(function(row){
                 var di = row.cell;
-                lst += TM.replace('limitrow', {
+                lst += tp.replace('limitrow', {
                     'id': di['id'],
                     'lmt': di['lmt'],
                     'gnm': di['gnm']
                 });
             });
-            TM.gel('limitwidget.table').innerHTML = TM.replace('limittable', {'rows': lst});
-        },
-        renderWait: function(){
-            var TM = this._TM;
-            TM.gel('limitwidget.table').innerHTML = TM.replace('limittable', {'rows': TM.replace('limitrowwait')});
-        },
-        onClick: function(el){
-            var TId = this._TId, tp = TId['limitwidget'];
-            switch (el.id) {
-                case tp['bappend']:
-                    this.editGroupLimit(0);
-                    return true;
-            }
-
-            var prefix = el.id.replace(/([0-9]+$)/, '');
-            var numid = el.id.replace(prefix, "");
-
-            switch (prefix) {
-                case (TId['limitrow']['edit'] + '-'):
-                    this.editGroupLimit(numid);
-                    return true;
-                case (TId['limitrow']['remove'] + '-'):
-                    this.removeGroupLimit(numid);
-                    return true;
-            }
-            return false;
+            tp.setHTML({
+                table: tp.replace('limittable', {'rows': lst})
+            });
         },
         editGroupLimit: function(id){
             var table = DATA.get('usergrouplimit'),
                 rows = table.getRows(),
                 row = id == 0 ? table.newRow() : rows.getById(id);
-            new GroupLimitEditorPanel(row, function(){
-                if (id == 0){
-                    rows.add(row);
+
+            new NS.GroupLimitEditorPanel({
+                row: row,
+                callback: function(){
+                    if (id == 0){
+                        rows.add(row);
+                    }
+                    table.applyChanges();
+                    DATA.request();
                 }
-                table.applyChanges();
-                DATA.request();
             });
         },
         removeGroupLimit: function(id){
             var table = DATA.get('usergrouplimit'),
                 rows = table.getRows(),
                 row = id == 0 ? table.newRow() : rows.getById(id);
+
             row.remove();
             table.applyChanges();
             DATA.request();
+        },
+        onClick: function(e){
+            var groupid = e.target.getData('id') | 0;
+            switch (e.dataClick) {
+                case 'create':
+                    this.editGroupLimit(0);
+                    return true;
+                case 'edit':
+                    this.editGroupLimit(groupid);
+                    return true;
+                case 'remove':
+                    this.removeGroupLimit(groupid);
+                    return true;
+            }
         }
-    };
-    NS.UserGroupLimitWidget = UserGroupLimitWidget;
+    }, {
+        ATTRS: {
+            component: {value: COMPONENT},
+            templateBlockName: {value: 'limitwidget,limitrow,limittable'}
+        }
+    });
 
-
-    var GroupLimitEditorPanel = function(row, callback){
-        this.row = row;
-        this.tname = row.isNew() ? 'limitappendpanel' : 'limiteditorpanel';
-        this.callback = callback;
-        GroupLimitEditorPanel.superclass.constructor.call(this, {
-            width: '400px', resize: true
-        });
-    };
-    YAHOO.extend(GroupLimitEditorPanel, Brick.widget.Dialog, {
-        el: function(name){
-            return Dom.get(this._TId[this.tname][name]);
+    NS.GroupLimitEditorPanel = Y.Base.create('groupLimitEditorPanel', SYS.Dialog, [], {
+        buildTData: function(){
+            return {};
         },
-        elv: function(name){
-            return Brick.util.Form.getValue(this.el(name));
+        initializer: function(){
+            Y.after(this._syncUIDialog, this, 'syncUI');
         },
-        setelv: function(name, value){
-            Brick.util.Form.setValue(this.el(name), value);
-        },
-        initTemplate: function(){
-            buildTemplate(this, this.tname + ',grouptable,grouprow,grouprowwait');
-            return this._TM.replace(this.tname);
-        },
-        onLoad: function(){
-
+        _syncUIDialog: function(){
             DATA.onStart.subscribe(this.dsEvent, this, true);
             DATA.onComplete.subscribe(this.dsEvent, this, true);
-            DATA.isFill({
-                'grouplist': DATA.get('grouplist', true)
-            }) ? this.renderTable() : this.renderWait();
+            var isFill = DATA.isFill({
+                grouplist: DATA.get('grouplist', true)
+            });
 
-            var di = this.row.cell;
-            this.setelv('size', di['lmt']);
+            if (isFill){
+                this.renderTable();
+            } else {
+                this.set('waiting', true);
+            }
+
+            var tp = this.template,
+                di = this.get('row').cell;
+
+            tp.setValue({
+                size: di['lmt']
+            });
+
             DATA.request();
+        },
+        destructor: function(){
+            DATA.onComplete.unsubscribe(this.dsEvent);
+            DATA.onStart.unsubscribe(this.dsEvent);
         },
         dsEvent: function(type, args){
             if (args[0].checkWithParam('grouplist')){
                 type == 'onComplete' ? this.renderTable() : this.renderWait();
             }
         },
-        destroy: function(){
-            DATA.onComplete.unsubscribe(this.dsEvent);
-            DATA.onStart.unsubscribe(this.dsEvent);
-            GroupLimitEditorPanel.superclass.destroy.call(this);
-        },
-        renderWait: function(){
-            var TM = this._TM;
-            TM.gel(this.tname + '.table').innerHTML = TM.replace('grouptable', {'rows': TM.replace('grouprowwait')});
-        },
         renderTable: function(){
-            var TM = this._TM, lst = "";
+            var tp = this.template,
+                lst = "";
+
             DATA.get('grouplist').getRows().foreach(function(row){
                 var di = row.cell;
-                lst += TM.replace('grouprow', {
-                    'id': di['id'],
-                    'nm': di['gnm']
+                lst += tp.replace('option', {
+                    id: di['id'],
+                    nm: di['gnm']
                 });
             });
-            TM.getEl(this.tname + '.table').innerHTML = TM.replace('grouptable', {'rows': lst});
 
-            var tbl = this._TM.getEl('grouptable.id');
-            if (!this.row.isNew()){
+            tp.setHTML({
+                table: tp.replace('select', {'rows': lst})
+            });
+
+            var tbl = tp.gel('select.id'),
+                row = this.get('row');
+
+            if (!row.isNew()){
                 tbl.disabled = 'disabled';
-                tbl.value = this.row.cell['gid'];
+                tbl.value = row.cell['gid'];
             }
-
-        },
-        onClick: function(el){
-            var tp = this._TId[this.tname];
-            switch (el.id) {
-                case tp['bcancel']:
-                    this.close();
-                    return true;
-                case tp['bsave']:
-                    this.save();
-                    return true;
-            }
-            return false;
         },
         save: function(){
-            this.row.update({
-                'lmt': this.elv('size'),
-                'gid': this._TM.getEl('grouptable.id').value
+            var tp = this.template;
+
+            this.get('row').update({
+                'lmt': tp.getValue('size'),
+                'gid': tp.getValue('select.id')
             });
-            this.callback();
-            this.close();
+            this.get('callback').call(this);
+            this.hide();
+        }
+    }, {
+        ATTRS: {
+            component: {value: COMPONENT},
+            templateBlockName: {value: 'limiteditorpanel,select,option'},
+            row: {value: null},
+            callback: {value: null},
+            width: {value: 600}
+        },
+        CLICKS: {
+            save: 'save',
+            cancel: 'hide'
         }
     });
-    NS.GroupLimitEditorPanel = GroupLimitEditorPanel;
+
+
+    NS.ExtensionManagerWidget = Y.Base.create('extensionManagerWidget', SYS.AppWidget, [], {
+        onInitAppWidget: function(err, appInstance, options){
+            var tp = this.template;
+            this.managerWidget = new NS.ExtensionFileWidget(tp.gel('widget'))
+        },
+        destructor: function(){
+            if (this.managerWidget){
+                this.managerWidget.destroy();
+            }
+        }
+    }, {
+        ATTRS: {
+            component: {value: COMPONENT},
+            templateBlockName: {value: 'limitConfigWidget'}
+        }
+    });
+
+    return;
+
+
+    var GroupLimitEditorPanel = function(row, callback){
+        this.row = row;
+        this.tname = row.isNew() ? 'limitappendpanel' : 'limitappendpanel';
+        this.callback = callback;
+        GroupLimitEditorPanel.superclass.constructor.call(this, {
+            width: '400px', resize: true
+        });
+    };
+    YAHOO.extend(GroupLimitEditorPanel, Brick.widget.Dialog, {
+
+    });
+    // NS.GroupLimitEditorPanel = GroupLimitEditorPanel;
 
 
     var ExtensionFileWidget = function(container){
@@ -384,4 +366,5 @@ Component.entryPoint = function(NS){
         }
     });
     NS.ExtensionEditorPanel = ExtensionEditorPanel;
+
 };

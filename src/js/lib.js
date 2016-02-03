@@ -1,6 +1,15 @@
 var Component = new Brick.Component();
-Component.requires = {};
+Component.requires = {
+    mod: [
+        {name: 'sys', files: ['application.js']},
+        // {name: '{C#MODNAME}', files: ['model.js']}
+    ]
+};
+
 Component.entryPoint = function(NS){
+
+    var COMPONENT = this,
+        SYS = Brick.mod.sys;
 
     var Y = Brick.YUI,
         L = Y.Lang;
@@ -10,6 +19,31 @@ Component.entryPoint = function(NS){
         isWrite: 30,
         isView: 10
     });
+
+    SYS.Application.build(COMPONENT, {}, {
+        initializer: function(){
+            NS.roles.load(function(){
+                this.initCallbackFire();
+            }, this);
+        },
+    }, [], {
+        REQS: {},
+        ATTRS: {
+            isLoadAppStructure: {value: false},
+        },
+        URLS: {
+            ws: "#app={C#MODNAMEURI}/wspace/ws/",
+            manager: {
+                limit: function(){
+                    return this.getURL('ws') + 'manager/LimitManagerWidget/';
+                },
+                extension: function(){
+                    return this.getURL('ws') + 'manager/ExtenstionManagerWidget/';
+                },
+            }
+        }
+    });
+
 
     var File = function(d){
         this.init(d);
@@ -211,6 +245,41 @@ Component.entryPoint = function(NS){
         }
     };
     NS.FileUploader = FileUploader;
+
+
+    /**
+     * API модуля
+     *
+     * @class API
+     * @extends Brick.Component.API
+     * @static
+     */
+    var API = NS.API;
+
+    API.showFileBrowserPanel = function(callback){
+        API.fn('filemanager', function(){
+            API.activeBrowser = new NS.BrowserPanel(callback);
+            API.dsRequest();
+        });
+    };
+
+    API.showImageEditorPanel = function(file){
+        API.fn('editor', function(){
+            new NS.ImageEditorPanel(new NS.File(file));
+        });
+    };
+
+    /**
+     * Запросить DataSet произвести обновление данных.
+     *
+     * @method dsRequest
+     */
+    API.dsRequest = function(){
+        if (!NS.data){
+            return;
+        }
+        NS.data.request(true);
+    };
 
 };
 

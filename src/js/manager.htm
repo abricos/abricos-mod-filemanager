@@ -1,29 +1,28 @@
-<!--{panel}-->
-<div class='hd'>{#mod.filemanager.manager.panel.1}</div>
-<div class='bd'>
-    <div id="{i#container}"></div>
-    <div style="text-align: right">
-        <input id="{i#bclose}" type="button" value="{#mod.filemanager.manager.panel.2}"/>
-    </div>
-</div>
-
-<!--{widget}-->
-<div id="{i#id}" class="yui-navset">
-    <ul class="yui-nav">
-        <li class="selected"><a href="#{i#limit}"><em>{#mod.filemanager.manager.widget.1}</em></a></li>
-        <li><a href="#{i#exten}"><em>{#mod.filemanager.manager.widget.2}</em></a></li>
-    </ul>
-    <div class="yui-content">
-        <div id="{i#limit}"></div>
-        <div id="{i#exten}"></div>
-    </div>
-</div>
-
 <!--{limitwidget}-->
-<div class="buttons right">
-    <input type="button" value="{#mod.filemanager.manager.limitwidget.1}" id="{i#bappend}"/>
+<div class="panel panel-default limitManager">
+    <div class="panel-heading text-center">
+
+        <h3 class="panel-title pull-left">
+            Настройка лимитов
+        </h3>
+
+        <div class="btn-toolbar pull-right">
+            <button data-click="create" class="btn btn-default btn-sm" type="button" data-wait="disable">
+                {#mod.filemanager.manager.limitwidget.1}
+            </button>
+        </div>
+
+        <span data-wait="show">
+            <img src="/images/loading.gif"/> Загрузка...
+        </span>
+
+        <div class="clearfix"></div>
+    </div>
+    <div class="panel-body">
+        <div id='{i#table}'></div>
+    </div>
 </div>
-<div id='{i#table}'></div>
+
 
 <!--{limittable}-->
 <table class="table table-striped">
@@ -38,54 +37,51 @@
     <tbody>{v#rows}</tbody>
 </table>
 
-<!--{limitrowwait}-->
-<tr valign="top">
-    <td colspan="4">{#mod.filemanager.manager.limitrowwait.1}</td>
-</tr>
-
 <!--{limitrow}-->
 <tr>
     <td>{v#gnm}</td>
     <td>{v#lmt}</td>
-    <td><a href="#" id="{i#edit}-{v#id}">{#mod.filemanager.manager.limitrow.1}</a></td>
-    <td><a href="#" id="{i#remove}-{v#id}">{#mod.filemanager.manager.limitrow.2}</a></td>
+    <td>
+        <button data-click="edit" data-id="{v#id}" class="btn btn-xs btn-default">
+            {#mod.filemanager.manager.limitrow.1}
+        </button>
+    </td>
+    <td>
+        <button data-click="remove" data-id="{v#id}" class="btn btn-xs btn-default">
+            {#mod.filemanager.manager.limitrow.2}
+        </button>
+    </td>
 </tr>
 
-<!--{limitappendpanel}-->
-<div class='hd'>{#mod.filemanager.manager.limitappendpanel.1}</div>
-<div class='bd'>
-    <div class="field">
-        <div id="{i#table}"></div>
-        <p>
-            {#mod.filemanager.manager.limitappendpanel.4} <input id="{i#size}" type="text" style="width: 80px;"/>
-        </p>
-
-        <div style="text-align: right">
-            <input id="{i#bsave}" type="button" value="{#mod.filemanager.manager.limitappendpanel.2}"/>
-            <input id="{i#bcancel}" type="button" value="{#mod.filemanager.manager.limitappendpanel.3}"/>
-        </div>
-    </div>
-</div>
-
 <!--{limiteditorpanel}-->
-<div class='hd'>{#mod.filemanager.manager.limiteditorpanel.4}</div>
+<div class='hd'>Редактор квоты</div>
 <div class='bd'>
-    <div class="field">
+    <div class="form-group">
         <div id="{i#table}"></div>
-        <p>
-            {#mod.filemanager.manager.limiteditorpanel.3} <input id="{i#size}" type="text" style="width: 100px;"/>
-        </p>
+    </div>
 
-        <div style="text-align: right">
-            <input id="{i#bsave}" type="button" value="{#mod.filemanager.manager.limiteditorpanel.1}"/>
-            <input id="{i#bcancel}" type="button" value="{#mod.filemanager.manager.limiteditorpanel.2}"/>
+    <div class="form-group row">
+        <div class="col-sm-6">
+            {#mod.filemanager.manager.limiteditorpanel.3}
+        </div>
+        <div class="col-sm-6">
+            <input id="{i#size}" type="text" class="form-control input-sm"/>
         </div>
     </div>
+
+</div>
+<div class='ft'>
+    <button data-click="save" type="button" class="btn btn-default">
+        {#mod.filemanager.manager.limiteditorpanel.1}
+    </button>
+    <button data-click="cancel" type="button" class="btn btn-default">
+        {#mod.filemanager.manager.limiteditorpanel.2}
+    </button>
 </div>
 
-<!--{grouptable}--><select id="{i#id}" style="width: 300px;">{v#rows}</select>
+<!--{select}--><select id="{i#id}" class="form-control input-sm">{v#rows}</select>
 
-<!--{grouprow}-->
+<!--{option}-->
 <option value="{v#id}">{v#nm}</option>
 
 <!--{grouprowwait}-->

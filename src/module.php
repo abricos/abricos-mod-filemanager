@@ -18,11 +18,6 @@
 class FileManagerModule extends Ab_Module {
 
     /**
-     * @var FileManager
-     */
-    private $_fileManager = null;
-
-    /**
      * @var FileManagerModule
      */
     public static $instance = null;
@@ -58,8 +53,16 @@ class FileManagerModule extends Ab_Module {
         return $this->GetManager();
     }
 
+    protected function GetManagerClassName(){
+        return 'FileManager';
+    }
+
     public function EnableThumbSize($list){
         FileManagerQueryModule::EnThumbsAppend(Abricos::$db, $list);
+    }
+
+    public function Bos_IsMenu(){
+        return true;
     }
 }
 

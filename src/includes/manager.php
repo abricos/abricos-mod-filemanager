@@ -33,14 +33,8 @@ class FileManager extends Ab_ModuleManager {
 
     private $_userGroupSizeLimit = null;
 
-
     private $_checkSizeDisable = false;
 
-    public function FileManager(FileManagerModule $module){
-        parent::__construct($module);
-
-        FileManager::$instance = $this;
-    }
 
     /**
      * Отключить проверку свободного места в профиле пользователя
@@ -854,6 +848,23 @@ class FileManager extends Ab_ModuleManager {
 
         return $newfilehash;
     }
+
+    public function Bos_MenuData(){
+        if (!$this->IsAdminRole()){
+            return null;
+        }
+        $i18n = $this->module->I18n();
+        return array(
+            array(
+                "name" => "filemanager",
+                "title" => $i18n->Translate('title'),
+                "icon" => "/modules/filemanager/images/cp_icon.gif",
+                "url" => "filemanager/wspace/ws",
+                "parent" => "controlPanel"
+            )
+        );
+    }
+
 }
 
 ?>
