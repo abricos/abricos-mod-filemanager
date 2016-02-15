@@ -1,183 +1,92 @@
 <!--{panel}-->
 <div class='hd'>{#mod.filemanager.panel.hd}</div>
 <div class='bd'>
-	<table><tbody>
-		<tr>
-			<td>
-				<table width="100%">
-					<tr>
-						<td><input id='{i#path}' type='text' style='width: 400px' value='' /></td>
-						<td style="text-align: right;">
-
-							<a href="#" id='{i#bnewfolder}'>
-								<img src='/modules/filemanager/images/folder__plus.png' title='{#mod.filemanager.panel.newfolder}' alt='New folder' />{#mod.filemanager.panel.newfolder}</a>
-							
-							&nbsp;&nbsp;
-							
-							<a href="#" id='{i#bupload}' title='{#mod.filemanager.panel.bload}'>
-								<img src='/modules/filemanager/images/plus.png' alt='upload' title='{#mod.filemanager.panel.bload}' />{#mod.filemanager.panel.bfload}</a>
-						
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top">
-				<table>
-					<tr>
-						<td>
-							<div id='{i#folders}' style="width: 220px; height: 250px; overflow-y:auto; background-color: #ffffff; border: 1px solid #999999"></div>
-						</td>
-						<td>
-							<div id="{i#files}" style="width: 554px; overflow-y:auto; height: 250px; background-color: #ffffff; border: 1px solid #999999"></div>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<table  style="width:100%; margin: 10px 0;">
-					<tr>
-						<td>
-							<table><tbody>
-							<tr>
-							<td>{#mod.filemanager.panel.1}:</td>
-							<td><input id='{i#filesrc}' type='text' style="width: 500px;"/></td>
-							</tr>
-							<tr>
-							<td>{#mod.filemanager.panel.code}</td>
-							<td><input id='{i#filesrchtml}' type='text' style="width: 500px;"/></td>
-							</tr>
-							</tbody></table>
-						</td>
-						<td>
-							<input id='{i#bselect}' value='{#mod.filemanager.panel.select}' type='button' disabled="disabled"/>&nbsp;&nbsp;&nbsp;
-							<input id='{i#bcancel}' value='{#mod.filemanager.panel.cancel}' type='button' />
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</tbody></table>
-	<div id="{i#screenshot}"></div>
+    <div id="{i#widget}"></div>
 </div>
 
-<!--{createfolderpanel}--><div class='hd'>{#mod.filemanager.createfolderpanel.hd}</div>
-<div class='bd'>
-	<div class="field" style="width: 400px">
-		<p>
-			{#mod.filemanager.createfolderpanel.fname}
-			<input id="{i#name}" type="text" style="width: 250px" value=""/>
-		</p>
-	</div>
-	<div class="buttons right">
-		<input id='{i#bcreate}' type="button" value="{#mod.filemanager.createfolderpanel.bnew}" />
-		<input id='{i#bcancel}' type="button" value="{#mod.filemanager.createfolderpanel.bcancel}" />
-	</div>
+<!--{widget}-->
+<div class="aw-filemanager browser">
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <table width="100%">
+                    <tr>
+                        <td><input id='{i#path}' type='text' style='width: 400px' value=''/></td>
+                        <td style="text-align: right;">
+
+                            <a data-click="bnewfolder" href="#">
+                                <img src='/modules/filemanager/images/folder__plus.png'
+                                     title='{#mod.filemanager.panel.newfolder}' alt='New folder'/>
+                                {#mod.filemanager.panel.newfolder}
+                            </a>
+
+                            &nbsp;&nbsp;
+
+                            <a data-click="bupload" href="#" title='{#mod.filemanager.panel.bload}'>
+                                <img src='/modules/filemanager/images/plus.png' alt='upload'
+                                     title='{#mod.filemanager.panel.bload}'/>
+                                {#mod.filemanager.panel.bfload}
+                            </a>
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">
+                <table>
+                    <tr>
+                        <td>
+                            <div id='{i#folders}'
+                                 style="width: 220px; height: 250px; overflow-y:auto; background-color: #ffffff; border: 1px solid #999999"></div>
+                        </td>
+                        <td>
+                            <div id="{i#files}"
+                                 style="width: 554px; overflow-y:auto; height: 250px; background-color: #ffffff; border: 1px solid #999999"></div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <hr/>
+    <div class="form-group">
+        <div class="col-sm-9">
+            <div class="form-group">
+                <div class="col-sm-3">
+                    {#mod.filemanager.panel.1}
+                </div>
+                <div class="col-sm-9">
+                    <input id='{i#filesrc}' class="form-control input-sm" type='text'/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-3">
+                    {#mod.filemanager.panel.code}
+                </div>
+                <div class="col-sm-9">
+                    <input id='{i#filesrchtml}' class="form-control input-sm" type='text'/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="btn-group ">
+                <button data-click="bselect" class="btn btn-primary btn-sm" type="button">
+                    {#mod.filemanager.panel.select}
+                </button>
+                <button data-click="bcancel" class="btn btn-default btn-sm" type="button">
+                    {#mod.filemanager.panel.cancel}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div id="{i#screenshot}"></div>
 </div>
 
-<!--{editfolderpanel}--><div class='hd'>{#mod.filemanager.editfolderpanel.hd}</div>
-<div class='bd'>
-	<div class="field" style="width: 400px">
-		<p>
-			{#mod.filemanager.editfolderpanel.fname}
-			<input id="{i#name}" type="text" style="width: 250px" value=""/>
-		</p>
-	</div>
-	<div class="buttons right">
-		<input id='{i#bsave}' type="button" value="{#mod.filemanager.editfolderpanel.bsave}" />
-		<input id='{i#bcancel}' type="button" value="{#mod.filemanager.editfolderpanel.bcancel}" />
-	</div>
-</div>
-
-<!--{screenshot}--><b>{#mod.filemanager.screenshot.hd}</b><br />
-<table style="width: 100%"><tbody><tr>
-	<td style="width: 50%">
-		<p>{#mod.filemanager.screenshot.name}<input id="{i#title}" type="text" style="width: 300px" value=""/></p>
-		<p>
-			{#mod.filemanager.screenshot.size}
-			{#mod.filemanager.screenshot.width}<input id="{i#width}" type="text" style="width: 50px" value="300"/>&nbsp;
-			{#mod.filemanager.screenshot.height}<input id="{i#height}" type="text" style="width: 50px" value="225"/>
-		</p>
-	</td>
-	<td style="width: 50%">
-		<p>
-			{#mod.filemanager.screenshot.tt}<br />
-			<textarea id="{i#code}" style="width:400px; height: 50px" ></textarea>
-		</p>
-	</td>
-</tr></tbody></table>
-<div class="buttons right">
-	<input id='{i#bselect}' value='{#mod.filemanager.screenshot.insscrn}' type='button' />
-</div>
-
-<!--{screenshottemplate}--><div>
-	<a href="{v#isrc}" target="_blank">
-		<img src="{v#sisrc}" width="{v#siw}" height="{v#sih}" alt="{v#sialt}" title="{v#sitl}" />
-	</a>
-</div>
-
-<!--{files}--><table width="100%">
-	<thead>
-		<tr align="center">
-			<td style="background-color:#D7D7D7; height:20px; width:16px;">&nbsp;</td>
-			<td style="background-color:#D7D7D7; height:20px; width:45%;">{#mod.filemanager.files.name}</td>
-			<td style="background-color:#D7D7D7; height:20px; ">{#mod.filemanager.files.size}</td>
-			<td style="background-color:#D7D7D7; height:20px; ">{#mod.filemanager.files.changed}</td>
-			<td style="background-color:#D7D7D7; height:20px; "></td>
-			<td style="background-color:#D7D7D7; height:20px; "></td>
-		</tr>
-	</thead>
-	<tbody>
-		{v#folders}
-		{v#files}
-	</tbody>
-</table>
-
-<!--{fileremovemsg}--><div class='hd'>{#mod.filemanager.fileremovemsg.hd}</div>
-<div class='bd'>
-	<div class="field" style="width: 400px">
-		<h3>{#mod.filemanager.fileremovemsg.hd2}</h3>
-		<p>{#mod.filemanager.fileremovemsg.hd3}<strong>{v#info}</strong>?</p>
-	</div>
-	<div class="buttons right">
-		<input id='{i#bremove}' type="button" value="{#mod.filemanager.fileremovemsg.remove}" />
-		<input id='{i#bcancel}' type="button" value="{#mod.filemanager.fileremovemsg.cancel}" />
-	</div>
-</div>
-<!--{folderremovemsg}--><div class='hd'>{#mod.filemanager.folderremovemsg.hd}</div>
-<div class='bd'>
-	<div class="field" style="width: 400px">
-		<h3>{#mod.filemanager.folderremovemsg.hd2}</h3>
-		<p>{#mod.filemanager.folderremovemsg.hd3}<strong>{v#info}</strong>{#mod.filemanager.folderremovemsg.hd4}</p>
-	</div>
-	<div class="buttons right">
-		<input id='{i#bremove}' type="button" value="{#mod.filemanager.folderremovemsg.remove}" />
-		<input id='{i#bcancel}' type="button" value="{#mod.filemanager.folderremovemsg.cancel}" />
-	</div>
-</div>
-
-<!--{filesrow}--><tr id="{i#id}-{v#id}" style='cursor: pointer'>
-	<td style="height:20px; width:16px;">{v#img}</td>
-	<td>{v#fn}</td>
-	<td style="text-align: right">{v#fs}</td>
-	<td style="text-align: right">{v#dl}&nbsp;</td>
-	<td><img id="{i#edit}-{v#id}" src="/modules/filemanager/images/edit.gif" alt="{#mod.filemanager.filesrow.edit}" title="{#mod.filemanager.filesrow.edit}" /></td>
-	<td><img id="{i#remove}-{v#id}" src="/modules/filemanager/images/remove.gif" alt="{#mod.filemanager.filesrow.remove}" title="{#mod.filemanager.filesrow.remove}" /></td>
-</tr>
-<!--{filesrowfd}--><tr id="{i#id}-{v#id}" style='cursor: pointer'>
-	<td style="height:20px; width:16px;"><img src='/modules/filemanager/images/folder.png' title='' alt='' /></td>
-	<td>{v#fn}</td>
-	<td colspan="2"></td>
-	<td><img id="{i#edit}-{v#id}" src="/modules/filemanager/images/edit.gif" alt="{#mod.filemanager.filesrowfd.edit}" title="{#mod.filemanager.filesrowfd.edit}" /></td>
-	<td><img id="{i#remove}-{v#id}" src="/modules/filemanager/images/remove.gif" alt="{#mod.filemanager.filesrowfd.remove}" title="{#mod.filemanager.filesrowfd.remove}" /></td>
-</tr>
-<!--{filesrowparent}--><tr id="{i#id}-{v#id}" style='cursor: pointer'>
-	<td style="height:20px; width:16px;"></td>
-	<td><strong>..</strong></td>
-	<td colspan="4"></td>
-</tr>
 <!--{image}--><img src='{v#src}' title='' alt=''/>
-<!--{imagefile}--><img src='/modules/filemanager/images/file.png' title='' alt='' />
+

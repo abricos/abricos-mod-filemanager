@@ -1,0 +1,55 @@
+<!--{files}--><table width="100%">
+    <thead>
+    <tr align="center">
+        <td style="background-color:#D7D7D7; height:20px; width:16px;">&nbsp;</td>
+        <td style="background-color:#D7D7D7; height:20px; width:45%;">{#mod.filemanager.files.name}</td>
+        <td style="background-color:#D7D7D7; height:20px; ">{#mod.filemanager.files.size}</td>
+        <td style="background-color:#D7D7D7; height:20px; ">{#mod.filemanager.files.changed}</td>
+        <td style="background-color:#D7D7D7; height:20px; "></td>
+        <td style="background-color:#D7D7D7; height:20px; "></td>
+    </tr>
+    </thead>
+    <tbody>
+    {v#folders}
+    {v#files}
+    </tbody>
+</table>
+
+<!--{filesrow}--><tr id="{i#id}-{v#id}" style='cursor: pointer'>
+    <td style="height:20px; width:16px;">{v#img}</td>
+    <td>{v#fn}</td>
+    <td style="text-align: right">{v#fs}</td>
+    <td style="text-align: right">{v#dl}&nbsp;</td>
+    <td><img id="{i#edit}-{v#id}" src="/modules/filemanager/images/edit.gif" alt="{#mod.filemanager.filesrow.edit}" title="{#mod.filemanager.filesrow.edit}" /></td>
+    <td><img id="{i#remove}-{v#id}" src="/modules/filemanager/images/remove.gif" alt="{#mod.filemanager.filesrow.remove}" title="{#mod.filemanager.filesrow.remove}" /></td>
+</tr>
+
+<!--{filesrowfd}--><tr id="{i#id}-{v#id}" style='cursor: pointer'>
+    <td style="height:20px; width:16px;"><img src='/modules/filemanager/images/folder.png' title='' alt='' /></td>
+    <td>{v#fn}</td>
+    <td colspan="2"></td>
+    <td><img id="{i#edit}-{v#id}" src="/modules/filemanager/images/edit.gif" alt="{#mod.filemanager.filesrowfd.edit}" title="{#mod.filemanager.filesrowfd.edit}" /></td>
+    <td><img id="{i#remove}-{v#id}" src="/modules/filemanager/images/remove.gif" alt="{#mod.filemanager.filesrowfd.remove}" title="{#mod.filemanager.filesrowfd.remove}" /></td>
+</tr>
+
+<!--{filesrowparent}--><tr id="{i#id}-{v#id}" style='cursor: pointer'>
+    <td style="height:20px; width:16px;"></td>
+    <td><strong>..</strong></td>
+    <td colspan="4"></td>
+</tr>
+
+<!--{imagefile}-->
+<img src='/modules/filemanager/images/file.png' title='' alt='' />
+
+<!--{fileremovemsg}-->
+<div class='hd'>{#mod.filemanager.fileremovemsg.hd}</div>
+<div class='bd'>
+    <div class="field" style="width: 400px">
+        <h3>{#mod.filemanager.fileremovemsg.hd2}</h3>
+        <p>{#mod.filemanager.fileremovemsg.hd3}<strong>{v#info}</strong>?</p>
+    </div>
+    <div class="buttons right">
+        <input id='{i#bremove}' type="button" value="{#mod.filemanager.fileremovemsg.remove}" />
+        <input id='{i#bcancel}' type="button" value="{#mod.filemanager.fileremovemsg.cancel}" />
+    </div>
+</div>
