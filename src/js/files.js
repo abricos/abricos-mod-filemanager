@@ -2,7 +2,7 @@ var Component = new Brick.Component();
 Component.requires = {
     yahoo: ['animation', 'container', 'dragdrop', 'treeview', 'imagecropper'],
     mod: [
-        {name: 'sys', files: ['panel.js', 'old-form.js', 'data.js', 'container.js']},
+        {name: 'sys', files: ['panel.js', 'data.js', 'container.js']},
         {name: '{C#MODNAME}', files: ['api.js', 'lib.js']}
     ]
 };
@@ -11,8 +11,6 @@ Component.entryPoint = function(NS){
     var Y = Brick.YUI,
         COMPONENT = this,
         SYS = Brick.mod.sys;
-
-    var Dom = YAHOO.util.Dom;
 
     if (!NS.data){
         NS.data = new Brick.util.data.byid.DataSet('filemanager');
@@ -37,44 +35,32 @@ Component.entryPoint = function(NS){
 
     NS.FileListWidget = Y.Base.create('fileListWidget', SYS.AppWidget, [], {
         onInitAppWidget: function(err, appInstance, options){
-
-            return;
-            this.owner = owner;
-            this.folderid = -1;
-            this.selectedItem = null;
-            this.isinit = true;
-
-            COMPONENT.buildTemplate(this, 'filesrow,filesrowparent,filesrowfd,imagefile,files');
-
             this.tables = {
-                'files': DATA.get('files', true),
-                'folders': DATA.get('folders', true)
+                files: DATA.get('files', true),
+                folders: DATA.get('folders', true)
             };
             DATA.onComplete.subscribe(this.onDSComplete, this, true);
-            this.setFolderId(folderid);
+
+            this.after('parentFolderIdChange', function(e){
+                this.rows = DATA.get('files').getRows({
+                    folderid: e.newVal
+                });
+
+                if (DATA.isFill(this.tables)){
+                    this.renderElements();
+                } else {
+                    DATA.request();
+                }
+            }, this);
+
+            this.set('parentFolderId', 0);
+        },
+        destructor: function(){
+            DATA.onComplete.unsubscribe(this.onDSComplete);
         },
         onDSComplete: function(type, args){
             if (args[0].check(['files', 'folders'])){
                 this.renderElements();
-            }
-        },
-        destroy: function(){
-            DATA.onComplete.unsubscribe(this.onDSComplete);
-        },
-        setFolderId: function(folderid){
-            return;
-            if (this.folderid == folderid){
-                return;
-            }
-            this.folderid = folderid;
-            this.rows = DATA.get('files').getRows({'folderid': folderid});
-            if (DATA.isFill(this.tables)){
-                this.renderElements();
-            }
-            if (this.isinit){
-                this.isinit = false;
-            } else {
-                DATA.request();
             }
         },
         refresh: function(){
@@ -82,7 +68,118 @@ Component.entryPoint = function(NS){
             DATA.get('files').applyChanges();
             DATA.request();
         },
-        onClick: function(el){
+        itemRemove: function(itemid, isFolder){
+            if (!isFolder){
+                var row = this.rows.getById(itemid);
+                new FileRemoveMsg(row, function(){
+                    row.remove();
+                    DATA.get('files').applyChanges();
+                    DATA.request();
+                });
+            } else {
+                var row = DATA.get('folders').getRows().getById(itemid);
+                new FolderRemoveMsg(row, function(){
+                    var table = DATA.get('folders');
+                    row.remove();
+                    table.applyChanges();
+                    DATA.request();
+                });
+            }
+        },
+        renderElements: function(){
+            var tp = this.template,
+                lstFolders = "",
+                lstFiles = "",
+                rowsFD = DATA.get('folders').getRows(),
+                folderid = this.get('parentFolderId');
+
+            if (folderid > 0){
+                var row = rowsFD.getById(folderid);
+                lstFolders += tp.replace('filesrowparent', {
+                    id: row.cell['pid']
+                });
+            }
+
+            rowsFD.foreach(function(row){
+                var di = row.cell;
+                if (folderid !== (di.pid | 0)){
+                    return;
+                }
+                lstFolders += tp.replace('filesrowfd', {
+                    id: di.id, fn: di.ph
+                });
+            });
+
+            this.rows.foreach(function(row){
+                var di = row.cell,
+                    file = new NS.File(di),
+                    img = tp.replace('imagefile');
+
+                if (!Y.Lang.isNull(file.image)){
+                    var linker = new NS.Linker(file);
+                    linker.setSize(16, 16);
+                    img = linker.getHTML();
+                }
+
+                lstFiles += tp.replace('filesrow', {
+                    id: di.id,
+                    'img': img,
+                    'fn': di['fn'],
+                    'fs': Brick.byteToString(di['fs']),
+                    'dl': Brick.dateExt.convert(di['d'], 1)
+                });
+            });
+
+            tp.setHTML({
+                list: tp.replace('files', {
+                    files: lstFiles,
+                    folders: lstFolders
+                })
+            });
+
+            this.set('selected', 0);
+        },
+        _selectItemByClick: function(type, itemid){
+            var tp = this.template,
+                row,
+                item = null;
+
+            if (type === 'folder'){
+                row = DATA.get('folders').getRows().getById(itemid);
+                if (row){
+                    item = new NS.Folder(row.cell);
+                }
+            } else if (type === 'file'){
+                row = this.rows.getById(itemid);
+                if (row){
+                    item = new NS.File(row.cell);
+                }
+            }
+
+            tp.one('list').all('tr').each(function(node){
+                if (item && item.type === node.getData('itemtype')
+                    && itemid == node.getData('id')){
+                    node.addClass('selected');
+                } else {
+                    node.removeClass('selected');
+                }
+            }, this);
+
+            this.set('selected', item);
+        },
+        onClick: function(e){
+            var target = e.defineTarget || e.target,
+                itemid = target.getData('id') | 0;
+
+            switch (e.dataClick) {
+                case 'itemSelect':
+                    this._selectItemByClick(target.getData('itemtype'), itemid);
+            }
+
+            return;
+
+            /*
+            // TODO: old code to remove
             var TId = this._TId,
                 prefix = el.id.replace(/([0-9]+$)/, ''),
                 numid = el.id.replace(prefix, "");
@@ -130,128 +227,20 @@ Component.entryPoint = function(NS){
                 return true;
             }
             return false;
-        },
-        selectItem: function(itemid, isFolder, isParent){
-            isParent = isParent || false;
-            this.selectedItem = null;
-            var item = null;
-            var TId = this._TId;
-
-            var pparentFolderId = '0';
-            var row;
-            if (this.folderid * 1 > 0){
-                row = DATA.get('folders').getRows().getById(this.folderid);
-                pparentFolderId = row.cell['pid'];
-            }
-            if (isParent){
-                item = new NS.Folder({'id': pparentFolderId, 'pid': (row ? row.cell['pid'] : '-1')});
-            }
-            var parentfolderid = isFolder && isParent ? itemid : 'none';
-            var el = Dom.get(TId['filesrowparent']['id'] + '-' + pparentFolderId);
-            if (el){
-                el.className = parentfolderid == itemid ? 'selected' : '';
-            }
-
-            var fileid = isFolder ? 'none' : itemid;
-            this.rows.foreach(function(row){
-                var id = row.cell['id'];
-                var el = Dom.get(TId['filesrow']['id'] + '-' + id);
-                if (id == fileid){
-                    item = new NS.File(row.cell);
-                }
-                el.className = id == fileid ? 'selected' : '';
-            });
-
-            var folderid = isFolder ? itemid : 'none';
-            var parentFolder = this.folderid;
-            DATA.get('folders').getRows().foreach(function(row){
-                if (row.cell['pid'] != parentFolder){
-                    return;
-                }
-                var id = row.cell['id'];
-                var el = Dom.get(TId['filesrowfd']['id'] + '-' + id);
-                if (id == folderid){
-                    item = new NS.Folder(row.cell);
-                }
-                el.className = id == folderid ? 'selected' : '';
-            });
-            this.selectedItem = item;
-            if (this.onSelect){
-                this.onSelect(item);
-            }
-        },
-        itemRemove: function(itemid, isFolder){
-            if (!isFolder){
-                var row = this.rows.getById(itemid);
-                new FileRemoveMsg(row, function(){
-                    row.remove();
-                    DATA.get('files').applyChanges();
-                    DATA.request();
-                });
-            } else {
-                var row = DATA.get('folders').getRows().getById(itemid);
-                new FolderRemoveMsg(row, function(){
-                    var table = DATA.get('folders');
-                    row.remove();
-                    table.applyChanges();
-                    DATA.request();
-                });
-            }
-        },
-        renderElements: function(){
-            var lstFolders = "",
-                rowsFD = DATA.get('folders').getRows(),
-                folderid = this.folderid,
-                TM = this._TM;
-
-            if (folderid > 0){
-                var row = rowsFD.getById(folderid);
-                lstFolders += TM.replace('filesrowparent', {
-                    'id': row.cell['pid']
-                });
-            }
-            rowsFD.foreach(function(row){
-                var di = row.cell;
-                if (folderid != di['pid']){
-                    return;
-                }
-                lstFolders += TM.replace('filesrowfd', {
-                    'id': di['id'], 'fn': di['ph']
-                });
-            });
-
-            var lstFiles = "";
-            this.rows.foreach(function(row){
-                var di = row.cell;
-                var file = new NS.File(di);
-                var img = TM.replace('imagefile');
-
-                if (!Y.Lang.isNull(file.image)){
-                    var linker = new NS.Linker(file);
-                    linker.setSize(16, 16);
-                    img = linker.getHTML();
-                }
-
-                lstFiles += TM.replace('filesrow', {
-                    'id': di['id'],
-                    'img': img,
-                    'fn': di['fn'],
-                    'fs': Brick.byteToString(di['fs']),
-                    'dl': Brick.dateExt.convert(di['d'], 1)
-                });
-            });
-
-            var el = this.owner._TM.gel('files');
-            el.innerHTML = TM.replace('files', {
-                files: lstFiles,
-                folders: lstFolders
-            });
-            this.selectItem(null);
+            /**/
         },
     }, {
         ATTRS: {
             component: {value: COMPONENT},
-            templateBlockName: {value: 'widget'},
+            templateBlockName: {value: 'widget,files,filesrow,filesrowparent,filesrowfd,imagefile'},
+            selected: {
+                value: null
+            },
+            parentFolderId: {
+                setter: function(val){
+                    return val | 0;
+                }
+            }
         },
     });
 

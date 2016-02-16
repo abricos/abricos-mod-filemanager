@@ -31,9 +31,9 @@ Component.entryPoint = function(NS){
                 }
             });
 
-            this.browserWidget.on('selected', function(){
+            this.browserWidget.on('selected', function(e){
                 this.hide();
-                this.fire('selected');
+                this.fire('selected', e);
             }, this);
 
             this.browserWidget.on('canceled', function(){
@@ -78,12 +78,7 @@ Component.entryPoint = function(NS){
             this.files = new NS.FileListWidget({
                 srcNode: tp.gel('files')
             });
-
-            /*
-            this.files = new NS.FilesPanel(this, tp.gel('files'), '0', function(item){
-                instance.onSelectItem_filesPanel(item);
-            });
-            /**/
+            this.files.after('selectedChange', this._filesSelectedChange, this);
 
             this.fileUploader = new NS.FileUploader(Brick.env.user.id, function(fileid, filename){
                 instance.onFileUpload(fileid, filename);
@@ -98,58 +93,59 @@ Component.entryPoint = function(NS){
                 this.folders.destroy();
             }
         },
-        _foldersSelectedChange: function(e){
-            this.refreshPath();
-
-            // this.files.setFolderId(e.item.id);
-        },
         refreshPath: function(){
             this.template.setValue('path', this.folders.get('selectedFullPath'));
         },
-        onSelectItem_filesPanel: function(item){
-            var fname = '', fsrc = '', fpath = '';
-            if (!Y.Lang.isNull(item)){
-                if (item.type == 'file'){
-                    fname = item.name;
-                    var lnk = new NS.Linker(item);
-                    fsrc = lnk.getHTML();
-                    fpath = lnk.getSrc();
-                } else {
-                    fname = item.phrase;
-                }
+        _foldersSelectedChange: function(e){
+            this.refreshPath();
+            this.files.set('parentFolderId', e.newVal);
+        },
+        _filesSelectedChange: function(e){
+            var tp = this.template,
+                item = e.newVal,
+                fsrc = '', fpath = '',
+                isFile = item && item.type === 'file';
+
+            if (isFile){
+                var lnk = new NS.Linker(item);
+                fsrc = lnk.getHTML();
+                fpath = lnk.getSrc();
             }
-            this.setelv('filesrchtml', fsrc);
-            this.setelv('filesrc', fpath);
-            this.el('bselect').disabled = Y.Lang.isNull(item) ? "disabled" : "";
+
+            tp.setValue({
+                filesrchtml: fsrc,
+                filesrc: fpath
+            });
+
+            tp.one('bselect').set('disabled', !item ? "disabled" : "");
+
             this.screenshot.setImage(item);
             this.refreshPath();
         },
         showUpload: function(){
             this.fileUploader.fileUpload({
-                'folderid': this.folders.selectedFolderId
+                'folderid': this.folders.get('selected')
             });
         },
         onFileUpload: function(fileid, filename){
             this.files.refresh();
         },
         select: function(){
-            if (Y.Lang.isNull(this.files.selectedItem)){
+            var item = this.files.get('selected');
+
+            if (!item){
                 return;
             }
-            var item = this.files.selectedItem;
+
             if (item.type == 'folder'){
-                this.files.setFolderId(item.id);
-                this.folders.setFolderId(item.id);
+                this.folders.set('selected', item.id);
             } else {
-                if (this.callback){
-                    var linker = new NS.Linker(item);
-                    this.callback({
-                        'html': this.elv('filesrchtml'),
-                        'file': item,
-                        'src': linker.getSrc()
-                    });
-                    this.close();
-                }
+                var linker = new NS.Linker(item);
+                this.fire('selected', {
+                    html: this.template.getValue('filesrchtml'),
+                    file: item,
+                    src: linker.getSrc()
+                });
             }
         },
         cancel: function(){
