@@ -1,9 +1,8 @@
 var Component = new Brick.Component();
 Component.requires = {
-    yahoo: ['animation', 'container', 'dragdrop', 'treeview', 'imagecropper'],
     mod: [
         {name: 'sys', files: ['panel.js', 'old-form.js', 'data.js', 'container.js']},
-        {name: '{C#MODNAME}', files: ['folder.js', 'files.js', 'screenshot.js', 'api.js', 'lib.js']}
+        {name: '{C#MODNAME}', files: ['folders.js', 'files.js', 'screenshot.js', 'api.js', 'lib.js']}
     ]
 };
 Component.entryPoint = function(NS){
@@ -15,22 +14,6 @@ Component.entryPoint = function(NS){
     if (!NS.data){
         NS.data = new Brick.util.data.byid.DataSet('filemanager');
     }
-
-    Brick.byteToString = function(byte){
-        var ret = byte;
-        var px = "";
-        if (byte < 1024){
-            ret = byte;
-            px = "б";
-        } else if (byte < 1024 * 1024){
-            ret = Math.round((byte / 1024) * 100) / 100;
-            px = 'кб';
-        } else {
-            ret = Math.round((byte / 1024 / 1024) * 100) / 100;
-            px = 'мб';
-        }
-        return ret + ' ' + px;
-    };
 
     NS.BrowserPanel = Y.Base.create('browserPanel', SYS.Dialog, [], {
         initializer: function(){
@@ -79,33 +62,49 @@ Component.entryPoint = function(NS){
             var tp = this.template,
                 instance = this;
 
-            this.screenshot = new NS.Screenshot(this, tp.gel('screenshot'));
-            this.folders = new NS.FolderPanel(this, function(item){
-                instance.onSelectItem_foldersPanel(item);
-            });
-            this.files = new NS.FilesPanel(this, tp.gel('files'), '0', function(item){
-                instance.onSelectItem_filesPanel(item);
+            this.screenshot = new NS.ScreenshotWidget({
+                srcNode: tp.gel('screenshot')
             });
 
-            this.fileUploader = new NS.FileUploader(Brick.env.user.id, function(fileid, filename){
-                instance.onFileUpload(fileid, filename);
+            this.folders = new NS.FolderListWidget({
+                srcNode: tp.gel('folders')
             });
+            this.folders.after('selectedChange', this._foldersSelectedChange, this);
 
             var onRenderWidgets = this.get('onRenderWidgets');
             if (Y.Lang.isFunction(onRenderWidgets)){
                 onRenderWidgets.call(this);
             }
-        },
-        destructor: function(){
-            this.files.destroy();
-            this.folders.destroy();
-        },
-        onSelectItem_foldersPanel: function(item){
-            this.files.setFolderId(item.id);
+            this.files = new NS.FileListWidget({
+                srcNode: tp.gel('files')
+            });
+
+            /*
+            this.files = new NS.FilesPanel(this, tp.gel('files'), '0', function(item){
+                instance.onSelectItem_filesPanel(item);
+            });
+            /**/
+
+            this.fileUploader = new NS.FileUploader(Brick.env.user.id, function(fileid, filename){
+                instance.onFileUpload(fileid, filename);
+            });
+
             this.refreshPath();
         },
+        destructor: function(){
+            if (this.screenshot){
+                this.screenshot.destroy();
+                this.files.destroy();
+                this.folders.destroy();
+            }
+        },
+        _foldersSelectedChange: function(e){
+            this.refreshPath();
+
+            // this.files.setFolderId(e.item.id);
+        },
         refreshPath: function(){
-            this.template.setValue('path', this.folders.fullPath(this.folders.selectedFolderId));
+            this.template.setValue('path', this.folders.get('selectedFullPath'));
         },
         onSelectItem_filesPanel: function(item){
             var fname = '', fsrc = '', fpath = '';
@@ -171,13 +170,6 @@ Component.entryPoint = function(NS){
                     this.select();
                     return true;
             }
-            if (this.screenshot.onClick(el)){
-                return true;
-            }
-            if (this.files.onClick(el)){
-                return true;
-            }
-            return false;
         },
     }, {
         ATTRS: {

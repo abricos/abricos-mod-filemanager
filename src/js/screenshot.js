@@ -11,50 +11,31 @@ Component.entryPoint = function(NS){
         COMPONENT = this,
         SYS = Brick.mod.sys;
 
-    var buildTemplate = this.buildTemplate;
-
-    var Screenshot = function(owner, container){
-        this.init(owner, container);
-    };
-    Screenshot.prototype = {
-        el: function(name){
-            return this._TM.gel(name);
-        },
-        elv: function(name){
-            return Brick.util.Form.getValue(this.el(name));
-        },
-        setel: function(el, value){
-            Brick.util.Form.setValue(el, value);
-        },
-        setelv: function(name, value){
-            Brick.util.Form.setValue(this.el(name), value);
-        },
-        getData: function(){
-            return {
-                'tpl': this.elv('code'),
-                'w': this.elv('width') * 1,
-                'h': this.elv('height') * 1
-            };
-        },
-        init: function(owner, container){
-            this.owner = owner;
-
-            container.innerHTML = buildTemplate(this, 'screenshot,screenshottemplate').replace('screenshot');
-
+    NS.ScreenshotWidget = Y.Base.create('screenshotWidget', SYS.AppWidget, [], {
+        onInitAppWidget: function(err, appInstance, options){
             this.setImage(null);
 
             var instance = this;
             Brick.appFunc('user', 'userOptionList', '{C#MODNAME}', function(err, res){
                 instance.userOptionList = res.userOptionList;
-                instance.render();
+                instance.renderWidget();
             });
         },
-        render: function(){
+        getData: function(){
+            var tp = this.template;
+            return {
+                tpl: tp.getValue('code'),
+                w: tp.getValue('width') | 0,
+                h: tp.getValue('height') | 0
+            };
+        },
+        renderWidget: function(){
             var uOptions = this.userOptionList;
             if (!uOptions){
                 return;
             }
-            var tplVal = uOptions.getById('tpl-screenshot'),
+            var tp = this.template,
+                tplVal = uOptions.getById('tpl-screenshot'),
                 scsTemplate = uOptions.getById('scsTemplate'),
                 scsWidth = uOptions.getById('scsWidth'),
                 scsHeight = uOptions.getById('scsHeight');
@@ -71,51 +52,32 @@ Component.entryPoint = function(NS){
                 scsHeight.set('value', val['h']);
             }
 
-            if (!scsTemplate.get('value') || scsTemplate.get('value').length === 0){
-                this.setelv('code', this._TM.replace('screenshottemplate'));
+            var tmp = scsTemplate.get('value');
+            if (Y.Lang.isNull(tmp) || tmp.length === 0){
+                tp.setValue({
+                    code: tp.replace('default')
+                });
                 return;
             }
 
-            this.setelv('code', scsTemplate.get('value'));
-            this.setelv('width', scsWidth.get('value'));
-            this.setelv('height', scsHeight.get('value'));
+            tp.setHTML({
+                code: scsTemplate.get('value'),
+                width: scsWidth.get('value'),
+                height: scsHeight.get('value')
+            });
         },
-
         setImage: function(file){
-            if (Y.Lang.isNull(file) || file.type != 'file' || Y.Lang.isNull(file.image)){
+            if (!file || file.type !== 'file' || !file.image){
                 file = null;
             }
             this.file = file;
 
-            var elBSelect = this.el('bselect');
-            var elImgTitle = this.el('title');
-            var elImgWidth = this.el('width');
-            var elImgHeight = this.el('height');
-            var elImgCode = this.el('code');
+            var tp = this.template,
+                elNames = ['bselect', 'title', 'width', 'height', 'code'];
 
-            this.disabled([elBSelect, elImgTitle, elImgWidth, elImgHeight, elImgCode], Y.Lang.isNull(file));
-        },
-        disabled: function(els, disabled){
-            for (var i = 0; i < els.length; i++){
-                els[i].disabled = disabled ? 'disabled' : '';
+            for (var i = 0; i < elNames.length; i++){
+                tp.one(elNames[i]).set('disabled', !file ? 'disabled' : '');
             }
-        },
-        clearValue: function(els){
-            for (var i = 0; i < els.length; i++){
-                this.setel(els[i], '');
-            }
-        },
-        onClick: function(el){
-            if (Y.Lang.isNull(this.file)){
-                return false;
-            }
-            var tp = this._TId['screenshot'];
-            switch (el.id) {
-                case tp['bselect']:
-                    this.selectItem();
-                    return true;
-            }
-            return false;
         },
         save: function(){
             var uOptions = this.userOptionList;
@@ -167,10 +129,25 @@ Component.entryPoint = function(NS){
             });
             this.save();
             this.owner.close();
-        }
-    };
-
-    NS.Screenshot = Screenshot;
+        },
+        onClick: function(el){
+            if (Y.Lang.isNull(this.file)){
+                return false;
+            }
+            var tp = this._TId['screenshot'];
+            switch (el.id) {
+                case tp['bselect']:
+                    this.selectItem();
+                    return true;
+            }
+            return false;
+        },
+    }, {
+        ATTRS: {
+            component: {value: COMPONENT},
+            templateBlockName: {value: 'widget,default'},
+        },
+    });
 
 };
 

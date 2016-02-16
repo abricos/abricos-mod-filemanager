@@ -1,0 +1,60 @@
+<!--{widget}-->
+<div class="folderList">
+    <div id="{i#tree}"></div>
+    <div id="{i#editor}" class="hide"></div>
+</div>
+
+<!--{create}-->
+<div class="editor">
+    <h4>{#mod.filemanager.createfolderpanel.hd}</h4>
+    <div class="form-group">
+        {#mod.filemanager.createfolderpanel.fname}
+        <input id="{i#name}" class="form-control input-sm" type="text"/>
+    </div>
+    <div class="text-center">
+        <button data-click="actionEditor"
+                class="btn btn-default btn-sm"
+                type="button">
+            {#mod.filemanager.createfolderpanel.bnew}
+        </button>
+        <button data-click="closeEditor"
+                class="btn btn-default btn-sm"
+                type="button">
+            {#mod.filemanager.createfolderpanel.bcancel}
+        </button>
+    </div>
+</div>
+
+<!--{edit}-->
+<div class="editor">
+    <h4>{#mod.filemanager.editfolderpanel.hd}</h4>
+    <div class="form-group">
+        {#mod.filemanager.editfolderpanel.fname}
+        <input id="{i#name}" class="form-control input-sm" type="text"/>
+    </div>
+    <div class="btn-group text-center">
+        <button data-click="actionEditor"
+                class="btn btn-default btn-sm"
+                type="button">
+            {#mod.filemanager.editfolderpanel.bsave}
+        </button>
+        <button data-click="closeEditor"
+                class="btn btn-default btn-sm"
+                type="button">
+            {#mod.filemanager.createfolderpanel.bcancel}
+        </button>
+    </div>
+</div>
+
+<!--{remove}-->
+<div class='hd'>{#mod.filemanager.folderremovemsg.hd}</div>
+<div class='bd'>
+    <div class="field" style="width: 400px">
+        <h3>{#mod.filemanager.folderremovemsg.hd2}</h3>
+        <p>{#mod.filemanager.folderremovemsg.hd3}<strong>{v#info}</strong>{#mod.filemanager.folderremovemsg.hd4}</p>
+    </div>
+    <div class="buttons right">
+        <input id='{i#bremove}' type="button" value="{#mod.filemanager.folderremovemsg.remove}"/>
+        <input id='{i#bcancel}' type="button" value="{#mod.filemanager.folderremovemsg.cancel}"/>
+    </div>
+</div>

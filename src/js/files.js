@@ -19,13 +19,26 @@ Component.entryPoint = function(NS){
     }
     var DATA = NS.data;
 
-    var FilesPanel = function(owner, container, folderid, onSelect){
-        folderid = folderid || '0';
-        this.onSelect = onSelect;
-        this.init(owner, container, folderid);
+    Brick.byteToString = function(byte){
+        var ret = byte;
+        var px = "";
+        if (byte < 1024){
+            ret = byte;
+            px = "б";
+        } else if (byte < 1024 * 1024){
+            ret = Math.round((byte / 1024) * 100) / 100;
+            px = 'кб';
+        } else {
+            ret = Math.round((byte / 1024 / 1024) * 100) / 100;
+            px = 'мб';
+        }
+        return ret + ' ' + px;
     };
-    FilesPanel.prototype = {
-        init: function(owner, container, folderid){
+
+    NS.FileListWidget = Y.Base.create('fileListWidget', SYS.AppWidget, [], {
+        onInitAppWidget: function(err, appInstance, options){
+
+            return;
             this.owner = owner;
             this.folderid = -1;
             this.selectedItem = null;
@@ -49,6 +62,7 @@ Component.entryPoint = function(NS){
             DATA.onComplete.unsubscribe(this.onDSComplete);
         },
         setFolderId: function(folderid){
+            return;
             if (this.folderid == folderid){
                 return;
             }
@@ -166,21 +180,6 @@ Component.entryPoint = function(NS){
                 this.onSelect(item);
             }
         },
-        itemEdit: function(itemid, isFolder){
-            if (!isFolder){
-                var row = this.rows.getById(itemid);
-                API.showImageEditorPanel(row.cell);
-            } else {
-                var row = DATA.get('folders').getRows().getById(itemid);
-                var rows = this.rows;
-                new FolderEditPanel(row, function(name){
-                    var table = DATA.get('folders');
-                    row.update({'ph': name});
-                    table.applyChanges();
-                    DATA.request();
-                });
-            }
-        },
         itemRemove: function(itemid, isFolder){
             if (!isFolder){
                 var row = this.rows.getById(itemid);
@@ -248,10 +247,14 @@ Component.entryPoint = function(NS){
                 folders: lstFolders
             });
             this.selectItem(null);
-        }
-    };
+        },
+    }, {
+        ATTRS: {
+            component: {value: COMPONENT},
+            templateBlockName: {value: 'widget'},
+        },
+    });
 
-    NS.FilesPanel = FilesPanel;
 
     var FileRemoveMsg = function(row, callback){
         this.row = row;
