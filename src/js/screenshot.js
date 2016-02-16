@@ -13,6 +13,7 @@ Component.entryPoint = function(NS){
 
     NS.ScreenshotWidget = Y.Base.create('screenshotWidget', SYS.AppWidget, [], {
         onInitAppWidget: function(err, appInstance, options){
+            this.publish('selected');
             this.setImage(null);
 
             var instance = this;
@@ -97,23 +98,25 @@ Component.entryPoint = function(NS){
             Brick.appFunc('user', 'userOptionSave', '{C#MODNAME}', [scsTemplate, scsWidth, scsHeight]);
         },
         selectItem: function(){
-            if (!this.owner.callback){
-                return;
+            if (!this.file){
+                return false;
             }
-            var item = this.file;
-            var linker = new NS.Linker(item);
 
-            var width = this.elv('width') * 1;
-            var height = this.elv('height') * 1;
-            if (width == 0 && height == 0){
+            var tp = this.template,
+                item = this.file,
+                linker = new NS.Linker(item),
+                title = tp.getValue('title'),
+                width = tp.getValue('width') | 0,
+                height = tp.getValue('height') | 0;
+
+            if (width === 0 && height === 0){
                 return;
             }
-            var title = this.elv('title');
 
             var smallLinker = new NS.Linker(item);
             smallLinker.setSize(width, height);
 
-            var html = Abricos.TemplateManager.replace(this.elv('code'), {
+            var html = Abricos.TemplateManager.replace(tp.getValue('code'), {
                 isrc: linker.getSrc(),
                 sisrc: smallLinker.getSrc(),
                 siw: width,
@@ -122,21 +125,16 @@ Component.entryPoint = function(NS){
                 sitl: title
             });
 
-            this.owner.callback({
+            this.save();
+            this.fire('selected', {
                 'html': html,
                 'file': item,
                 'src': linker.getSrc()
             });
-            this.save();
-            this.owner.close();
         },
-        onClick: function(el){
-            if (Y.Lang.isNull(this.file)){
-                return false;
-            }
-            var tp = this._TId['screenshot'];
-            switch (el.id) {
-                case tp['bselect']:
+        onClick: function(e){
+            switch (e.dataClick) {
+                case 'bselect':
                     this.selectItem();
                     return true;
             }

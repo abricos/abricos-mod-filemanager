@@ -32,13 +32,13 @@ Component.entryPoint = function(NS){
             });
 
             this.browserWidget.on('selected', function(e){
-                this.hide();
                 this.fire('selected', e);
+                this.hide();
             }, this);
 
             this.browserWidget.on('canceled', function(){
-                this.hide();
                 this.fire('canceled');
+                this.hide();
             }, this);
         },
         destructor: function(){
@@ -65,6 +65,9 @@ Component.entryPoint = function(NS){
             this.screenshot = new NS.ScreenshotWidget({
                 srcNode: tp.gel('screenshot')
             });
+            this.screenshot.on('selected', function(e){
+                this.fire('selected', e);
+            }, this);
 
             this.folders = new NS.FolderListWidget({
                 srcNode: tp.gel('folders')
@@ -85,6 +88,8 @@ Component.entryPoint = function(NS){
             });
 
             this.refreshPath();
+
+            NS.data.request(true);
         },
         destructor: function(){
             if (this.screenshot){

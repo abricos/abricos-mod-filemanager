@@ -5,8 +5,8 @@ Component.entryPoint = function(NS){
 
     API.showFileBrowserPanel = function(callback){
         API.fn('filemanager', function(){
-            API.activeBrowser = new NS.BrowserPanel(callback);
-            API.dsRequest();
+            API.activeBrowser = new NS.BrowserPanel();
+            API.activeBrowser.on('selected', callback);
         });
     };
 
@@ -14,12 +14,5 @@ Component.entryPoint = function(NS){
         API.fn('editor', function(){
             new NS.ImageEditorPanel(new NS.File(file));
         });
-    };
-
-    API.dsRequest = function(){
-        if (!NS.data){
-            return;
-        }
-        NS.data.request(true);
     };
 };

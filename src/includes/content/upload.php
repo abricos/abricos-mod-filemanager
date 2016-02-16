@@ -52,34 +52,36 @@ $brick->content = Brick::ReplaceVarByData($brick->content, array(
 
 
 $p_do = Abricos::CleanGPC('g', 'do', TYPE_STR);
-if ($p_do == "upload"){
-
-    $uploadFile = $fileManager->CreateUploadByVar('uploadfile');
-    if ($p_folderid > 0){
-        $uploadFile->folderid = $p_folderid;
-    } else if (!empty($p_folderpath)){
-        $uploadFile->folderPath = $p_folderpath;
-    } else if ($p_sysfolder){
-        $uploadFile->folderPath = "system/".date("d.m.Y", TIMENOW);
-    }
-    $error = $uploadFile->Upload();
-
-    if ($error == 0){
-        $var['command'] = Brick::ReplaceVarByData($var['ok'], array(
-            "winid" => $p_winid,
-            "fhash" => $uploadFile->uploadFileHash,
-            "fname" => $uploadFile->fileName
-        ));
-    } else {
-        $var['command'] = Brick::ReplaceVarByData($var['error'], array(
-            "errnum" => $error
-        ));
-
-        $brick->content = Brick::ReplaceVarByData($brick->content, array(
-            "fname" => $uploadFile->fileName
-        ));
-    }
-
+if ($p_do !== "upload"){
+    return;
 }
+
+
+$uploadFile = $fileManager->CreateUploadByVar('uploadfile');
+if ($p_folderid > 0){
+    $uploadFile->folderid = $p_folderid;
+} else if (!empty($p_folderpath)){
+    $uploadFile->folderPath = $p_folderpath;
+} else if ($p_sysfolder){
+    $uploadFile->folderPath = "system/".date("d.m.Y", TIMENOW);
+}
+$error = $uploadFile->Upload();
+
+if ($error == 0){
+    $var['command'] = Brick::ReplaceVarByData($var['ok'], array(
+        "winid" => $p_winid,
+        "fhash" => $uploadFile->uploadFileHash,
+        "fname" => $uploadFile->fileName
+    ));
+} else {
+    $var['command'] = Brick::ReplaceVarByData($var['error'], array(
+        "errnum" => $error
+    ));
+
+    $brick->content = Brick::ReplaceVarByData($brick->content, array(
+        "fname" => $uploadFile->fileName
+    ));
+}
+
 
 ?>
