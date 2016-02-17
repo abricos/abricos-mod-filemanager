@@ -13,6 +13,7 @@ class FileManager extends Ab_ModuleManager {
 
     /**
      * @var FileManager
+     * @deprecated
      */
     public static $instance;
 
@@ -35,6 +36,10 @@ class FileManager extends Ab_ModuleManager {
 
     private $_checkSizeDisable = false;
 
+    public function __construct(Ab_Module $module){
+        FileManager::$instance = $this;
+        parent::__construct($module);
+    }
 
     /**
      * Отключить проверку свободного места в профиле пользователя
