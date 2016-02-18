@@ -36,21 +36,12 @@ Component.entryPoint = function(NS){
                 return;
             }
             var tp = this.template,
-                tplVal = uOptions.getById('tpl-screenshot'),
                 scsTemplate = uOptions.getById('scsTemplate'),
                 scsWidth = uOptions.getById('scsWidth'),
                 scsHeight = uOptions.getById('scsHeight');
 
             if (!scsTemplate){
                 return;
-            }
-
-            if (tplVal && tplVal.get('value') && tplVal.get('value').length > 0){
-                var val = Y.JSON.parse(tplVal.get('value'));
-
-                scsTemplate.set('value', val['tpl']);
-                scsWidth.set('value', val['w']);
-                scsHeight.set('value', val['h']);
             }
 
             var tmp = scsTemplate.get('value');
@@ -61,7 +52,7 @@ Component.entryPoint = function(NS){
                 return;
             }
 
-            tp.setHTML({
+            tp.setValue({
                 code: scsTemplate.get('value'),
                 width: scsWidth.get('value'),
                 height: scsHeight.get('value')
@@ -125,11 +116,12 @@ Component.entryPoint = function(NS){
                 sitl: title
             });
 
-            this.save();
-            this.fire('selected', {
-                'html': html,
-                'file': item,
-                'src': linker.getSrc()
+            this.save(function(){
+                this.fire('selected', {
+                    'html': html,
+                    'file': item,
+                    'src': linker.getSrc()
+                });
             });
         },
         onClick: function(e){

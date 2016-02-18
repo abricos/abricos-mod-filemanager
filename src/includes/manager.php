@@ -209,7 +209,6 @@ class FileManager extends Ab_ModuleManager {
         }
 
         return array(
-            "tpl-screenshot",
             "scsTemplate",
             "scsWidth",
             "scsHeight"
