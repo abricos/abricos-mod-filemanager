@@ -31,6 +31,9 @@ if ($adress->level > 2 && $adress->dir[1] == 'i'){
                 case 'cnv':
                     $p_cnv = $val[1];
                     break;
+                case 'cm':
+                    $p_cropMode = intval($val[1]);
+                    break;
             }
         }
     }
@@ -46,7 +49,7 @@ if ($adress->level > 2 && $adress->dir[1] == 'i'){
 $modFM = FileManagerModule::$instance;
 $fileManager = $modFM->GetFileManager();
 
-$p_filehash = $fileManager->ImageConvert($p_filehash, $p_w, $p_h, $p_cnv);
+$p_filehash = $fileManager->ImageConvert($p_filehash, $p_w, $p_h, $p_cnv, $p_cropMode);
 
 $fileinfo = $fileManager->GetFileData($p_filehash);
 

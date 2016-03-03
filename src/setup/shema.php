@@ -178,12 +178,11 @@ if ($updateManager->isUpdate('0.3.1')){
 
 }
 if ($updateManager->isUpdate('0.3.2')){
-
     $db->query_write("
 		CREATE TABLE IF NOT EXISTS ".$pfx."fm_enthumbs (
 		  `enthumbs` int(4) unsigned NOT NULL auto_increment,
 		  `width` int(6) unsigned NOT NULL DEFAULT 0,
-		  `height` int(6) unsigned NOT NULL DEFAULT 0,
+		  height int(6) unsigned NOT NULL DEFAULT 0,
 		  PRIMARY KEY  (`enthumbs`),
 		  UNIQUE KEY `size` (`width`,`height`)
 		)".$charset
@@ -194,5 +193,18 @@ if ($updateManager->isUpdate('0.3.3')){
     $db->query_write("ALTER TABLE `".$pfx."fm_file` CHANGE `filedata` `filedata` LONGBLOB NULL DEFAULT NULL");
 }
 
+if ($updateManager->isUpdate('0.3.6.1')){
+    $db->query_write("
+        ALTER TABLE `".$pfx."fm_enthumbs`
+        ADD cropMode tinyint(1) unsigned NOT NULL DEFAULT 0,
+        DROP INDEX `size`,
+        ADD UNIQUE `size` (`width`,`height`, cropMode)
+
+    ");
+    $db->query_write("
+        ALTER TABLE `".$pfx."fm_imgprev`
+        ADD cropMode tinyint(1) unsigned NOT NULL DEFAULT 0
+    ");
+}
 
 ?>

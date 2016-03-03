@@ -25,7 +25,7 @@ class FileManagerModule extends Ab_Module {
     public function __construct(){
         FileManagerModule::$instance = $this;
 
-        $this->version = "0.3.6";
+        $this->version = "0.3.6.1";
 
         $this->name = "filemanager";
         $this->takelink = "filemanager";
@@ -106,13 +106,17 @@ class FileManagerQueryModule {
 
         $values = array();
         foreach ($list as $size){
-            array_push($values, "(".bkint($size['w']).",".bkint($size['h']).")");
+            $size['w'] = isset($size['w']) ? intval($size['w']) : 0;
+            $size['h'] = isset($size['h']) ? intval($size['h']) : 0;
+            $size['cm'] = isset($size['cm']) ? intval($size['cm']) : 0;
+
+            array_push($values, "(".$size['w'].",".$size['h'].",".$size['cm'].")");
         }
         $sql = "
-			INSERT IGNORE INTO ".$db->prefix."fm_enthumbs 
-			(`width`, `height`) VALUES
-			".implode(",", $values)." 
-			";
+            INSERT IGNORE INTO ".$db->prefix."fm_enthumbs
+            (width, height, cropMode) VALUES
+            ".implode(",", $values)."
+        ";
         $db->query_write($sql);
     }
 }

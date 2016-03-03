@@ -330,21 +330,22 @@ class FileManagerQuery {
         return intval($row['fullsize']);
     }
 
-    public static function ImagePreviewAdd(Ab_Database $db, $filehashsrc, $filehashdst, $width, $height, $cnv){
+    public static function ImagePreviewAdd(Ab_Database $db, $filehashsrc, $filehashdst, $width, $height, $cnv, $cropMode = FileManager::THUMB_CROPMODE_DEFAULT){
         $sql = "
 			INSERT INTO ".$db->prefix."fm_imgprev
-			(filehashsrc, width, height, cnv, filehashdst) VALUES (
+			(filehashsrc, width, height, cnv, cropMode, filehashdst) VALUES (
 				'".bkstr($filehashsrc)."',
 				".bkint($width).",
 				".bkint($height).",
 				'".bkstr($cnv)."',
+				".bkint($cropMode).",
 				'".bkstr($filehashdst)."'
 			)
 		";
         $db->query_write($sql);
     }
 
-    public static function ImagePreviewHash(Ab_Database $db, $filehashsrc, $width, $height, $cnv){
+    public static function ImagePreviewHash(Ab_Database $db, $filehashsrc, $width, $height, $cnv, $cropMode = FileManager::THUMB_CROPMODE_DEFAULT){
         $sql = "
 			SELECT filehashdst
 			FROM ".$db->prefix."fm_imgprev
@@ -353,6 +354,7 @@ class FileManagerQuery {
 				AND width=".bkint($width)."
 				AND height=".bkint($height)."
 				AND cnv='".bkstr($cnv)."'
+				AND cropMode='".bkstr($cropMode)."'
 		";
         $row = $db->query_first($sql);
         if (empty($row)){
@@ -577,13 +579,15 @@ class FileManagerQuery {
         $db->query_write($sql);
     }
 
-    public static function EnThumbsCheck(Ab_Database $db, $width, $height){
+    public static function EnThumbsCheck(Ab_Database $db, $width, $height, $cropMode = 0){
         $sql = "
 			SELECT
 				width as w,
 				height as h 
 			FROM ".$db->prefix."fm_enthumbs 
-			WHERE width=".bkint($width)." AND height=".bkint($height)."
+			WHERE width=".bkint($width)."
+			    AND height=".bkint($height)."
+			    AND cropMode=".bkint($cropMode)."
 			LIMIT 1
 		";
         $row = $db->query_first($sql);

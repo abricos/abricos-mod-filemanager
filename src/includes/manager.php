@@ -11,6 +11,10 @@ require_once 'dbquery.php';
 
 class FileManager extends Ab_ModuleManager {
 
+    const THUMB_CROPMODE_DEFAULT = 0;
+
+    const THUMB_CROPMODE_CENTER = 1;
+
     /**
      * @var FileManager
      * @deprecated
@@ -494,20 +498,20 @@ class FileManager extends Ab_ModuleManager {
         return new upload($file);
     }
 
-    public function ImageConvert($p_filehash, $p_w, $p_h, $p_cnv){
+        public function ImageConvert($p_filehash, $p_w, $p_h, $p_cnv, $p_cropMode = FileManager::THUMB_CROPMODE_DEFAULT){
         if (empty($p_w) && empty($p_h) && empty($p_cnv)){
             return $p_filehash;
         }
 
         $log = "Image Convert <br />";
-        $log .= "Parameters: filehash=$p_filehash, w=$p_w, h=$p_h, format=$p_cnv <br />";
+        $log .= "Parameters: filehash=$p_filehash, w=$p_w, h=$p_h, format=$p_cnv, cropMode=$p_cropMode <br />";
 
         if (!$this->IsFileViewRole()){
             return $p_filehash;
         }
 
         // Запрос особого размера картинки
-        $filehashdst = FileManagerQuery::ImagePreviewHash($this->db, $p_filehash, $p_w, $p_h, $p_cnv);
+        $filehashdst = FileManagerQuery::ImagePreviewHash($this->db, $p_filehash, $p_w, $p_h, $p_cnv, $p_cropMode);
 
         if (!empty($filehashdst)){
             return $filehashdst;
@@ -515,7 +519,7 @@ class FileManager extends Ab_ModuleManager {
 
         if (!$this->IsFileUploadRole()){
             // доступ на изменение картинки закрыт, есть ли особые разрешения?
-            if (!FileManagerQuery::EnThumbsCheck($this->db, $p_w, $p_h)){
+            if (!FileManagerQuery::EnThumbsCheck($this->db, $p_w, $p_h, $p_cropMode)){
                 return $p_filehash;
             }
         }
@@ -546,19 +550,27 @@ class FileManager extends Ab_ModuleManager {
             $w = $upload->image_src_x;
             $h = $upload->image_src_y;
 
-            if ($p_w > 0 && $w > $p_w){
-                $pr = $p_w / $w;
-                $w = $w * $pr;
-                $h = $h * $pr;
+            if ($p_cropMode === FileManager::THUMB_CROPMODE_CENTER){
+                $upload->image_ratio_crop = true;
+                $w = $p_w;
+                $h = $p_h;
+            } else {
+                if ($p_w > 0 && $w > $p_w){
+                    $pr = $p_w / $w;
+                    $w = $w * $pr;
+                    $h = $h * $pr;
+                }
+                if ($p_h > 0 && $h > $p_h){
+                    $pr = $p_h / $h;
+                    $w = $w * $pr;
+                    $h = $h * $pr;
+                }
             }
-            if ($p_h > 0 && $h > $p_h){
-                $pr = $p_h / $h;
-                $w = $w * $pr;
-                $h = $h * $pr;
-            }
+
             $log .= "New width=$w, New height=$h<br />";
             $upload->image_x = $w;
             $upload->image_y = $h;
+
             /*
             if (empty($p_w)){
                 $upload->image_ratio_x = true;
@@ -610,7 +622,7 @@ class FileManager extends Ab_ModuleManager {
         if (!empty($error) || empty($this->lastUploadFileHash)){
             return $p_filehash;
         }
-        FileManagerQuery::ImagePreviewAdd($this->db, $p_filehash, $this->lastUploadFileHash, $p_w, $p_h, $p_cnv);
+        FileManagerQuery::ImagePreviewAdd($this->db, $p_filehash, $this->lastUploadFileHash, $p_w, $p_h, $p_cnv, $p_cropMode);
         unlink($upload->file_dst_pathname);
 
         return $this->lastUploadFileHash;
