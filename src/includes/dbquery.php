@@ -702,5 +702,3 @@ class FileManagerQuery {
         $db->query_write($sql);
     }
 }
-
-?>

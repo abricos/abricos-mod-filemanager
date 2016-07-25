@@ -122,5 +122,3 @@ class FileManagerQueryModule {
 }
 
 Abricos::ModuleRegister(new FileManagerModule());
-
-?>

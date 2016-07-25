@@ -131,5 +131,3 @@ function EchoEmptyGif(){
     echo $filedata;
     exit;
 }
-
-?>

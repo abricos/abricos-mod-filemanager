@@ -498,7 +498,7 @@ class FileManager extends Ab_ModuleManager {
         return new upload($file);
     }
 
-        public function ImageConvert($p_filehash, $p_w, $p_h, $p_cnv, $p_cropMode = FileManager::THUMB_CROPMODE_DEFAULT){
+    public function ImageConvert($p_filehash, $p_w, $p_h, $p_cnv, $p_cropMode = FileManager::THUMB_CROPMODE_DEFAULT){
         if (empty($p_w) && empty($p_h) && empty($p_cnv)){
             return $p_filehash;
         }
@@ -880,7 +880,4 @@ class FileManager extends Ab_ModuleManager {
             )
         );
     }
-
 }
-
-?>

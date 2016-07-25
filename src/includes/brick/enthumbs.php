@@ -18,5 +18,3 @@ foreach ($arr as &$arr1){
     ));
 }
 Abricos::GetModule('filemanager')->EnableThumbSize($size);
-
-?>

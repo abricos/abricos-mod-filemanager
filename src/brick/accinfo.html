@@ -15,7 +15,7 @@
 [bkvar=userspace]
 	<fieldset style="display: {v#hideuserspace}">
 			<legend>Профиль</legend>
-			<div>{#filemanager.upload_freespace} <span class="{v#clerrtext}">{v#freespace}</span></div>
+			<div>{#upload_freespace} <span class="{v#clerrtext}">{v#freespace}</span></div>
 	</fieldset>
 [/bkvar]
 
@@ -48,9 +48,9 @@
 				<table border="1">
 					<thead>
 						<tr align="center">
-							<td>{#filemanager.upload_filetype}</td>
-							<td>{#filemanager.upload_maxfsize}</td>
-							<td>{#filemanager.upload_maxpsize}</td>
+							<td>{#upload_filetype}</td>
+							<td>{#upload_maxfsize}</td>
+							<td>{#upload_maxpsize}</td>
 						</tr>
 					</thead>
 					<tbody>
@@ -61,7 +61,7 @@
 		</fieldset>
 	   	
 		<div align="center" style="margin-top:10px">
-			<input type="button" class="button" value="{#filemanager.upload_close}" onclick="window.close();" />
+			<input type="button" class="button" value="{#upload_close}" onclick="window.close();" />
 		</div>	
 	</div>
 </div>

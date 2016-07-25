@@ -485,7 +485,4 @@ class UploadFile {
 
         return UploadError::NO_ERROR;
     }
-
 }
-
-?>

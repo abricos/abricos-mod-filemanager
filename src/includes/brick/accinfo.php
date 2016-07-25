@@ -50,5 +50,3 @@ $brick->content = Brick::ReplaceVarByData($brick->content, array(
     "clerrtext" => ($freeSpace <= 0 ? 'errtext' : ''),
     "ftypelst" => $list
 ));
-
-?>

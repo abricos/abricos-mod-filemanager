@@ -206,5 +206,3 @@ if ($updateManager->isUpdate('0.3.6.1')){
         ADD cropMode tinyint(1) unsigned NOT NULL DEFAULT 0
     ");
 }
-
-?>
