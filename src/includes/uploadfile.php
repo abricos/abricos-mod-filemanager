@@ -395,7 +395,7 @@ class UploadFile {
                 $upload->file_new_name_body = $pi['filename'];
             }
 
-            $upload->process(CWD."/cache");
+            @$upload->process(CWD."/cache");
 
             $fName = $upload->file_dst_name;
 
