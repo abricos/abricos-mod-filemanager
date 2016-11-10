@@ -19,20 +19,20 @@ if ($updateManager->isInstall()){
 		  `fileid` int(10) unsigned NOT NULL auto_increment,
 		  `userid` int(10) unsigned NOT NULL,
 		  `filehash` varchar(8) NOT NULL,
-		  `filename` varchar(250) NOT NULL default '',
-		  `title` VARCHAR( 250 ) NOT NULL default '',
+		  `filename` varchar(250) NOT NULL DEFAULT '',
+		  `title` VARCHAR(250) NOT NULL DEFAULT '',
 		  `filedata` mediumblob,
-		  `filesize` int(10) unsigned NOT NULL default 0,
-		  `extension` varchar(20) NOT NULL default '',
-		  `counter` int(10) unsigned NOT NULL default '0',
-		  `lastget` int(10) unsigned NOT NULL default '0',
+		  `filesize` int(10) unsigned NOT NULL DEFAULT 0,
+		  `extension` varchar(20) NOT NULL DEFAULT '',
+		  `counter` int(10) unsigned NOT NULL DEFAULT '0',
+		  `lastget` int(10) unsigned NOT NULL DEFAULT '0',
 		  `dateline` int(10) unsigned NOT NULL,
-		  `deldate` int(10) unsigned NOT NULL default '0',
-		  `attribute` int(6) unsigned NOT NULL default '0',
-		  `isimage` int(1) unsigned NOT NULL default '0',
-		  `imgwidth` int(6) unsigned NOT NULL default '0',
-		  `imgheight` int(6) unsigned NOT NULL default '0',
-		  `folderid` int(10) unsigned NOT NULL default '0',
+		  `deldate` int(10) unsigned NOT NULL DEFAULT '0',
+		  `attribute` int(6) unsigned NOT NULL DEFAULT '0',
+		  `isimage` int(1) unsigned NOT NULL DEFAULT '0',
+		  `imgwidth` int(6) unsigned NOT NULL DEFAULT '0',
+		  `imgheight` int(6) unsigned NOT NULL DEFAULT '0',
+		  `folderid` int(10) unsigned NOT NULL DEFAULT '0',
 		  PRIMARY KEY  (`fileid`),
 		  UNIQUE KEY `filehash` (`filehash`),
 		  KEY `userid` (`userid`)
@@ -43,13 +43,13 @@ if ($updateManager->isInstall()){
     $db->query_write("
 		CREATE TABLE IF NOT EXISTS ".$pfx."fm_filetype (
 		  `filetypeid` int(5) unsigned NOT NULL auto_increment,
-		  `extension` varchar(20) NOT NULL default '',
+		  `extension` varchar(20) NOT NULL DEFAULT '',
 		  `usergroupid` int(5) unsigned NOT NULL,
-		  `mimetype` varchar(50) NOT NULL default '',
-		  `maxsize` int(10) unsigned NOT NULL default '0',
-		  `maxwidth` int(5) unsigned NOT NULL default '0',
-		  `maxheight` int(5) unsigned NOT NULL default '0',
-		  `disable` tinyint(1) unsigned NOT NULL default '0',
+		  `mimetype` varchar(50) NOT NULL DEFAULT '',
+		  `maxsize` int(10) unsigned NOT NULL DEFAULT '0',
+		  `maxwidth` int(5) unsigned NOT NULL DEFAULT '0',
+		  `maxheight` int(5) unsigned NOT NULL DEFAULT '0',
+		  `disable` tinyint(1) unsigned NOT NULL DEFAULT '0',
 		  PRIMARY KEY  (`filetypeid`),
 		  KEY `usergroupid` (`usergroupid`)
 		)".$charset
@@ -76,12 +76,12 @@ if ($updateManager->isInstall()){
     $db->query_write("
 		CREATE TABLE IF NOT EXISTS ".$pfx."fm_folder (
 		  `folderid` int(10) unsigned NOT NULL auto_increment,
-		  `parentfolderid` int(10) unsigned NOT NULL default '0',
+		  `parentfolderid` int(10) unsigned NOT NULL DEFAULT '0',
 		  `userid` int(10) unsigned NOT NULL,
 		  `name` varchar(100) NOT NULL,
 		  `phrase` varchar(250) NOT NULL,
-		  `dateline` int(10) unsigned NOT NULL default '0',
-		  `deldate` int(10) unsigned NOT NULL default '0',
+		  `dateline` int(10) unsigned NOT NULL DEFAULT '0',
+		  `deldate` int(10) unsigned NOT NULL DEFAULT '0',
 		  PRIMARY KEY  (`folderid`),
 		  KEY `parentfolderid` (`parentfolderid`,`userid`)
 		)".$charset
@@ -93,7 +93,7 @@ if ($updateManager->isInstall()){
 		  `filehashsrc` varchar(8) NOT NULL,
 		  `width` int(6) NOT NULL,
 		  `height` int(6) NOT NULL,
-		  `cnv` varchar(20) default NULL,
+		  `cnv` varchar(20) DEFAULT NULL,
 		  `filehashdst` varchar(8) NOT NULL,
 		  PRIMARY KEY  (`imgprevid`),
 		  KEY `filehashsrc` (`filehashsrc`)
@@ -119,7 +119,7 @@ if ($updateManager->isInstall()){
 		  `height` int(6) unsigned NOT NULL DEFAULT 0,
 		  `left` int(6) unsigned NOT NULL DEFAULT 0,
 		  `top` int(6) unsigned NOT NULL DEFAULT 0,
-		  `tools` varchar(20) default NULL,
+		  `tools` varchar(20) DEFAULT NULL,
 		  `filehashdst` varchar(8) NOT NULL,
 		  `dateline` int(10) unsigned NOT NULL DEFAULT 0,
 		  `session` int(10) unsigned NOT NULL DEFAULT 0,
@@ -130,8 +130,9 @@ if ($updateManager->isInstall()){
 }
 if ($updateManager->serverVersion == "1.0.0"){
     $db->query_write("
-		ALTER TABLE `".$pfx."fm_file` ADD `title` VARCHAR( 250 ) NOT NULL AFTER `filename`
-	");
+        ALTER TABLE `".$pfx."fm_file` 
+        ADD `title` VARCHAR(250) NOT NULL DEFAULT '' AFTER `filename`
+    ");
 
     $db->query_write("
 		CREATE TABLE IF NOT EXISTS ".$pfx."fm_editor (
@@ -142,7 +143,7 @@ if ($updateManager->serverVersion == "1.0.0"){
 		  `height` int(6) unsigned NOT NULL DEFAULT 0,
 		  `left` int(6) unsigned NOT NULL DEFAULT 0,
 		  `top` int(6) unsigned NOT NULL DEFAULT 0,
-		  `tools` varchar(20) default NULL,
+		  `tools` varchar(20) DEFAULT NULL,
 		  `filehashdst` varchar(8) NOT NULL,
 		  `dateline` int(10) unsigned NOT NULL DEFAULT 0,
 		  `session` int(10) unsigned NOT NULL DEFAULT 0,
@@ -157,7 +158,7 @@ if ($updateManager->isInstall() || $updateManager->isUpdate('0.3')){
     // Добавить поле имени файла в файловой системе
     $db->query_write("
 		ALTER TABLE `".$db->prefix."fm_file` 
-			ADD `fsname` varchar(250) NOT NULL default '' AFTER `folderid`
+			ADD `fsname` varchar(250) NOT NULL DEFAULT '' AFTER `folderid`
 	");
 
 }
@@ -204,5 +205,12 @@ if ($updateManager->isUpdate('0.3.6.1')){
     $db->query_write("
         ALTER TABLE `".$pfx."fm_imgprev`
         ADD cropMode tinyint(1) unsigned NOT NULL DEFAULT 0
+    ");
+}
+
+if ($updateManager->isUpdate('0.3.7') && !$updateManager->isInstall()){
+    $db->query_write("
+        ALTER TABLE `".$pfx."fm_file`
+        CHANGE `title` `title` VARCHAR(250) NOT NULL DEFAULT ''
     ");
 }

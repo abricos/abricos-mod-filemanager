@@ -25,7 +25,7 @@ class FileManagerModule extends Ab_Module {
     public function __construct(){
         FileManagerModule::$instance = $this;
 
-        $this->version = "0.3.6.1";
+        $this->version = "0.3.7";
 
         $this->name = "filemanager";
         $this->takelink = "filemanager";
